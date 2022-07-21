@@ -24,7 +24,6 @@ const amountMaxApprove = 9999999999;
  * 
  */
 export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
-    console.log("loadModalWithdraw",dataToken);
 
     const state = getState();
     const { web3, account } = state.web3;
@@ -76,9 +75,9 @@ export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
                 totalUserWithdraw = totalUserWithdraw.toLocaleString('fullwide', {useGrouping:false});
                 totalUserWithdraw = ethers.utils.formatEther(totalUserWithdraw) / dataPrice[dataToken.assetsAddress];
 
-                // console.log("currentATokenBalance", accountBalance);
-                // console.log("totalUserWithdraw", totalUserWithdraw);
-                // console.log("totalUserCollateralPool", totalUserCollateralPool);
+                console.log("currentATokenBalance", accountBalance);
+                console.log("totalUserWithdraw", totalUserWithdraw);
+                console.log("totalUserCollateralPool", totalUserCollateralPool);
 
                 if(totalUserWithdraw > 0){ // lúc nay
                     if(totalUserWithdraw < Number(totalUserCollateralPool)){
@@ -89,9 +88,6 @@ export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
                 if(accountBalance > totalUserCollateralPool){ // pool khong đủ cung cấp
                     accountBalance = totalUserCollateralPool;
                 }
-
-
-                console.log("accountBalance",accountBalance);
                 
             }
         }

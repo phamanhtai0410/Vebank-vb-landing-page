@@ -90,7 +90,7 @@ export const loadDetailRemoveLiquidity = createAsyncThunk(
 export const approvePoolLiquidity = createAsyncThunk(
   poolConstants.APPROVE_POOL_ADDRESS,
   async (
-    { poolAddress, addressTokenA, addressTokenB, tokenAInfo, tokenBInfo },
+    { poolAddress },
     { getState }
   ) => {
     if (!poolAddress) return;

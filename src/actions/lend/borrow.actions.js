@@ -58,6 +58,7 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
     if(contractPOOL){
 
         const accountData = await contractPOOL.methods.getUserAccountData(account).call();
+        console.log("accountData",accountData);
 
         if (accountData.availableBorrowsBase) {
             accountBalance = ethers.utils.formatUnits(accountData.availableBorrowsBase, 18);
@@ -68,21 +69,30 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
         if(contractAAVE ){
 
             const getReserveData = await contractAAVE.methods.getReserveData(dataToken.assetsAddress).call();
-            const configReserveData = await contractAAVE.methods.getReserveConfigurationData(dataToken.assetsAddress).call();
+            console.log("getReserveData", getReserveData);
 
-            // totalPoolSupply - TotalPoolDebt/(1 - reserveFactor)
-            let totalBorrowRate = (getReserveData.totalVariableDebt  /(10000-Number(configReserveData.reserveFactor)));
-            totalBorrowRate = Number(getReserveData.totalAToken) - Number(totalBorrowRate);
-            totalBorrowRate = totalBorrowRate.toLocaleString('fullwide', {useGrouping:false});
+            let totalUserCollateralPool = getReserveData.totalAToken - (getReserveData.totalStableDebt  + getReserveData.totalVariableDebt)
+            totalUserCollateralPool = totalUserCollateralPool.toLocaleString('fullwide', {useGrouping:false});
+            totalUserCollateralPool = ethers.utils.formatUnits(totalUserCollateralPool, dataToken.assetsDecimals);
 
-            if(dataToken.assetsAddress === process.env.REACT_APP_TOKEN_VEUSD){
-                totalBorrowRate =  web3.utils.toWei(totalBorrowRate, 'micro');
-            }
+            // const configReserveData = await contractAAVE.methods.getReserveConfigurationData(dataToken.assetsAddress).call();
+
+            // // totalPoolSupply - TotalPoolDebt/(1 - reserveFactor)
+            // let totalBorrowRate = (getReserveData.totalVariableDebt  /(10000-Number(configReserveData.reserveFactor)));
+            
+            // console.log("totalBorrowRate",totalBorrowRate);
+            // totalBorrowRate = Number(getReserveData.totalAToken) - Number(totalBorrowRate);
+            // totalBorrowRate = totalBorrowRate.toLocaleString('fullwide', {useGrouping:false});
+
+            // if(dataToken.assetsAddress === process.env.REACT_APP_TOKEN_VEUSD){
+            //     totalBorrowRate =  web3.utils.toWei(totalBorrowRate, 'micro');
+            // }
 
             // Tổng pool có chép borrow nhỏ hơn giá trị user có thể variableBorrowRate
-            if(Number(totalBorrowRate) < Number(accountData.availableBorrowsBase)){
-                accountBalance = ethers.utils.formatUnits(totalBorrowRate, 18);
-                accountBalance = accountBalance * dataPrice[dataToken.assetsAddress];
+            if(Number(totalUserCollateralPool) < Number(accountBalance)){
+                accountBalance = totalUserCollateralPool;
+                // accountBalance = ethers.utils.formatUnits(totalBorrowRate, 18);
+                // accountBalance = accountBalance * dataPrice[dataToken.assetsAddress];
             }
             
         }

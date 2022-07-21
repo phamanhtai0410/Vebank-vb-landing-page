@@ -20,6 +20,7 @@ import {
   isContainVET,
 } from "../../utils/lib";
 import assert from "assert";
+import PartialConstants from "../../constants/partial.constants";
 
 const ADDRESS_ROUTER = process.env.REACT_APP_ADDRESS_ROUTER;
 const ADDRESS_FACTORY = process.env.REACT_APP_ADDRESS_FACTORY;
@@ -227,10 +228,11 @@ export const loadDetailAddLiquidity = createAsyncThunk(
     let abExchangeRate, baExchangeRate;
 
     if (firstTokenAddress && secondTokenAddress) {
-      const assetsDecimal = getDecimalForAssetPair(
-        firstTokenAddress,
-        secondTokenAddress
-      );
+      const assetsDecimal = PartialConstants.DEFAULT_ASSET_DECIMAL;
+      // getDecimalForAssetPair(
+      //   firstTokenAddress,
+      //   secondTokenAddress
+      // );
 
       let contractFactory = new web3.eth.Contract(
         ERC20ABI_FACTORY,
@@ -272,10 +274,15 @@ export const loadDetailAddLiquidity = createAsyncThunk(
 
         // If pool has been removed by all provider
         if (reserveA == 0) abExchangeRate = 0;
-        else abExchangeRate = reserveB / reserveA;
+        else
+          abExchangeRate = FixedNumber.from(reserveB).divUnsafe(
+            FixedNumber.from(reserveA)
+          );
         // If pool has been removed by all provider
         if (reserveB == 0) baExchangeRate = 0;
-        else baExchangeRate = reserveA / reserveB;
+        else baExchangeRate = FixedNumber.from(reserveA).divUnsafe(
+          FixedNumber.from(reserveB)
+        );
 
         if (account) {
           const balanceBigN = await contractPair.methods
@@ -377,17 +384,17 @@ export const addLiquidity = createAsyncThunk(
 
     const deadline = Math.round(new Date().getTime() / 1000) + 3600;
 
-    // console.table([
-    //   ["tokenA", firstToken],
-    //   ["tokenB", secondToken],
-    //   ["transactionFee", transactionFee],
-    //   ["amountA", amountA],
-    //   ["amountB", amountB],
-    //   ["amountAMin", amountAMin],
-    //   ["amountBMin", amountBMin],
-    //   ["account", account],
-    //   ["deadline", deadline],
-    // ]);
+    console.table(
+      ["tokenA", firstToken],
+      ["tokenB", secondToken],
+      ["transactionFee", transactionFee],
+      ["amountA", amountA],
+      ["amountB", amountB],
+      ["amountAMin", amountAMin],
+      ["amountBMin", amountBMin],
+      ["account", account],
+      ["deadline", deadline]
+    );
 
     let transaction;
 

@@ -79,7 +79,7 @@ const Swap = () => {
     } else {
       if (showErr || poolErr !== "") {
         if (showErr) {
-          return `Your ${sourceTokenInfo?.assetsChain} balance is not enough`;
+          return `Insufficient ${sourceTokenInfo?.assetsChain} balance `;
         } else {
           return poolErr;
         }
@@ -265,17 +265,10 @@ const Swap = () => {
                 ) : (
                   <div className="w-full flex flex-row items-center justify-between">
                     <div className="row-center space-x-2 w-fit group relative">
-                      <p className="sm:flex hidden ">
+                      <p>
                         1 {sourceTokenInfo?.assetsChain} ={" "}
-                        {exchangeRate.toString().split(".")[1].length >= 18
-                          ? `${exchangeRate.toFixed(18)}...`
-                          : exchangeRate}{" "}
-                        {desireTokenInfo?.assetsChain}
-                      </p>
-                      <p className="sm:hidden flex">
-                        1 {sourceTokenInfo?.assetsChain} ={" "}
-                        {exchangeRate.toString().length >= 18
-                          ? `${exchangeRate.toFixed(6)}...`
+                        {exchangeRate.toString().length >= 6
+                          ? `${exchangeRate.toFixed(6)}`
                           : exchangeRate}{" "}
                         {desireTokenInfo?.assetsChain}
                       </p>
@@ -290,19 +283,20 @@ const Swap = () => {
                       )})`}</p> */}
                     </div>
                     <div className="sm:max-w-[156px] w-fit max-w-[162px] flex flex-row items-center justify-end">
-                      <div className="bg-itemForm rounded-lg p-2 flex flex-row items-center w-fit group relative">
-                        <img src={IcGas} alt="gas" className="w-4" />
-                        <p className="ml-1">
-                          {swapFee.toFixed(6)}
-                          {"... "} {sourceTokenInfo?.assetsChain}
-                        </p>
-                        <div class="absolute bottom-0 flex-col items-center hidden mb-6 group-hover:flex">
-                          <span class="relative z-10 px-2 py-3 text-xs leading-none text-white whitespace-no-wrap border-[1px] border-vbDisableText bg-itemForm rounded-lg shadow-lg">
-                            {swapFee} {sourceTokenInfo?.assetsChain}
-                          </span>
-                          <div class="w-3 h-3 -mt-2 rotate-45 bg-itemForm  border-[1px] border-vbDisableText"></div>
+                      {!showDetailInfo && (
+                        <div className="bg-itemForm rounded-lg p-2 flex flex-row items-center w-fit group relative">
+                          <img src={IcGas} alt="gas" className="w-4" />
+                          <p className="ml-1">
+                            {swapFee.toFixed(6)} {sourceTokenInfo?.assetsChain}
+                          </p>
+                          <div class="absolute bottom-0 flex-col items-center hidden mb-6 group-hover:flex">
+                            <span class="relative z-10 px-2 py-3 text-xs leading-none text-white whitespace-no-wrap border-[1px] border-vbDisableText bg-itemForm rounded-lg shadow-lg">
+                              {swapFee} {sourceTokenInfo?.assetsChain}
+                            </span>
+                            <div class="w-3 h-3 -mt-2 rotate-45 bg-itemForm  border-[1px] border-vbDisableText"></div>
+                          </div>
                         </div>
-                      </div>
+                      )}
                       <img
                         src={showDetailInfo ? IcUp : IcDown}
                         alt="IcDown"
@@ -344,16 +338,16 @@ const Swap = () => {
                     <p className="text-grey-3 min-w-fit">Slippage tolerance</p>
                     {/* <img className="w-5" src={IcQuestionCircle} alt="" /> */}
                   </div>
-                  <div className="w-20 flex flex-row justify-end items-center">
+                  <div className="w-20 flex flex-row justify-evenly items-center bg-itemForm rounded border-vbDisableText border px-2 py-[0.0625rem]">
                     <input
-                      className="bg-transparent py-[0.0625rem] rounded focus:outline-none placeholder-vbDisableText font-poppins_medium text-base text-grey-1 text-right"
+                      className="bg-transparent w-6 rounded focus:outline-none placeholder-vbDisableText font-poppins_medium text-base text-grey-1"
                       type="number"
                       min={0.1}
-                      max={100}
+                      max={50}
                       value={inputSlippage}
                       onChange={(event) => {
-                        if (event.target.value > 100) {
-                          setInputSlippage(100);
+                        if (event.target.value >= 50) {
+                          setInputSlippage(50);
                         } else {
                           setInputSlippage(event.target.value);
                         }

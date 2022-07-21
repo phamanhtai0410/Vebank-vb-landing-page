@@ -10,6 +10,7 @@ import ERC20ABI_VB from "../_contracts/assets/VB.json";
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
+  addressWalletCompact,
   compareString,
   getDeadline,
   getDecimalForAsset,
@@ -403,15 +404,15 @@ export const swapAsset = createAsyncThunk(
   ) => {
     const currentState = getState();
 
-    const { poolAddress } = currentState.swapAsset;
+    const { poolAddress, amountsOut } = currentState.swapAsset;
     const { connex, account, web3 } = currentState.web3;
     const assetsPoolName = `${tokenAInfo?.assetsChain} - ${tokenBInfo?.assetsChain}`;
     const key = randomKeyUUID();
     dispatch(
       actions.alertActions.loading(
         {
-          title: "Waiting For Swap",
-          description: `Swap ${assetsPoolName} on VeBank`,
+          title: "Waiting For Confirmation",
+          description: `Swapping ${amountInToSwap} ${tokenAInfo.assetsChain} for ${amountsOut} ${tokenBInfo.assetsChain}`,
         },
         key
       )
@@ -472,32 +473,28 @@ export const swapAsset = createAsyncThunk(
       ["amountIn", amountIn],
     ]);
 
-    if (poolAddress && account) {
-      const contractPair = new web3.eth.Contract(ERC20ABI_PAIR, poolAddress);
-      contractPair.events.Swap({}).on("data", async (data) => {
-        const { event, returnValues } = data;
-        if (
-          event === "Swap" &&
-          returnValues.to.toLowerCase() === account.toLowerCase()
-        ) {
-          dispatch(refreshDataSwap());
-          dispatch(
-            actions.alertActions.update(
-              {
-                status: "success",
-                title: "Swap successfully",
-                description: `Swap ${assetsPoolName} successfully`,
-                details: {
-                  message: "View on VeChain Stats",
-                  txid: data.meta.txID,
-                },
-              },
-              key
-            )
-          );
-        }
-      });
-    }
+    // if (poolAddress && account) {
+    //   const contractPair = new web3.eth.Contract(ERC20ABI_PAIR, poolAddress);
+    //   contractPair.events.Swap({}).on("data", async (data) => {
+    //     const { event, returnValues } = data;
+    //     console.log("mau - contractPair.events", contractPair.events)
+    //     console.log("mau - data", data)
+    //     if (event === "Swap" && compareString(returnValues.to, account)) {
+    //       dispatch(
+    //         actions.alertActions.success({
+    //           status: "success",
+    //           title: "Swap successfully",
+    //           description: `Received ${amountsOut} ${tokenBInfo.assetsChain}`,
+    //           details: {
+    //             message: "View on VeChain Stats",
+    //             txid: data.meta.txID,
+    //           },
+    //         }),
+    //         randomKeyUUID()
+    //       );
+    //     }
+    //   });
+    // }
 
     let transaction;
     if (isPairContainVET) {
@@ -517,6 +514,21 @@ export const swapAsset = createAsyncThunk(
           .comment(`transaction swap ${assetsPoolName} from VeBank`)
           .request()
           .then((transaction) => {
+            dispatch(refreshDataSwap());
+            dispatch(
+              actions.alertActions.update(
+                {
+                  status: "success",
+                  title: "Transaction Submitted",
+                  description: `Swapping ${amountInToSwap} ${tokenAInfo.assetsChain} for ${amountsOut} ${tokenBInfo.assetsChain}`,
+                  details: {
+                    message: "View on VeChain Stats",
+                    txid: transaction.txID,
+                  },
+                },
+                key
+              )
+            );
             return transaction;
           })
           .catch((e) => {
@@ -524,8 +536,8 @@ export const swapAsset = createAsyncThunk(
               actions.alertActions.update(
                 {
                   status: "warning",
-                  title: "Swap rejected",
-                  description: `Swap ${assetsPoolName} rejected`,
+                  title: "Transaction Rejected",
+                  description: `Wallets ${addressWalletCompact(account)}`,
                 },
                 key
               )
@@ -545,6 +557,21 @@ export const swapAsset = createAsyncThunk(
           .comment(`transaction swap ${assetsPoolName} from VeBank`)
           .request()
           .then((transaction) => {
+            dispatch(refreshDataSwap());
+            dispatch(
+              actions.alertActions.update(
+                {
+                  status: "success",
+                  title: "Transaction Submitted",
+                  description: `Swapping ${amountInToSwap} ${tokenAInfo.assetsChain} for ${amountsOut} ${tokenBInfo.assetsChain}`,
+                  details: {
+                    message: "View on VeChain Stats",
+                    txid: transaction.txID,
+                  },
+                },
+                key
+              )
+            );
             return transaction;
           })
           .catch((e) => {
@@ -552,8 +579,8 @@ export const swapAsset = createAsyncThunk(
               actions.alertActions.update(
                 {
                   status: "warning",
-                  title: "Swap rejected",
-                  description: `Swap ${assetsPoolName} rejected`,
+                  title: "Transaction Rejected",
+                  description: `Wallets ${addressWalletCompact(account)}`,
                 },
                 key
               )
@@ -573,6 +600,21 @@ export const swapAsset = createAsyncThunk(
         .comment(`transaction swap ${assetsPoolName} from VeBank`)
         .request()
         .then((transaction) => {
+          dispatch(refreshDataSwap());
+          dispatch(
+            actions.alertActions.update(
+              {
+                status: "success",
+                title: "Transaction Submitted",
+                description: `Swapping ${amountInToSwap} ${tokenAInfo.assetsChain} for ${amountsOut} ${tokenBInfo.assetsChain}`,
+                details: {
+                  message: "View on VeChain Stats",
+                  txid: transaction.txID,
+                },
+              },
+              key
+            )
+          );
           return transaction;
         })
         .catch((e) => {
@@ -580,8 +622,8 @@ export const swapAsset = createAsyncThunk(
             actions.alertActions.update(
               {
                 status: "warning",
-                title: "Swap rejected",
-                description: `Swap ${assetsPoolName} rejected`,
+                title: "Transaction Rejected",
+                description: `Wallets ${addressWalletCompact(account)}`,
               },
               key
             )

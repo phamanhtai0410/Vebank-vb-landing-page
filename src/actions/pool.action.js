@@ -28,7 +28,7 @@ export const getPoolAssets = () => async (dispatch, getState) => {
     );
 
     for await (const item of dataAssets) {
-      const { addressTokenA, addressTokenB } = item;
+      const { addressTokenA, addressTokenB, isSubscribeListener } = item;
       const assetsPoolAddress = await contractFactory.methods
         .getPair(addressTokenA, addressTokenB)
         .call();
@@ -40,11 +40,12 @@ export const getPoolAssets = () => async (dispatch, getState) => {
           assetsPoolAddress
         );
 
-        if (contractPair) {
-          contractPair.events.Approval?.().removeAllListeners?.();
+        let _isSubscribed = isSubscribeListener ?? false;
+
+        if (contractPair && !isSubscribeListener) {
           contractPair.events.Approval?.().on("data", async (data) => {
             console.log("🐶🐶  ~ contractPair.events.Approval?. ~ data", data);
-            if (compareString(data.returnValues?.owner ?? "", account)) {
+            if (account.equals(data.returnValues?.owner)) {
               const balanceBigN = await contractPair.methods
                 .balanceOf(account)
                 .call();
@@ -68,7 +69,6 @@ export const getPoolAssets = () => async (dispatch, getState) => {
             }
           });
 
-          contractPair.events.Transfer().removeAllListeners?.();
           contractPair.events.Transfer().on("data", async (data) => {
             console.log("Pair Transfer event emitted");
             console.log(
@@ -104,19 +104,23 @@ export const getPoolAssets = () => async (dispatch, getState) => {
               );
             }
           });
+          _isSubscribed = true;
         }
 
         //Lấy tổng liquidity
         let totalSupply = await contractPair.methods.totalSupply().call();
+        console.log('🐶🐶  ~ raw fetch from blockchain ~ totalSupply', totalSupply)
         if (totalSupply) {
           totalSupply = ethers.utils.formatUnits(
             totalSupply,
             PartialConstants.DEFAULT_ASSET_DECIMAL
           );
+          console.log('🐶🐶  ~ formatted by ether ~ totalSupply', totalSupply)
         }
 
         dataList.push({
           ...item,
+          isSubscribeListener: _isSubscribed,
           liquidity: totalSupply,
           assetsPoolAddress,
         });
@@ -158,7 +162,7 @@ export const getPoolAssetsByAccount =
             item.assetsPoolAddress
           );
 
-          const { amountTokenA, amountTokenB, liquidityPool } =
+          const { amountTokenA, amountTokenB, liquidityPool, totalSupply } =
             await getUserTokenAmounts({
               contractPair,
               account,
@@ -168,6 +172,7 @@ export const getPoolAssetsByAccount =
 
           dataList.push({
             ...item,
+            liquidity: totalSupply,
             balanceAccount: liquidityPool,
             amountTokenA,
             amountTokenB,
@@ -212,10 +217,12 @@ export const getUserTokenAmounts = async ({
 
   try {
     const balanceBigN = await contractPair.methods.balanceOf(account).call();
+    console.log('🐶🐶  ~ liquidityPool(raw)', balanceBigN)
     liquidityPool = await ethers.utils.formatUnits(
       balanceBigN,
       PartialConstants.DEFAULT_ASSET_DECIMAL
     );
+    console.log('🐶🐶  ~ liquidityPool(formatted)', liquidityPool)
     liquidityPool = FixedNumber.from(liquidityPool);
     totalSupply = await contractPair.methods.totalSupply().call();
     if (totalSupply) {

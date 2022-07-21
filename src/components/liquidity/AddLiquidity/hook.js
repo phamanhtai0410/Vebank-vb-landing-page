@@ -21,6 +21,7 @@ import {
 import { selectBalanceById } from "../../../reducers/accountBalance.reducer";
 import RouteName from "../../../constants/routeName.constants";
 import { selectAccount } from "../../../reducers/web3.reducer";
+import { FixedNumber } from "ethers";
 
 const useAddLiquidFacade = () => {
   const dispatch = useDispatch();
@@ -120,14 +121,16 @@ const useAddLiquidFacade = () => {
         if (totalSupply === 0) {
           setFirstTokenVolume(value);
         } else if (value !== "") {
-          const secondTokenAmount = value * firstPerSecondTokenExchangeRate;
+          const secondTokenAmount = FixedNumber.from(value).mulUnsafe(
+            FixedNumber.from(firstPerSecondTokenExchangeRate.toString())
+          );
           // if (
           //   value <= firstTokenBalance &&
           //   secondTokenAmount <= secondTokenBalance
           // ) {
           // if (value <= firstTokenBalance) {
           setFirstTokenVolume(value);
-          setSecondTokenVolume(secondTokenAmount);
+          setSecondTokenVolume(secondTokenAmount.toString());
           // }
         } else {
           // Clear inputs from both field
@@ -147,14 +150,16 @@ const useAddLiquidFacade = () => {
         if (totalSupply === 0) {
           setSecondTokenVolume(value);
         } else if (value !== "") {
-          const firstTokenAmount = value * secondPerFirstTokenExchangeRate;
+          const firstTokenAmount = FixedNumber.from(value).mulUnsafe(
+            FixedNumber.from(secondPerFirstTokenExchangeRate.toString())
+          );
           // if (
           //   value <= secondTokenBalance &&
           //   firstTokenAmount <= firstTokenBalance
           // ) {
           // if (value <= secondTokenBalance) {
           setSecondTokenVolume(value);
-          setFirstTokenVolume(firstTokenAmount);
+          setFirstTokenVolume(firstTokenAmount.toString());
           // }
         } else {
           // Clear inputs from both field

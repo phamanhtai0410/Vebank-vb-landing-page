@@ -4,6 +4,7 @@ import { shallowEqual } from "react-redux";
 const initialState = {
   addresses: [],
   data: {},
+  userAddedPoolsAddresses: [],
 };
 
 const userAssetPools = createSlice({
@@ -22,6 +23,23 @@ const userAssetPools = createSlice({
       if (!state.addresses.includes(assetsPoolAddress)) {
         state.addresses.push(assetsPoolAddress);
       }
+
+      if (
+        (state.data[assetsPoolAddress]?.liquidityPool ?? 0) == 0 &&
+        liquidityPool > 0
+      ) {
+        // User add pool first time.
+        state.userAddedPoolsAddresses.push(assetsPoolAddress);
+      } else if (
+        state.data[assetsPoolAddress]?.liquidityPool > 0 &&
+        liquidityPool == 0
+      ) {
+        // User remove all asset from this pool
+        const indexOfAsset =
+          state.userAddedPoolsAddresses.indexOf(assetsPoolAddress);
+        state.userAddedPoolsAddresses.splice(indexOfAsset, 1);
+      }
+
       state.data[assetsPoolAddress] = {
         ...state.data[assetsPoolAddress],
         liquidityPool,
@@ -39,16 +57,8 @@ export const { updateLiquidityPool, updateUserAssets } = userAssetPools.actions;
 export const selectAllAddresses = (state) => state.userAssetPools.addresses;
 export const selectAllPoolBalance = (state) => state.userAssetPools.data;
 
-const _selectUsersAddedPoolAddresses = createSelector(
-  [selectAllAddresses, selectAllPoolBalance],
-  (addressList, data) =>
-    addressList.filter((address) => data[address]?.liquidityPool > 0),
-  {
-    equalityCheck: (prev, next) => prev.length === next.length,
-  }
-);
-
-export const selectUsersAddedPoolAddresses = state => _selectUsersAddedPoolAddresses(state);
+export const selectUserAddedPoolsAddresses = (state) =>
+  state.userAssetPools.userAddedPoolsAddresses;
 
 export const selectUserPoolAssetByPoolAddress = (state, poolAddress) =>
   state.userAssetPools.data[poolAddress];

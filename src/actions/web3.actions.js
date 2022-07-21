@@ -311,7 +311,7 @@ export const instantiateVetContracts = () => async (dispatch, getState) => {
         .on("data", async (data) => {
           console.log("🐶🐶  ~ contractVTHO.events.Approval ~ data", data);
           // dispatch(instantiateVetContracts());
-          if (compareString(data.returnValues?.src, account)) {
+          if (compareString(data.returnValues?.owner, account)) {
             const accInfo = await connex.thor.account(account).get();
 
             let balanceVET = 0;

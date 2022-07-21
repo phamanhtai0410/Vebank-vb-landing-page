@@ -3,8 +3,7 @@ import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import * as actions from "../../../actions";
 import RouteName from "../../../constants/routeName.constants";
-import { selectPoolAddresses } from "../../../reducers/assetsPool.reducer";
-import { selectUsersAddedPoolAddresses } from "../../../reducers/userAssetPools.reducer";
+import { selectAllAddresses, selectUserAddedPoolsAddresses } from "../../../reducers/userAssetPools.reducer";
 import { selectAccount, selectWeb3 } from "../../../reducers/web3.reducer";
 
 const useLiquidityFacade = () => {
@@ -13,8 +12,8 @@ const useLiquidityFacade = () => {
 
   const web3 = useSelector(selectWeb3);
   const account = useSelector(selectAccount);
-  const poolAddresses = useSelector(selectPoolAddresses)
-  const userPoolAddresses = useSelector(selectUsersAddedPoolAddresses);
+  const poolAddresses = useSelector(selectAllAddresses)
+  const userPoolAddresses = useSelector(selectUserAddedPoolsAddresses);
 
   const addLiquidity = () => {
     navigate(RouteName.ADD_LIQUIDITY);

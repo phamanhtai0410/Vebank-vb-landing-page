@@ -225,7 +225,7 @@ const FrmAddLiquidity = () => {
                 {/*Minh said only PartialConstants.DEFAULT_FORMAT_FLOATING_NUMBER fractional digit*/}
                 {nFormatter(
                   liquidityEstimated,
-                  PartialConstants.DEFAULT_FORMAT_FLOATING_NUMBER
+                  15
                 )}
               </p>
               <div className="flex flex-row space-x-3">

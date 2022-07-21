@@ -54,6 +54,8 @@ export const loadModalSupply = (dataToken) => async (dispatch, getState) => {
 
     }
 
+    console.log("ADDRESS_POOL",ADDRESS_POOL);
+
     // get the approved coin MSP account
     accountApprove = await contractSupply.methods.allowance(account, ADDRESS_POOL).call();
     accountApprove = ethers.utils.formatEther(accountApprove);
@@ -94,6 +96,8 @@ export const approveSupply = (dataToken) => async (dispatch, getState) => {
         // if (dataToken.assetsChain === "VET") {
         //     TOKEN_APPROVE = process.env.REACT_APP_ADDRESS_GATEWAY;
         // }
+
+        console.log("approveSupply ADDRESS_POOL",ADDRESS_POOL);
 
         approveMethod
             .transact(TOKEN_APPROVE, web3.utils.toWei(amountMax.toString()))

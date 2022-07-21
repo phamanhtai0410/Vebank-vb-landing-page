@@ -194,6 +194,7 @@ export const approveWithdraw = (dataToken, rateMode = 2) => async (dispatch, get
  * 
  */
 export const withdrawMarket = (dataToken, amount) => async (dispatch, getState) => {
+   
 
     const state = getState();
 
@@ -223,7 +224,7 @@ export const withdrawMarket = (dataToken, amount) => async (dispatch, getState) 
 
         connex.vendor
             .sign('tx', [c2_withdraw])
-            .comment(`transfer ${amount} ${dataToken.assetsChain} to Borrow VeBank`)
+            .comment(`withdraw ${amount} ${dataToken.assetsChain}`)
             .request()
             .then(transaction => {
 
@@ -270,6 +271,7 @@ export const withdrawMarket = (dataToken, amount) => async (dispatch, getState) 
  * "interestRateMode: 0, 1, 2 => 0: None, 1: Stable, 2: Variable"
  */
 export const withdrawETHMarket = (dataToken, amount) => async (dispatch, getState) => {
+    console.log("withdrawETHMarket",dataToken,amount);
 
     const state = getState();
 
@@ -289,15 +291,19 @@ export const withdrawETHMarket = (dataToken, amount) => async (dispatch, getStat
         });
 
         const amountWithdraw = web3.utils.toWei(amount.toString());
+        console.log("amountWithdraw",amountWithdraw);
 
         // approve Atoken 
         let approveABI = ABI_ATOKEN.find(({ name, type }) => name === "approve" && type === "function");
         let approveMethod = connex.thor.account(process.env.REACT_APP_ATOKEN_VET).method(approveABI);
         const c1_approve = approveMethod.asClause(ADDRESS_GATEWAY, web3.utils.toWei(amountMaxApprove.toString()))
+        console.log("c1_approve",c1_approve);
 
         const withdrawETH_ABI = ERC20ABI_WETH_GETAWAY.find(({ name, type }) => name === "withdrawETH" && type === "function");
         const methodWithdraw = connex.thor.account(ADDRESS_GATEWAY).method(withdrawETH_ABI);
         const c2_withdraw = methodWithdraw.asClause(ADDRESS_POOL, amountWithdraw, account)
+        console.log("c2_withdraw",c2_withdraw);
+
 
         connex.vendor
             .sign('tx', [ c2_withdraw])

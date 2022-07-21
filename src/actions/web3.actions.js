@@ -173,7 +173,6 @@ export const instantiateVetContracts = () => async (dispatch, getState) => {
         contractVET.events
       );
 
-      contractVET.events.Approval().removeAllListeners?.();
       contractVET.events
         .Approval()
         .on("data", async (data) => {
@@ -524,7 +523,12 @@ export const instantiateVBContracts = () => async (dispatch, getState) => {
               .balanceOf(account)
               .call()
               .then((balanceBigNumber) => {
-                let balance = ethers.utils.formatEther(balanceBigNumber);
+                console.log("🐶🐶  ~ balance VB (raw)", balanceBigNumber);
+                let balance = ethers.utils.formatUnits(
+                  balanceBigNumber,
+                  PartialConstants.DEFAULT_ASSET_DECIMAL
+                );
+                console.log("🐶🐶  ~ VB formatted ~ balance", balance);
                 balance = Math.round(balance * 100) / 100;
                 dispatch({
                   type: web3Constants.INIT_CONTRACT_VB,
@@ -576,35 +580,38 @@ export const instantiateVEUSDContracts = createAsyncThunk(
 
       let balance = 0;
 
-      const tokenInfo = selectAssetByAddress(currentState, TOKEN_VEUSD);
-
       if (contractVEUSD && account) {
         const balanceBigN = await contractVEUSD.methods
           .balanceOf(account)
           .call();
         balance = ethers.utils.formatUnits(
           balanceBigN,
-          tokenInfo?.assetsDecimals || 6
+          PartialConstants.VEUSD_DECIMAL
         );
         balance = Math.round(balance * 100) / 100;
 
-        contractVEUSD.events.Approval?.()?.removeAllListeners?.();
         contractVEUSD.events
           .Approval?.()
           .on("data", async (data) => {
             console.log("🐶🐶  ~ contractVEUSD.events.Approval ~ data", data);
-            if (data.returnValues?.owner?.equals?.(account)) {
+            if (account.equals?.(data.returnValues?.owner)) {
               contractVEUSD.methods
                 .balanceOf(account)
                 .call()
                 .then((balanceBigNumber) => {
-                  let balance = ethers.utils.formatEther(balanceBigNumber);
+                  // console.log("🐶🐶  ~ balance VeUSD (raw)", balanceBigNumber);
+                  let balance = ethers.utils.formatUnits(
+                    balanceBigNumber,
+                    PartialConstants.VEUSD_DECIMAL
+                  );
+                  // console.log("🐶🐶  ~ VEUSD formatted ~ balance", balance);
                   balance = Math.round(balance * 100) / 100;
-                  dispatch({
-                    type: instantiateVEUSDContracts.fulfilled.type,
-                    contractVEUSD,
-                    balance,
-                  });
+                  dispatch(
+                    instantiateVEUSDContracts.fulfilled({
+                      balance,
+                      contractVEUSD,
+                    })
+                  );
                 });
 
               const approveAmount = Number(
@@ -626,19 +633,8 @@ export const instantiateVEUSDContracts = createAsyncThunk(
             console.log("🐶🐶  ~ contractVEUSD.events.Approval ~ err", err);
           });
 
-        contractVEUSD.events.Withdrawal?.()?.removeAllListeners?.();
         contractVEUSD.events
-          .Withdrawal?.()
-          .on("data", async (data) => {
-            console.log("🐶🐶  ~ contractVEUSD.events.Withdrawal ~ data", data);
-          })
-          .on("error", async (err) => {
-            console.log("🐶🐶  ~ contractVEUSD.events.Withdrawal ~ err", err);
-          });
-
-        contractVEUSD.events.Transfer?.()?.removeAllListeners?.();
-        contractVEUSD.events
-          .Transfer({})
+          .Transfer()
           .on("data", async function (event) {
             console.log("onTransferEvent - VeUSD", event);
             // Do something here
@@ -646,7 +642,7 @@ export const instantiateVEUSDContracts = createAsyncThunk(
             // const { value, to } = event?.returnValues;
             const { txOrigin } = event?.meta;
             // const formattedValue = Number(ethers.utils.formatUnits(value, 6));
-            if (txOrigin.toLowerCase() === account) {
+            if (account.equals(txOrigin)) {
               // console.log("User send amount away");
               // if (account.toLowerCase() === to) {
               //   balance += formattedValue;
@@ -657,13 +653,19 @@ export const instantiateVEUSDContracts = createAsyncThunk(
                 .balanceOf(account)
                 .call()
                 .then((balanceBigNumber) => {
-                  let balance = ethers.utils.formatEther(balanceBigNumber);
+                  // console.log("🐶🐶  ~ balance VeUSD (raw)", balanceBigNumber);
+                  let balance = ethers.utils.formatUnits(
+                    balanceBigNumber,
+                    PartialConstants.VEUSD_DECIMAL
+                  );
+                  // console.log("🐶🐶  ~ VEUSD formatted ~ balance", balance);
                   balance = Math.round(balance * 100) / 100;
-                  dispatch({
-                    type: instantiateVEUSDContracts.fulfilled.type,
-                    contractVEUSD,
-                    balance,
-                  });
+                  dispatch(
+                    instantiateVEUSDContracts.fulfilled({
+                      balance,
+                      contractVEUSD,
+                    })
+                  );
                 });
             }
             // console.log("🐶🐶  ~ VEUSD balance", balance);

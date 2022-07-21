@@ -55,7 +55,7 @@ export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
         const getReserveData = await contractAAVE.methods.getReserveData(dataToken.assetsAddress).call();
         console.log("getReserveData",getReserveData);
 
-        if(Number(getReserveData.totalAToken) === 0){
+        if(Number(getReserveData.totalAToken) > 0){
             totalUserCollateralPool = getReserveData.totalAToken - (getReserveData.totalStableDebt  + getReserveData.totalVariableDebt)
             totalUserCollateralPool = totalUserCollateralPool.toLocaleString('fullwide', {useGrouping:false});
             totalUserCollateralPool = ethers.utils.formatUnits(totalUserCollateralPool, dataToken.assetsDecimals);

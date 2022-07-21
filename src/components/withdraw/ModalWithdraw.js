@@ -173,7 +173,7 @@ const ModalWithdraw = () => {
                         </div>
                         <div>
                             <span className='font-poppins font-bold inline-block'>
-                            {accountBalance ? accountBalance : <TailSpin className='w-4 h-4 mr-2' />}
+                            {loading === false ? accountBalance : <TailSpin className='w-4 h-4 mr-2' />}
                             </span>
                             <span className='text-[#BFBFBF] pl-2'>{dataToken ? dataToken.assetsChain : ""}</span>
                         </div>
@@ -205,7 +205,7 @@ const ModalWithdraw = () => {
                     </div>
 
                     <div className='px-8'>
-                        {loading === false ? <Range
+                        {loading === false && accountBalance ? <Range
                             step={1}
                             min={0}
                             max={accountBalance}

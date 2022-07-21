@@ -202,7 +202,7 @@ const ModalSupply = () => {
                             </div>
                             <div className='flex items-center'>
                                 <img className='w-6 h-6' src={dataToken ? dataToken.icon : ""} alt="Token VEBank" />
-                                <span className='font-poppins font-bold pl-2'>{numberWithCommas(amount)}</span>
+                                <span className='font-poppins font-bold pl-2'>{amount}</span>
                                 <span className='text-[#BFBFBF] pl-2'>{dataToken ? dataToken.assetsChain : ""}</span>
                             </div>
                         </div>
@@ -211,7 +211,7 @@ const ModalSupply = () => {
                             <div className='text-[#FAFAFA]'>
                             </div>
                             <div>
-                                <span className='font-poppins font-thin text-sm'>{numberWithCommas(amount)} $</span>
+                                <span className='font-poppins font-thin text-sm'>{amount} $</span>
                             </div>
                         </div>
 

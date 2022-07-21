@@ -18,7 +18,7 @@ String.prototype.isMatch = function (pattern) {
  * @returns true if the string is equal, false if it's not.
  */
 String.prototype.equals = function (otherString) {
-  return this.toLowerCase() === otherString.toLowerCase();
+  return this.toLowerCase() === otherString?.toString().toLowerCase();
 };
 
 export const getDeadline = () => Math.round(new Date().getTime() / 1000) + 3600;
@@ -138,5 +138,5 @@ export const addressWalletCompact = (address) => {
   )}`;
 };
 export const compareString = (a, b) => {
-  return a.toString().toLowerCase() === b.toString().toLowerCase();
+  return a?.toString().toLowerCase() === b?.toString().toLowerCase();
 };

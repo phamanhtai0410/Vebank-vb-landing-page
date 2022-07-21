@@ -42,7 +42,7 @@ export const getPoolAssets = () => async (dispatch, getState) => {
 
         let _isSubscribed = isSubscribeListener ?? false;
 
-        if (contractPair && !isSubscribeListener) {
+        if (contractPair && !_isSubscribed) {
           contractPair.events.Approval?.().on("data", async (data) => {
             console.log("🐶🐶  ~ contractPair.events.Approval?. ~ data", data);
             if (account.equals(data.returnValues?.owner)) {
@@ -99,7 +99,10 @@ export const getPoolAssets = () => async (dispatch, getState) => {
                   title: isUserReceiving
                     ? "Add liquidity Confirmed"
                     : "Remove liquidity Transaction Sent",
-                  description: "View on Chain",
+                  details: {
+                    txid: data.meta?.txID ?? "",
+                    message: "View on Chain",
+                   }
                 })
               );
             }

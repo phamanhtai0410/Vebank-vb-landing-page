@@ -21,6 +21,7 @@ import {
 import { selectBalanceById } from "../../../reducers/accountBalance.reducer";
 import RouteName from "../../../constants/routeName.constants";
 import { selectAccount } from "../../../reducers/web3.reducer";
+import { FixedNumber } from "ethers";
 
 const useAddLiquidFacade = () => {
   const dispatch = useDispatch();
@@ -114,20 +115,36 @@ const useAddLiquidFacade = () => {
     [account, dispatch]
   );
 
+  const getFirstAmount = useCallback(
+    (input) =>
+      FixedNumber.from(input)
+        .mulUnsafe(FixedNumber.from(secondPerFirstTokenExchangeRate.toString()))
+        .toString(),
+    [secondPerFirstTokenExchangeRate]
+  );
+
+  const getSecondAmount = useCallback(
+    (input) =>
+      FixedNumber.from(input)
+        .mulUnsafe(FixedNumber.from(firstPerSecondTokenExchangeRate.toString()))
+        .toString(),
+    [firstPerSecondTokenExchangeRate]
+  );
+
   const onChangeFirstTokenAmount = useCallback(
     (value) => {
       if (value.isMatch?.(/^\d*\.?\d*$/)) {
         if (totalSupply === 0) {
           setFirstTokenVolume(value);
         } else if (value !== "") {
-          const secondTokenAmount = value * firstPerSecondTokenExchangeRate;
+          const secondTokenAmount = getSecondAmount(value);
           // if (
           //   value <= firstTokenBalance &&
           //   secondTokenAmount <= secondTokenBalance
           // ) {
           // if (value <= firstTokenBalance) {
           setFirstTokenVolume(value);
-          setSecondTokenVolume(secondTokenAmount);
+          setSecondTokenVolume(secondTokenAmount.toString());
           // }
         } else {
           // Clear inputs from both field
@@ -138,7 +155,7 @@ const useAddLiquidFacade = () => {
         setFirstTokenVolume(firstTokenVolume);
       }
     },
-    [firstPerSecondTokenExchangeRate, firstTokenVolume, totalSupply]
+    [firstTokenVolume, getSecondAmount, totalSupply]
   );
 
   const onChangeSecondTokenAmount = useCallback(
@@ -147,14 +164,14 @@ const useAddLiquidFacade = () => {
         if (totalSupply === 0) {
           setSecondTokenVolume(value);
         } else if (value !== "") {
-          const firstTokenAmount = value * secondPerFirstTokenExchangeRate;
+          const firstTokenAmount = getFirstAmount(value);
           // if (
           //   value <= secondTokenBalance &&
           //   firstTokenAmount <= firstTokenBalance
           // ) {
           // if (value <= secondTokenBalance) {
           setSecondTokenVolume(value);
-          setFirstTokenVolume(firstTokenAmount);
+          setFirstTokenVolume(firstTokenAmount.toString());
           // }
         } else {
           // Clear inputs from both field
@@ -165,7 +182,7 @@ const useAddLiquidFacade = () => {
         setSecondTokenVolume(secondTokenVolume);
       }
     },
-    [totalSupply, secondPerFirstTokenExchangeRate, secondTokenVolume]
+    [totalSupply, getFirstAmount, secondTokenVolume]
   );
 
   const closeModal = () => {
@@ -241,8 +258,7 @@ const useAddLiquidFacade = () => {
           secondTokenVolume !== 0 &&
           secondTokenVolume !== ""
         ) {
-          const secondAmount =
-            firstTokenVolume * firstPerSecondTokenExchangeRate;
+          const secondAmount = getSecondAmount(firstTokenVolume);
           if (secondTokenVolume !== secondAmount) {
             setSecondTokenVolume(secondAmount);
           }
@@ -250,14 +266,10 @@ const useAddLiquidFacade = () => {
           setContinueAvailable(true);
         } else if (secondTokenVolume === 0 || secondTokenVolume === "") {
           if (firstTokenVolume !== 0 && firstTokenVolume !== "") {
-            setSecondTokenVolume(
-              firstTokenVolume * firstPerSecondTokenExchangeRate
-            );
+            setSecondTokenVolume(getSecondAmount(firstTokenVolume));
           } else setPrimaryButtonLabel("Enter an amount");
         } else {
-          setFirstTokenVolume(
-            secondTokenVolume * secondPerFirstTokenExchangeRate
-          );
+          setFirstTokenVolume(getFirstAmount(secondTokenVolume));
           setPrimaryButtonLabel("Supply");
           setContinueAvailable(true);
         }

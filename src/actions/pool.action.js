@@ -42,11 +42,10 @@ export const getPoolAssets = () => async (dispatch, getState) => {
 
         let _isSubscribed = isSubscribeListener ?? false;
 
-        if (contractPair && !isSubscribeListener) {
-          contractPair.events.Approval?.().removeAllListeners?.();
+        if (contractPair && !_isSubscribed) {
           contractPair.events.Approval?.().on("data", async (data) => {
             console.log("🐶🐶  ~ contractPair.events.Approval?. ~ data", data);
-            if (compareString(data.returnValues?.owner ?? "", account)) {
+            if (account.equals(data.returnValues?.owner)) {
               const balanceBigN = await contractPair.methods
                 .balanceOf(account)
                 .call();
@@ -70,7 +69,6 @@ export const getPoolAssets = () => async (dispatch, getState) => {
             }
           });
 
-          contractPair.events.Transfer().removeAllListeners?.();
           contractPair.events.Transfer().on("data", async (data) => {
             console.log("Pair Transfer event emitted");
             console.log(
@@ -101,7 +99,10 @@ export const getPoolAssets = () => async (dispatch, getState) => {
                   title: isUserReceiving
                     ? "Add liquidity Confirmed"
                     : "Remove liquidity Transaction Sent",
-                  description: "View on Chain",
+                  details: {
+                    txid: data.meta?.txID ?? "",
+                    message: "View on Chain",
+                   }
                 })
               );
             }

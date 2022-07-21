@@ -95,9 +95,26 @@ html {
   html { font-size: 0.75rem; }
 }
 
-header{
+header {
+  background: rgba(13, 21, 34, 0.5);
+  // backdrop-filter: blur(100px);
+}
+.navbar-sub-menu {
   background: rgba(13, 21, 34, 0.5);
   backdrop-filter: blur(100px);
+  -webkit-backdrop-filter: blur(100px);
+}
+
+header::before, .navbar-sub-menu::before {
+  backdrop-filter: blur(100px);
+  content: "";
+  display: block;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
 }
 
 /* Chrome, Safari, Edge, Opera */

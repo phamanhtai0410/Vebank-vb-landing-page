@@ -5,7 +5,7 @@ import { Range } from "react-range";
 import { TailSpin } from 'react-loading-icons';
 
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
-import { numberWithCommas } from '../../utils/lib';
+import { nFormatter, numberWithCommas } from '../../utils/lib';
 
 import { marketplaceConstants } from '../../constants';
 import * as actions from '../../actions';
@@ -173,7 +173,7 @@ const ModalWithdraw = () => {
                         </div>
                         <div>
                             <span className='font-poppins font-bold inline-block'>
-                            {accountBalance ? accountBalance : <TailSpin className='w-4 h-4 mr-2' />}
+                            {loading === false ? accountBalance : <TailSpin className='w-4 h-4 mr-2' />}
                             </span>
                             <span className='text-[#BFBFBF] pl-2'>{dataToken ? dataToken.assetsChain : ""}</span>
                         </div>
@@ -205,7 +205,7 @@ const ModalWithdraw = () => {
                     </div>
 
                     <div className='px-8'>
-                        {loading === false ? <Range
+                        {loading === false && accountBalance ? <Range
                             step={1}
                             min={0}
                             max={accountBalance}
@@ -250,7 +250,7 @@ const ModalWithdraw = () => {
                             </div>
                             <div className='flex items-center'>
                                 <img className='w-6 h-6' src={dataToken ? dataToken.icon : ""} alt="Token VEBank" />
-                                <span className='font-poppins font-bold pl-2'>{numberWithCommas(amount)}</span>
+                                <span className='font-poppins font-bold pl-2'>{amount}</span>
                                 <span className='text-[#BFBFBF] pl-2'>{dataToken ? dataToken.assetsChain : ""}</span>
                             </div>
                         </div>

@@ -89,7 +89,7 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
             // }
 
             // Tổng pool có chép borrow nhỏ hơn giá trị user có thể variableBorrowRate
-            if(Number(totalUserCollateralPool) < Number(accountData.availableBorrowsBase)){
+            if(Number(totalUserCollateralPool) < Number(accountBalance)){
                 accountBalance = totalUserCollateralPool;
                 // accountBalance = ethers.utils.formatUnits(totalBorrowRate, 18);
                 // accountBalance = accountBalance * dataPrice[dataToken.assetsAddress];

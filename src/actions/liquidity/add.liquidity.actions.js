@@ -16,7 +16,6 @@ import assetAbi from "../../_contracts/asset-abi";
 import {
   getAmountInWeiFormatted,
   getDecimalForAsset,
-  getDecimalForAssetPair,
   isContainVET,
 } from "../../utils/lib";
 import assert from "assert";

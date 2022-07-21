@@ -15,7 +15,9 @@ const BtnWithdraw = ({ dataToken, amount, pending }) => {
     const handlerSubmit = async () => {
 
         if (isPending === false && dataToken && amount) {
+
             setIsPending(true);
+            console.log("BtnWithdraw dataToken",dataToken,amount);
 
             if (dataToken.assetsChain === "VET") {
                 await dispatch(actions.withdrawETHMarket(dataToken, amount)).then(() => {

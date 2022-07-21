@@ -144,7 +144,28 @@ export const checkExchangeRatePool = createAsyncThunk(
           : reserves?.[0],
         getDecimalForAsset(tokenAddressB)
       );
-      return { reserves1, reserves2 };
+
+      let contractFactory = new web3.eth.Contract(
+        ERC20ABI_ROUTER,
+        ADDRESS_ROUTER
+      );
+
+      const amountInUint = web3.utils.toWei(
+        "1",
+        getDecimalForAsset(tokenAddressA) === PartialConstants.VEUSD_DECIMAL
+          ? "mwei"
+          : "ether"
+      );
+
+      const exchangeRate = await contractFactory.methods
+        .getAmountsOut(amountInUint, [tokenAddressA, tokenAddressB])
+        .call();
+      const exchangeRateFormat = ethers.utils.formatUnits(
+        exchangeRate[1],
+        getDecimalForAsset(tokenAddressB)
+      );
+
+      return { reserves1, reserves2, exchangeRateFormat };
     }
   }
 );
@@ -156,7 +177,6 @@ export const checkTotalSupplyAvailable = createAsyncThunk(
     const { web3 } = state.web3;
     const {
       poolErr,
-      amountsOut,
       reserves2,
       poolAddress,
       sourceTokenAddress,
@@ -182,7 +202,7 @@ export const checkTotalSupplyAvailable = createAsyncThunk(
       }
 
       if (
-        parseFloat(amountOut ? amountOut : amountsOut) >
+        parseFloat(amountOut) >
           parseFloat(reserves2) ||
         parseFloat(totalSupply) <= 0.0
       ) {
@@ -192,7 +212,7 @@ export const checkTotalSupplyAvailable = createAsyncThunk(
           poolErr: "Pool not enough volume",
         };
       } else {
-        return { totalSupply: totalSupply, isSwap: true, poolErr: poolErr };
+        return { totalSupply: totalSupply, isSwap: true, poolErr: "" };
       }
     }
   }
@@ -477,8 +497,6 @@ export const swapAsset = createAsyncThunk(
     //   const contractPair = new web3.eth.Contract(ERC20ABI_PAIR, poolAddress);
     //   contractPair.events.Swap({}).on("data", async (data) => {
     //     const { event, returnValues } = data;
-    //     console.log("mau - contractPair.events", contractPair.events)
-    //     console.log("mau - data", data)
     //     if (event === "Swap" && compareString(returnValues.to, account)) {
     //       dispatch(
     //         actions.alertActions.success({

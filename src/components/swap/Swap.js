@@ -268,7 +268,7 @@ const Swap = () => {
                       <p>
                         1 {sourceTokenInfo?.assetsChain} ={" "}
                         {exchangeRate.toString().length >= 6
-                          ? `${exchangeRate.toFixed(6)}`
+                          ? `${parseFloat(exchangeRate).toFixed(6)}`
                           : exchangeRate}{" "}
                         {desireTokenInfo?.assetsChain}
                       </p>
@@ -379,12 +379,12 @@ const Swap = () => {
 
             {account && (
               <button
-                disabled={!isSwap || loadingSwap || loadingApprove || showErr}
+                disabled={!isSwap || loadingSwap || loadingApprove || showErr || poolErr !== ""}
                 onClick={
                   accountApprove === 0 ? onApproveToken : onSwapAssetToken
                 }
                 className={`w-full ${
-                  isSwap && !loadingSwap && !loadingApprove && !showErr
+                  isSwap && !loadingSwap && !loadingApprove && !showErr && poolErr === ""
                     ? "btn-veb"
                     : "bg-btn-veb-disabled rounded-lg"
                 }  h-12`}

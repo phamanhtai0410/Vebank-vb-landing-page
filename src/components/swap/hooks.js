@@ -20,6 +20,7 @@ import {
   selectPoolErr,
   selectEmptyAddress,
   selectLoadingApprove,
+  selectUserInput,
 } from "../../reducers/swap.reducer";
 import { selectAssetByAddress } from "../../reducers/assetsMarket.reducer";
 import { selectPriceByTokenAddress } from "../../reducers/assetsPrice.reducer";
@@ -43,15 +44,18 @@ import { getDecimalForAsset, randomKeyUUID } from "../../utils/lib";
 const useSwapFacade = () => {
   const dispatch = useDispatch();
   const account = useSelector(selectAccount);
-  const [inputAmountIn, setInputAmountIn] = useState("");
-  const [inputAmountOut, setInputAmountOut] = useState("");
+  const userInput = useSelector(selectUserInput);
+  const amountsOut = useSelector(selectAmountsOut);
+  const amountsIn = useSelector(selectAmountsIn);
+  const [inputAmountIn, setInputAmountIn] = useState(amountsIn);
+  const [inputAmountOut, setInputAmountOut] = useState(amountsOut);
   const [inputSlippage, setInputSlippage] = useState(0.1);
   const [pressSwap, setPressSwap] = useState(false);
   const [showErr, setShowErr] = useState(false);
   const [showDetailInfo, setShowDetailInfo] = useState(false);
-  const userInputRef = useRef(inputAmountIn);
-  const amountInRef = useRef(inputAmountIn);
-  const amountOutRef = useRef(inputAmountOut);
+  const userInputRef = useRef(userInput);
+  const amountInRef = useRef(amountsIn);
+  const amountOutRef = useRef(amountsOut);
 
   const sourceTokenAddress = useSelector(selectSourceToken);
   const desireTokenAddress = useSelector(selectDesireToken);
@@ -64,8 +68,7 @@ const useSwapFacade = () => {
   const loadingApprove = useSelector(selectLoadingApprove);
   const loadingGetAmountOut = useSelector(selectLoadingGetAmountOut);
   const loadingGetAmountIn = useSelector(selectLoadingGetAmountIn);
-  const amountsOut = useSelector(selectAmountsOut);
-  const amountsIn = useSelector(selectAmountsIn);
+
   const accountApprove = useSelector(selectAccountApprove);
   const loadingExchangeRate = useSelector(selectLoadingExchangeRate);
   const swapSuccess = useSelector(selectSwapSuccess);
@@ -177,6 +180,11 @@ const useSwapFacade = () => {
         tokenBInfo: desireTokenInfo,
       })
     );
+    dispatch(
+      checkTotalSupplyAvailable({
+        amountOut: value,
+      })
+    );
   }, 1000);
 
   const getAmountsInDebounced = useDebouncedCallback((value) => {
@@ -272,14 +280,13 @@ const useSwapFacade = () => {
       }
       setPressSwap(false);
     } else {
-      // if (amountInRef.current === userInputRef.current) {
-      //   setInputAmountIn(userInputRef.current);
-      //   setInputAmountOut("");
-      //   getAmountOutDebounced(userInputRef.current);
-      // } else {
-      //   setInputAmountIn("");
-      // }
-      getAmountOutDebounced(inputAmountIn);
+      if (amountInRef.current === userInputRef.current) {
+        setInputAmountOut("");
+        getAmountOutDebounced(userInputRef.current);
+      } else {
+        setInputAmountIn("");
+      }
+      // getAmountOutDebounced(inputAmountIn);
     }
   }, [sourceTokenAddress]);
 
@@ -293,15 +300,14 @@ const useSwapFacade = () => {
       }
       setPressSwap(false);
     } else {
-      // if (amountOutRef.current === userInputRef.current) {
-      //   setInputAmountOut(userInputRef.current);
-      //   setInputAmountIn("");
-      //   getAmountsInDebounced(userInputRef.current);
-      // } else {
-      //   setInputAmountOut("");
-      //   getAmountOutDebounced(userInputRef.current);
-      // }
-      getAmountOutDebounced(inputAmountIn);
+      if (amountOutRef.current === userInputRef.current) {
+        setInputAmountIn("");
+        getAmountsInDebounced(userInputRef.current);
+      } else {
+        setInputAmountOut("");
+        getAmountOutDebounced(userInputRef.current);
+      }
+      // getAmountOutDebounced(inputAmountIn);
     }
   }, [desireTokenAddress]);
 
@@ -311,12 +317,7 @@ const useSwapFacade = () => {
 
   useEffect(() => {
     checkBalance(amountsIn);
-    dispatch(
-      checkTotalSupplyAvailable({
-        amountOut: inputAmountOut,
-      })
-    );
-  }, [amountsIn, dispatch]);
+  }, [amountsIn]);
 
   useEffect(() => {
     if (emptyAddress && (inputAmountIn || inputAmountOut)) {

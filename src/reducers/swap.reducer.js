@@ -30,6 +30,7 @@ const initialState = {
   loadingExchangeRate: false,
   amountsOut: "",
   amountsIn: "",
+  userInput: "",
   accountApprove: 0,
   contractSwap: "",
   poolAddress: "",
@@ -48,12 +49,6 @@ const swapAssetSlice = createSlice({
     updateStatusSwap: (state, action) => {
       state.isSwap = action.payload;
     },
-    // countExchangeRate: (state, action) => {
-    //   state.exchangeRateAB =
-    //     action.payload.reserves2 / action.payload.reserves1;
-    //   state.exchangeRateBA =
-    //     action.payload.reserves1 / action.payload.reserves2;
-    // },
     selectSourceTokenFromModal: (state, action) => {
       if (action.payload) {
         state.sourceTokenAddress = action.payload;
@@ -112,6 +107,7 @@ const swapAssetSlice = createSlice({
       })
       .addCase(getAmountsOut.fulfilled, (state, action) => {
         state.loadingGetAmountOut = false;
+        state.userInput = action.payload.inputAmountIn;
         state.amountsIn = action.payload.inputAmountIn;
         state.amountsOut = action.payload.amountsOutFormat;
         state.swapSuccess = false;
@@ -127,6 +123,7 @@ const swapAssetSlice = createSlice({
       })
       .addCase(getAmountsIn.fulfilled, (state, action) => {
         state.loadingGetAmountIn = false;
+        state.userInput = action.payload.inputAmountOut;
         state.amountsIn = action.payload.amountsInFormat;
         state.amountsOut = action.payload.inputAmountOut;
         state.swapSuccess = false;
@@ -175,10 +172,7 @@ const swapAssetSlice = createSlice({
         state.loadingExchangeRate = false;
         state.reserves1 = action.payload.reserves1;
         state.reserves2 = action.payload.reserves2;
-        state.exchangeRateAB =
-          action.payload.reserves2 / action.payload.reserves1;
-        state.exchangeRateBA =
-          action.payload.reserves1 / action.payload.reserves2;
+        state.exchangeRateAB = action.payload.exchangeRateFormat;
       })
       .addCase(checkExchangeRatePool.rejected, (state) => {
         state.loadingExchangeRate = false;
@@ -200,7 +194,6 @@ export const {
   selectSourceTokenFromModal,
   selectDesireTokenFromModal,
   getSymbolPairs,
-  // countExchangeRate,
   updateStatusSwap,
   refreshDataSwap,
   approveSuccess,
@@ -230,3 +223,4 @@ export const selectLoadingExchangeRate = (state) =>
   state.swapAsset.loadingExchangeRate;
 export const selectPoolErr = (state) => state.swapAsset.poolErr;
 export const selectEmptyAddress = (state) => state.swapAsset.emptyAddress;
+export const selectUserInput = (state) => state.swapAsset.userInput;

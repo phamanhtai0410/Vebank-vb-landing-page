@@ -33,6 +33,7 @@ export const loadModalSupply = (dataToken) => async (dispatch, getState) => {
     if (!account) {
         return;
     }
+    
     contractSupply = new web3.eth.Contract(ERC20ABI_VB, dataToken.assetsAddress);
 
     if (dataToken.assetsChain === "VET") {

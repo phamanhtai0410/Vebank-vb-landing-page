@@ -31,6 +31,7 @@ export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
 
     let accountBalance = 0;
     let accountApprove = 0;
+    let totalUserCollateralPool =0;
 
     if (!account) {
         return;
@@ -54,17 +55,18 @@ export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
         const getReserveData = await contractAAVE.methods.getReserveData(dataToken.assetsAddress).call();
         console.log("getReserveData",getReserveData);
 
-        //let totalUserCollateralPool = accountReserve.currentATokenBalance - (accountReserve.currentStableDebt  + accountReserve.currentVariableDebt);
-        let totalUserCollateralPool = getReserveData.totalAToken - (getReserveData.totalStableDebt  + getReserveData.totalVariableDebt)
-        totalUserCollateralPool = totalUserCollateralPool.toLocaleString('fullwide', {useGrouping:false});
-        totalUserCollateralPool = ethers.utils.formatUnits(totalUserCollateralPool, dataToken.assetsDecimals);
+        if(Number(getReserveData.totalAToken) === 0){
+            totalUserCollateralPool = getReserveData.totalAToken - (getReserveData.totalStableDebt  + getReserveData.totalVariableDebt)
+            totalUserCollateralPool = totalUserCollateralPool.toLocaleString('fullwide', {useGrouping:false});
+            totalUserCollateralPool = ethers.utils.formatUnits(totalUserCollateralPool, dataToken.assetsDecimals);
+        }
 
         const contractPOOL = new web3.eth.Contract(ERC20ABI_POOL, ADDRESS_POOL);
         const accountData = await contractPOOL.methods.getUserAccountData(account).call();
         console.log("getUserAccountData",accountData);
         
         // get balance A Token your account withdrawal is allowed
-        if (accountReserve.currentATokenBalance) {
+        if (Number(accountReserve.currentATokenBalance && Number(totalUserCollateralPool) > 0)) {
             accountBalance = ethers.utils.formatUnits(accountReserve.currentATokenBalance, dataToken.assetsDecimals);
             if(accountData && accountData.availableBorrowsBase){
 
@@ -152,7 +154,7 @@ export const approveWithdraw = (dataToken, rateMode = 2) => async (dispatch, get
             }, key));
 
             approveMethod.transact(TOKEN_APPROVE, web3.utils.toWei(amountMaxApprove.toString()))
-                .comment(`ATOKEN approve ${TOKEN_APPROVE} on VeBank`)
+                .comment(`approve withdraw ${TOKEN_APPROVE} on VeBank`)
                 .request()
                 .then(result => {
 
@@ -307,7 +309,7 @@ export const withdrawETHMarket = (dataToken, amount) => async (dispatch, getStat
 
         connex.vendor
             .sign('tx', [ c2_withdraw])
-            .comment(`transfer ${amount} to withdrawETH`)
+            .comment(`withdraw ${amount} ${dataToken.assetsChain}`)
             .request()
             .then(transaction => {
 

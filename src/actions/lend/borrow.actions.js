@@ -75,24 +75,9 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
             totalUserCollateralPool = totalUserCollateralPool.toLocaleString('fullwide', {useGrouping:false});
             totalUserCollateralPool = ethers.utils.formatUnits(totalUserCollateralPool, dataToken.assetsDecimals);
 
-            // const configReserveData = await contractAAVE.methods.getReserveConfigurationData(dataToken.assetsAddress).call();
-
-            // // totalPoolSupply - TotalPoolDebt/(1 - reserveFactor)
-            // let totalBorrowRate = (getReserveData.totalVariableDebt  /(10000-Number(configReserveData.reserveFactor)));
-            
-            // console.log("totalBorrowRate",totalBorrowRate);
-            // totalBorrowRate = Number(getReserveData.totalAToken) - Number(totalBorrowRate);
-            // totalBorrowRate = totalBorrowRate.toLocaleString('fullwide', {useGrouping:false});
-
-            // if(dataToken.assetsAddress === process.env.REACT_APP_TOKEN_VEUSD){
-            //     totalBorrowRate =  web3.utils.toWei(totalBorrowRate, 'micro');
-            // }
-
             // Tổng pool có chép borrow nhỏ hơn giá trị user có thể variableBorrowRate
             if(Number(totalUserCollateralPool) < Number(accountBalance)){
                 accountBalance = totalUserCollateralPool;
-                // accountBalance = ethers.utils.formatUnits(totalBorrowRate, 18);
-                // accountBalance = accountBalance * dataPrice[dataToken.assetsAddress];
             }
             
         }
@@ -135,7 +120,7 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
         accountApprove,
         accountStableDebtApprove,
         accountVariableDebtApprove,
-        accountBalance:formatLocaleString(accountBalance,8),
+        accountBalance:formatLocaleString(accountBalance),
         dataToken
     });
 

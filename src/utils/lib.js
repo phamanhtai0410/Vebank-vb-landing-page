@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 var CryptoJS = require("crypto-js");
 
 export function formatLocaleString(x,digits){
-  return x.toLocaleString('en-IN',{ maximumSignificantDigits:  digits || 10 })
+  return x.toLocaleString('en-IN',{currency:"USD", maximumSignificantDigits:  digits || 10 })
 }
 export function numberWithCommas(num) {
   num = num.toLocaleString('en-IN',{ maximumSignificantDigits: 10  })

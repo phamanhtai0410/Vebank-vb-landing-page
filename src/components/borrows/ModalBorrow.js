@@ -228,7 +228,7 @@ const ModalBorrow = () => {
                     </div>
 
                     <div className='px-8'>
-                        {loading === false  && accountBalance > 0? <Range
+                        {loading === false  && Number(accountBalance) > 0? <Range
                             step={1}
                             min={0}
                             max={accountBalance}

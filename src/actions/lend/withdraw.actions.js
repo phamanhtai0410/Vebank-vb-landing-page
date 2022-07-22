@@ -82,10 +82,11 @@ export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
                 console.log("totalUserCollateralPool", totalUserCollateralPool);
             
                 if(accountBalance > totalUserWithdraw  ){ // luong có thể withdraw nhỏ hơn aToken trong pool
-                    accountBalance = totalUserWithdraw.toLocaleString('fullwide', {useGrouping:false});;
+                    accountBalance = totalUserWithdraw;
                 }else if(accountBalance > Number(totalUserCollateralPool)){ // Pool ko đủ
-                    accountBalance = totalUserWithdraw.toLocaleString('fullwide', {useGrouping:false});;
+                    accountBalance = totalUserWithdraw;
                 }
+
                 
             }
 
@@ -113,7 +114,7 @@ export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
         type: marketplaceConstants.MODAL_OPEN_WITHDRAW_MARKET,
         loading:false,
         accountApprove,
-        accountBalance: formatLocaleString(accountBalance,8),
+        accountBalance:formatLocaleString(accountBalance),
         dataToken
     });
 

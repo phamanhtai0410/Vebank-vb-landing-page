@@ -207,7 +207,20 @@ const useSwapFacade = () => {
       userInputRef.current = value;
       checkBalance(value);
       if (value !== "") {
-        getAmountOutDebounced(value);
+        if (emptyAddress) {
+          const key = randomKeyUUID();
+          dispatch(
+            actions.alertActions.warning(
+              {
+                title: "Warning",
+                description: `${sourceTokenInfo?.assetsChain} - ${desireTokenInfo?.assetsChain} not existing in pools`,
+              },
+              key
+            )
+          );
+        } else {
+          getAmountOutDebounced(value);
+        }
       } else {
         setInputAmountOut("");
         setShowDetailInfo(false);
@@ -228,7 +241,20 @@ const useSwapFacade = () => {
       userInputRef.current = value;
       setInputAmountOut(value);
       if (value !== "") {
-        getAmountsInDebounced(value);
+        if (emptyAddress) {
+          const key = randomKeyUUID();
+          dispatch(
+            actions.alertActions.warning(
+              {
+                title: "Warning",
+                description: `${sourceTokenInfo?.assetsChain} - ${desireTokenInfo?.assetsChain} not existing in pools`,
+              },
+              key
+            )
+          );
+        } else {
+          getAmountsInDebounced(value);
+        }
       } else {
         setInputAmountIn("");
       }
@@ -318,21 +344,6 @@ const useSwapFacade = () => {
   useEffect(() => {
     checkBalance(amountsIn);
   }, [amountsIn]);
-
-  useEffect(() => {
-    if (emptyAddress && (inputAmountIn || inputAmountOut)) {
-      const key = randomKeyUUID();
-      dispatch(
-        actions.alertActions.warning(
-          {
-            title: "Warning",
-            description: `${sourceTokenInfo?.assetsChain} - ${desireTokenInfo?.assetsChain} not existing in pools`,
-          },
-          key
-        )
-      );
-    }
-  }, [emptyAddress, dispatch, inputAmountIn, inputAmountOut]);
 
   return {
     isSwap,

@@ -176,7 +176,6 @@ export const checkTotalSupplyAvailable = createAsyncThunk(
     const state = getState();
     const { web3 } = state.web3;
     const {
-      poolErr,
       reserves2,
       poolAddress,
       sourceTokenAddress,
@@ -397,6 +396,7 @@ export const onApproveTokenForAccount = createAsyncThunk(
               key
             )
           );
+          return { accountApprove: amountMax };
         })
         .catch((e) => {
           amountMax = 0;

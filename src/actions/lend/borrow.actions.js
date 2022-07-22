@@ -120,7 +120,7 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
         accountApprove,
         accountStableDebtApprove,
         accountVariableDebtApprove,
-        accountBalance:formatLocaleString(accountBalance),
+        accountBalance: formatLocaleString(accountBalance),
         dataToken
     });
 

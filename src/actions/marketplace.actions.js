@@ -22,7 +22,7 @@ const ListKeyISeerOracle = {
     "VEUSD": process.env.REACT_APP_ISO_VEUSD
 }
 
-export const getMarketAssets = (isCurrentUSD) => async (dispatch, getState) => {
+export const getMarketAssets = () => async (dispatch, getState) => {
 
     const state = getState();
 
@@ -43,6 +43,7 @@ export const getMarketAssets = (isCurrentUSD) => async (dispatch, getState) => {
         const RAY = 10**27; // 10 to the power 27
         const SECONDS_PER_YEAR = 31536000;
 
+        let totalChange = 0;
         for await (const item of data) {
 
             const getReserveData = await contractAAVE.methods.getReserveData(item.assetsAddress).call();
@@ -92,11 +93,7 @@ export const getMarketAssets = (isCurrentUSD) => async (dispatch, getState) => {
 
                 // const totalStableDebt = ethers.utils.formatUnits(getReserveData.totalStableDebt || '0', item.assetsDecimals);
                 const totalVariableDebt = ethers.utils.formatUnits(getReserveData.totalVariableDebt || '0', item.assetsDecimals);
-
-                // balanceBorrow = Number(totalStableDebt) + Number(totalVariableDebt);
                 balanceBorrow = totalVariableDebt;
-                //balanceBorrow = Math.round((balanceBorrow) * 100) / 100;
-
                 dataTotal.totalBorrow = dataTotal.totalBorrow + Number(balanceBorrow);
 
             }
@@ -105,14 +102,16 @@ export const getMarketAssets = (isCurrentUSD) => async (dispatch, getState) => {
                 ...item,
                 totalSupplied: balanceSupply,
                 totalBorrowed: balanceBorrow,
-                supplyAPY: parseFloat((depositAPY * 100).toFixed(5)),
-                borrowAPY: parseFloat((variableBorrowAPY * 100).toFixed(5))
+                supplyAPY: parseFloat((depositAPY * 100).toFixed(2)),
+                borrowAPY: parseFloat((variableBorrowAPY * 100).toFixed(2)),
+                depositAPY,
+                variableBorrowAPY
             })
 
         }
 
-        dataTotal.totalBorrow = dataTotal.totalBorrow.toFixed(2)
-        dataTotal.totalSupply = dataTotal.totalSupply.toFixed(2)
+        dataTotal.totalBorrow = dataTotal.totalBorrow.toFixed(2);
+        dataTotal.totalSupply = dataTotal.totalSupply.toFixed(2);
 
         dispatch({
             type: marketplaceConstants.FETCH_ASSETS_MARKET_SUCCESS,
@@ -189,6 +188,7 @@ export const getAccountOverview = () => async (dispatch, getState) => {
 
         let accountTotalSupplied= 0;
         let accountTotalBorrowed= 0;
+        let netAPY = 0;
 
         if (contractPOOL && account) {
 
@@ -202,18 +202,24 @@ export const getAccountOverview = () => async (dispatch, getState) => {
             } catch (error) {
                 console.log("error getUserAccountData:", error);
             }
-
+            let supplyAPYChange = 0;
+            let borrowAPYChange = 0
             for await (const item of dataAccountAssets) {
 
+                console.log("item",item.depositAPY,item.variableBorrowAPY);
                 if(item.totalSupplied){
+                    supplyAPYChange =  ((dataPrice[item.assetsAddress] * item.totalSupplied) * item.depositAPY) +supplyAPYChange;
                     accountTotalSupplied = (dataPrice[item.assetsAddress] * item.totalSupplied) + accountTotalSupplied;
                 }
 
                 if(item.totalBorrowed){
+                    borrowAPYChange =  ((dataPrice[item.assetsAddress] * item.totalBorrowed) * item.variableBorrowAPY) +borrowAPYChange;
                     accountTotalBorrowed = (dataPrice[item.assetsAddress] * item.totalBorrowed) + accountTotalBorrowed;
                 }
                 
             }
+
+            netAPY = (supplyAPYChange - borrowAPYChange) / accountTotalSupplied;
 
         }
 
@@ -222,7 +228,8 @@ export const getAccountOverview = () => async (dispatch, getState) => {
             data: {
                 accountTotalSupplied,
                 accountTotalBorrowed,
-                healthFactor
+                healthFactor,
+                netAPY
             }
         });
 
@@ -289,6 +296,7 @@ export const getAccountAssets = () => async (dispatch, getState) => {
                 }
 
                 if (balanceSupply || balanceBorrow) {
+                    console.log("item",item);
                     dataList.push({
                         ...item,
                         totalSupplied: balanceSupply,

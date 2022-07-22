@@ -10,6 +10,7 @@ const initialState = {
   accountTotalBorrowed: null,
   
   healthFactor: null,
+  netAPY:null,
 
   query: {},
   total: 0,

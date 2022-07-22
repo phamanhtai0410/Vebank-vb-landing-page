@@ -10,8 +10,6 @@ import GradientStrokeWrapper from "../partials/GradientStrokeWrapper";
 import { addressWalletCompact, copyTextToClipboard } from "../../utils/lib";
 import ModalWallet from "./ModalWallet";
 
-
-
 const BtnConnect = () => {
   
   const [isConnecting, setIsConnecting] = useState(false);

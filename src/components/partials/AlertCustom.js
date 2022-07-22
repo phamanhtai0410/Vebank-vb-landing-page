@@ -5,7 +5,7 @@ import IcWarning from "../../assets/images/toast/warning.svg";
 import { TailSpin } from "react-loading-icons";
 
 const AlertCustom = ({ dataItem, closeToast, status }) => {
-  console.log("dataItem", dataItem);
+  
   const { message, isLoading } = dataItem;
 
   const loadIconView = (status) => {

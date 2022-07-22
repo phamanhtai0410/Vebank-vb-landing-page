@@ -5,8 +5,14 @@ import { v4 as uuidv4 } from "uuid";
 
 var CryptoJS = require("crypto-js");
 
-export function numberWithCommas(x) {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+export function formatLocaleString(x,digits){
+  return x.toLocaleString('en-IN',{ maximumSignificantDigits:  digits || 10 })
+}
+export function numberWithCommas(num) {
+  num = num.toLocaleString('en-IN',{ maximumSignificantDigits: 10  })
+  let x = num.toString().split(".");
+    x[0] = x[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return x.join(".");
 }
 
 String.prototype.isMatch = function (pattern) {
@@ -24,11 +30,6 @@ String.prototype.equals = function (otherString) {
 export const getDeadline = () => Math.round(new Date().getTime() / 1000) + 3600;
 
 export const getTimeStamp = () => new Date().getTime().toString();
-
-export function formatNumberEther(amount) {
-  const amountN = Number(ethers.utils.formatEther(amount, { commify: true }));
-  return numberWithCommas(Math.round(amountN * 100) / 100);
-}
 
 export function formatUriSecure(url) {
   const currentDate = new Date();

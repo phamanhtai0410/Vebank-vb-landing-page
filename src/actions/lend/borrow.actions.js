@@ -11,7 +11,7 @@ import ERC20ABI_AAVE from '../../_contracts/lend/AaveProtocolDataProvider.json';
 import ERC20ABI_STABLE_DEBT_TOKEN from '../../_contracts/lend/StableDebtToken.json';
 import ERC20ABI_VARIBLE_DEBT_TOKEN from '../../_contracts/lend/VariableDebtToken.json';
 
-import { randomKeyUUID } from '../../utils/lib';
+import { formatLocaleString, numberWithCommas, randomKeyUUID } from '../../utils/lib';
 import * as actions from '../.';
 
 
@@ -128,13 +128,14 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
 
     }
 
+
     dispatch({
         type: marketplaceConstants.MODAL_OPEN_BORROW_MARKET,
         loading:false,
         accountApprove,
         accountStableDebtApprove,
         accountVariableDebtApprove,
-        accountBalance: accountBalance,
+        accountBalance:formatLocaleString(accountBalance,8),
         dataToken
     });
 

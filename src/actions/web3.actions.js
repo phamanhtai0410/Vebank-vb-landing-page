@@ -26,6 +26,7 @@ const TOKEN_VEBANK = process.env.REACT_APP_TOKEN_VEBANK;
 const TOKEN_VEUSD = process.env.REACT_APP_TOKEN_VEUSD;
 
 export const web3Connect = (isLogin) => async (dispatch) => {
+
   const web3 = await getWeb3();
 
   let _acc = localStorage.getItem("_acc");

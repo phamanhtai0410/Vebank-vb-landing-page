@@ -7,7 +7,7 @@ import ERC20ABI_WETH_GETAWAY from '../../_contracts/lend/WETHGateway.json';
 import ERC20ABI_POOL from '../../_contracts/lend/Pool.json';
 import ABI_ATOKEN from '../../_contracts/lend/AToken.json';
 
-import { randomKeyUUID } from '../../utils/lib';
+import { formatLocaleString, randomKeyUUID } from '../../utils/lib';
 import * as actions from '../.';
 
 const ADDRESS_GATEWAY = process.env.REACT_APP_ADDRESS_GATEWAY; // WETHGateway (chinh là VET Asset)
@@ -49,11 +49,10 @@ export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
 
         let contractAAVE = new web3.eth.Contract(ERC20ABI_AAVE, TOKEN_AAVE);
         const accountReserve = await contractAAVE.methods.getUserReserveData(dataToken.assetsAddress, account).call();
-       // accountBalance = ethers.utils.formatEther(accountReserve.currentATokenBalance); 
-        console.log("getUserReserveData",accountReserve);
+        //accountBalance = ethers.utils.formatEther(accountReserve.currentATokenBalance); 
+        //console.log("getUserReserveData",accountReserve);
 
         const getReserveData = await contractAAVE.methods.getReserveData(dataToken.assetsAddress).call();
-        console.log("getReserveData",getReserveData);
 
         if(Number(getReserveData.totalAToken) > 0){
             totalUserCollateralPool = getReserveData.totalAToken - (getReserveData.totalStableDebt  + getReserveData.totalVariableDebt)
@@ -63,35 +62,33 @@ export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
 
         const contractPOOL = new web3.eth.Contract(ERC20ABI_POOL, ADDRESS_POOL);
         const accountData = await contractPOOL.methods.getUserAccountData(account).call();
-        console.log("getUserAccountData",accountData);
         
         // get balance A Token your account withdrawal is allowed
         if (Number(accountReserve.currentATokenBalance && Number(totalUserCollateralPool) > 0)) {
             accountBalance = ethers.utils.formatUnits(accountReserve.currentATokenBalance, dataToken.assetsDecimals);
+            accountBalance = Number(accountBalance);
+
             if(accountData && accountData.availableBorrowsBase){
 
-                // totalUserCollateralPool : Tổng số lượng amoun withdraw đang có
-                // totalUserWithdraw : Tổng số lượng user có thể withdraw
+                // totalUserCollateralPool : Tổng số lượng amount mà pool đang có thể withdraw
+                // totalUserWithdraw : Tổng số lượng amount mà user có thể withdraw
 
                 let totalUserWithdraw = accountData.totalCollateralBase - (accountData.totalDebtBase /(accountData.ltv/10000));
                 totalUserWithdraw = totalUserWithdraw.toLocaleString('fullwide', {useGrouping:false});
                 totalUserWithdraw = ethers.utils.formatEther(totalUserWithdraw) / dataPrice[dataToken.assetsAddress];
 
-                console.log("currentATokenBalance", accountBalance);
-                console.log("totalUserWithdraw", totalUserWithdraw);
+                console.log("currentATokenBalance", accountBalance); 
+                console.log("totalUserWithdraw", totalUserWithdraw); 
                 console.log("totalUserCollateralPool", totalUserCollateralPool);
-
-                if(totalUserWithdraw > 0){ // lúc nay
-                    if(totalUserWithdraw < Number(totalUserCollateralPool)){
-                        accountBalance = totalUserWithdraw;
-                    }
-                }
-
-                if(accountBalance > totalUserCollateralPool){ // pool khong đủ cung cấp
-                    accountBalance = totalUserCollateralPool;
+            
+                if(accountBalance > totalUserWithdraw  ){ // luong có thể withdraw nhỏ hơn aToken trong pool
+                    accountBalance = totalUserWithdraw.toLocaleString('fullwide', {useGrouping:false});;
+                }else if(accountBalance > Number(totalUserCollateralPool)){ // Pool ko đủ
+                    accountBalance = totalUserWithdraw.toLocaleString('fullwide', {useGrouping:false});;
                 }
                 
             }
+
         }
 
         // totalCollateralBase - (totalDebtBase/ltv)
@@ -116,7 +113,7 @@ export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
         type: marketplaceConstants.MODAL_OPEN_WITHDRAW_MARKET,
         loading:false,
         accountApprove,
-        accountBalance: accountBalance,
+        accountBalance: formatLocaleString(accountBalance,8),
         dataToken
     });
 

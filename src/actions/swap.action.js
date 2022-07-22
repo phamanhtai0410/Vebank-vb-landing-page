@@ -37,9 +37,11 @@ const ADDRESS_FACTORY = process.env.REACT_APP_ADDRESS_FACTORY;
 export { swapTokenDesire } from "../reducers/swap.reducer";
 
 export const checkAssetExistsPools = createAsyncThunk(
-  swapConstants.CHECK_TOKEN,
+  swapConstants.checkAssetExistsPools,
   async ({ tokenAInfo, tokenBInfo }, { dispatch, getState }) => {
     const state = getState();
+    let poolErr = "";
+    let isSwap = true;
     const assetsPoolName = `${tokenAInfo?.assetsChain} - ${tokenBInfo?.assetsChain}`;
 
     const addressTokenA = tokenAInfo?.assetsAddress || "";
@@ -55,8 +57,20 @@ export const checkAssetExistsPools = createAsyncThunk(
       const assetsPoolAddress = await contractFactory.methods
         .getPair(addressTokenA, addressTokenB)
         .call();
+
       const emptyAddress = /^0x0+$/.test(assetsPoolAddress); // true chưa có
+
+      dispatch(
+        checkExchangeRatePool({
+          tokenAddressA: addressTokenA,
+          tokenAddressB: addressTokenB,
+          assetsPoolAddress: assetsPoolAddress,
+        })
+      );
+
       if (!emptyAddress && assetsPoolAddress) {
+        poolErr = "";
+        isSwap = true;
         const contractPair = new web3.eth.Contract(
           ERC20ABI_PAIR,
           assetsPoolAddress
@@ -76,48 +90,32 @@ export const checkAssetExistsPools = createAsyncThunk(
             }
           });
         }
-
-        // const reserves = await contractPair.methods.getReserves().call();
-        // const reserves1 = ethers.utils.formatUnits(
-        //   reserves?.[0],
-        //   getDecimalForAsset(addressTokenA)
-        // );
-        // const reserves2 = ethers.utils.formatUnits(
-        //   reserves?.[1],
-        //   getDecimalForAsset(addressTokenB)
-        // );
-
-        // dispatch(countExchangeRate({ reserves1, reserves2 }));
-        const addressTokenA = tokenAInfo?.assetsAddress || "";
-        dispatch(
-          checkExchangeRatePool({
-            tokenAddressA: addressTokenA,
-            tokenAddressB: addressTokenB,
-            assetsPoolAddress: assetsPoolAddress,
-          })
-        );
-        dispatch(updateStatusSwap(true));
-        return {
-          assetsPoolAddress: assetsPoolAddress,
-          poolErr: "",
-          isSwap: true,
-          emptyAddress: emptyAddress,
-        };
       } else {
-        dispatch(updateStatusSwap(false));
-        return {
-          assetsPoolAddress: assetsPoolAddress,
-          poolErr: `${assetsPoolName} not existing in pools`,
-          isSwap: false,
-          emptyAddress: emptyAddress,
-        };
+        isSwap = false;
+        poolErr = `${assetsPoolName} not existing in pools`;
+        const key = randomKeyUUID();
+        dispatch(
+          actions.alertActions.warning(
+            {
+              title: "Warning",
+              description: `${tokenAInfo?.assetsChain} - ${tokenBInfo?.assetsChain} not existing in pools`,
+            },
+            key
+          )
+        );
       }
+      return {
+        assetsPoolAddress: assetsPoolAddress,
+        poolErr: poolErr,
+        isSwap: isSwap,
+        emptyAddress: emptyAddress,
+      };
     }
   }
 );
 
 export const checkExchangeRatePool = createAsyncThunk(
-  "checkExchangeRatePool",
+  swapConstants.checkExchangeRatePool,
   async (
     { tokenAddressA, tokenAddressB, assetsPoolAddress },
     { dispatch, getState }
@@ -171,16 +169,12 @@ export const checkExchangeRatePool = createAsyncThunk(
 );
 
 export const checkTotalSupplyAvailable = createAsyncThunk(
-  "checkTotalSupplyAvailable",
+  swapConstants.checkTotalSupplyAvailable,
   async ({ amountOut }, { dispatch, getState }) => {
     const state = getState();
     const { web3 } = state.web3;
-    const {
-      reserves2,
-      poolAddress,
-      sourceTokenAddress,
-      desireTokenAddress,
-    } = state.swapAsset;
+    const { reserves2, poolAddress, sourceTokenAddress, desireTokenAddress } =
+      state.swapAsset;
 
     if (web3 && ADDRESS_FACTORY) {
       let assetsDecimals = 18;
@@ -201,8 +195,7 @@ export const checkTotalSupplyAvailable = createAsyncThunk(
       }
 
       if (
-        parseFloat(amountOut) >
-          parseFloat(reserves2) ||
+        parseFloat(amountOut) > parseFloat(reserves2) ||
         parseFloat(totalSupply) <= 0.0
       ) {
         return {
@@ -218,7 +211,7 @@ export const checkTotalSupplyAvailable = createAsyncThunk(
 );
 
 export const getPairsFee = createAsyncThunk(
-  swapConstants.GET_PAIR_FEE,
+  swapConstants.getPairsFee,
   async ({ tokenAInfo, tokenBInfo }, { dispatch, getState }) => {
     const state = getState();
 
@@ -249,7 +242,7 @@ export const getPairsFee = createAsyncThunk(
 );
 
 export const getAmountsOut = createAsyncThunk(
-  swapConstants.GET_AMOUNTS_OUT,
+  swapConstants.getAmountsOut,
   async ({ inputAmountIn, tokenAInfo, tokenBInfo }, { dispatch, getState }) => {
     const state = getState();
 
@@ -283,7 +276,7 @@ export const getAmountsOut = createAsyncThunk(
 );
 
 export const getAmountsIn = createAsyncThunk(
-  swapConstants.GET_AMOUNTS_IN,
+  swapConstants.getAmountsIn,
   async (
     { inputAmountOut, tokenAInfo, tokenBInfo },
     { dispatch, getState }
@@ -320,7 +313,7 @@ export const getAmountsIn = createAsyncThunk(
 );
 
 export const checkApproveToken = createAsyncThunk(
-  swapConstants.GET_APPROVE_TOKEN,
+  swapConstants.checkApproveToken,
   async ({ tokenInfo }, { dispatch, getState }) => {
     const state = getState();
     const { web3, account } = state.web3;
@@ -343,7 +336,7 @@ export const checkApproveToken = createAsyncThunk(
 );
 
 export const onApproveTokenForAccount = createAsyncThunk(
-  swapConstants.ON_APPROVE_TOKEN,
+  swapConstants.onApproveTokenForAccount,
   async ({ tokenInfo }, { dispatch, getState }) => {
     const state = getState();
     const { web3, account, connex } = state.web3;
@@ -379,11 +372,13 @@ export const onApproveTokenForAccount = createAsyncThunk(
         .account(addressToken)
         .method(approveABI);
 
-      approveMethod
-        .transact(ADDRESS_ROUTER, web3.utils.toWei(amountMax.toString()))
-        .comment(`Approve ${tokenInfo.assetsChain} on VeBank`)
-        .request()
-        .then(() => {
+      try {
+        const res = await approveMethod
+          .transact(ADDRESS_ROUTER, web3.utils.toWei(amountMax.toString()))
+          .comment(`Approve ${tokenInfo.assetsChain} on VeBank`)
+          .request();
+
+        if (res) {
           amountMax = 1000000000;
           dispatch(approveSuccess({ accountApprove: amountMax }));
           dispatch(
@@ -397,34 +392,34 @@ export const onApproveTokenForAccount = createAsyncThunk(
             )
           );
           return { accountApprove: amountMax };
-        })
-        .catch((e) => {
-          amountMax = 0;
-          dispatch(
-            actions.alertActions.update(
-              {
-                status: "warning",
-                title: "Approve failed",
-                description: `Approve ${tokenInfo.assetsChain} failed`,
-              },
-              key
-            )
-          );
-          return { accountApprove: amountMax };
-        });
+        }
+      } catch (error) {
+        amountMax = 0;
+        dispatch(
+          actions.alertActions.update(
+            {
+              status: "warning",
+              title: "Approve failed",
+              description: `Approve ${tokenInfo.assetsChain} failed`,
+            },
+            key
+          )
+        );
+        return { accountApprove: amountMax };
+      }
     }
   }
 );
 
 export const swapAsset = createAsyncThunk(
-  swapConstants.SWAP_TOKEN,
+  swapConstants.swapToken,
   async (
     { amountInToSwap, minAmountOut, tokenAInfo, tokenBInfo },
     { dispatch, getState }
   ) => {
     const currentState = getState();
 
-    const { poolAddress, amountsOut } = currentState.swapAsset;
+    const { amountsOut } = currentState.swapAsset;
     const { connex, account, web3 } = currentState.web3;
     const assetsPoolName = `${tokenAInfo?.assetsChain} - ${tokenBInfo?.assetsChain}`;
     const key = randomKeyUUID();

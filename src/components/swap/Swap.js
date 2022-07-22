@@ -379,12 +379,22 @@ const Swap = () => {
 
             {account && (
               <button
-                disabled={!isSwap || loadingSwap || loadingApprove || showErr || poolErr !== ""}
+                disabled={
+                  !isSwap ||
+                  loadingSwap ||
+                  loadingApprove ||
+                  showErr ||
+                  poolErr !== ""
+                }
                 onClick={
                   accountApprove === 0 ? onApproveToken : onSwapAssetToken
                 }
                 className={`w-full ${
-                  isSwap && !loadingSwap && !loadingApprove && !showErr && poolErr === ""
+                  isSwap &&
+                  !loadingSwap &&
+                  !loadingApprove &&
+                  !showErr &&
+                  poolErr === ""
                     ? "btn-veb"
                     : "bg-btn-veb-disabled rounded-lg"
                 }  h-12`}

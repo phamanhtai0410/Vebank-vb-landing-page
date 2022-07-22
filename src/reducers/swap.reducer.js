@@ -46,9 +46,6 @@ const swapAssetSlice = createSlice({
   name: "swapAsset",
   initialState,
   reducers: {
-    updateStatusSwap: (state, action) => {
-      state.isSwap = action.payload;
-    },
     selectSourceTokenFromModal: (state, action) => {
       if (action.payload) {
         state.sourceTokenAddress = action.payload;
@@ -147,9 +144,6 @@ const swapAssetSlice = createSlice({
       .addCase(onApproveTokenForAccount.rejected, (state, action) => {
         state.loadingApprove = false;
       })
-      .addCase(checkAssetExistsPools.pending, (state, action) => {
-        state.emptyAddress = false;
-      })
       .addCase(checkAssetExistsPools.fulfilled, (state, action) => {
         state.poolAddress = action.payload.assetsPoolAddress;
         state.emptyAddress = action.payload.emptyAddress;
@@ -176,6 +170,8 @@ const swapAssetSlice = createSlice({
       })
       .addCase(checkExchangeRatePool.rejected, (state) => {
         state.loadingExchangeRate = false;
+        state.reserves1 = "";
+        state.reserves2 = "";
       })
       .addCase(checkTotalSupplyAvailable.fulfilled, (state, action) => {
         state.totalSupply = action.payload.totalSupply;
@@ -194,7 +190,6 @@ export const {
   selectSourceTokenFromModal,
   selectDesireTokenFromModal,
   getSymbolPairs,
-  updateStatusSwap,
   refreshDataSwap,
   approveSuccess,
 } = swapAssetSlice.actions;

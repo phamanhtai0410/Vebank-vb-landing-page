@@ -39,7 +39,7 @@ import {
 } from "../../actions";
 import { useDebouncedCallback } from "use-debounce";
 import PartialConstants from "../../constants/partial.constants";
-import { getDecimalForAsset, randomKeyUUID } from "../../utils/lib";
+import { getDecimalForAsset } from "../../utils/lib";
 
 const useSwapFacade = () => {
   const dispatch = useDispatch();
@@ -207,33 +207,13 @@ const useSwapFacade = () => {
       userInputRef.current = value;
       checkBalance(value);
       if (value !== "") {
-        if (emptyAddress) {
-          const key = randomKeyUUID();
-          dispatch(
-            actions.alertActions.warning(
-              {
-                title: "Warning",
-                description: `${sourceTokenInfo?.assetsChain} - ${desireTokenInfo?.assetsChain} not existing in pools`,
-              },
-              key
-            )
-          );
-        } else {
-          getAmountOutDebounced(value);
-        }
+        getAmountOutDebounced(value);
       } else {
         setInputAmountOut("");
         setShowDetailInfo(false);
       }
-      // setInputAmountOut(value !== "" ? value * exchangeRate : "");
-      // dispatch(
-      //   getPairsFee({
-      //     tokenAInfo: sourceTokenInfo,
-      //     tokenBInfo: desireTokenInfo,
-      //   })
-      // );
     },
-    [checkBalance, getAmountOutDebounced]
+    [getAmountOutDebounced]
   );
 
   const onChangeDesireInput = useCallback(
@@ -241,30 +221,10 @@ const useSwapFacade = () => {
       userInputRef.current = value;
       setInputAmountOut(value);
       if (value !== "") {
-        if (emptyAddress) {
-          const key = randomKeyUUID();
-          dispatch(
-            actions.alertActions.warning(
-              {
-                title: "Warning",
-                description: `${sourceTokenInfo?.assetsChain} - ${desireTokenInfo?.assetsChain} not existing in pools`,
-              },
-              key
-            )
-          );
-        } else {
-          getAmountsInDebounced(value);
-        }
+        getAmountsInDebounced(value);
       } else {
         setInputAmountIn("");
       }
-      // setInputAmountIn(value !== "" ? value * desirePerSourceTokenPrice : "");
-      // dispatch(
-      //   getPairsFee({
-      //     tokenAInfo: sourceTokenInfo,
-      //     tokenBInfo: desireTokenInfo,
-      //   })
-      // );
     },
     [getAmountsInDebounced]
   );
@@ -312,7 +272,6 @@ const useSwapFacade = () => {
       } else {
         setInputAmountIn("");
       }
-      // getAmountOutDebounced(inputAmountIn);
     }
   }, [sourceTokenAddress]);
 
@@ -333,7 +292,6 @@ const useSwapFacade = () => {
         setInputAmountOut("");
         getAmountOutDebounced(userInputRef.current);
       }
-      // getAmountOutDebounced(inputAmountIn);
     }
   }, [desireTokenAddress]);
 

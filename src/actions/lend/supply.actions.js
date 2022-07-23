@@ -242,7 +242,7 @@ export const supplyDepositETHMarket = (addressAsset, amount) => async (dispatch,
         methodDepositETH.value(web3.utils.toWei(amount.toString()));
 
         methodDepositETH.transact(ADDRESS_POOL, account, 0)
-            .comment(`transfer ${amount} VET to DepositETH`)
+            .comment(`Transfer ${amount} VET to supply to the market`)
             .request()
             .then(transaction => {
 
@@ -256,7 +256,7 @@ export const supplyDepositETHMarket = (addressAsset, amount) => async (dispatch,
                 dispatch(actions.alertActions.update({
                     status: "success",
                     title: "Transaction Submitted",
-                    description: `Transfer ${amount} VET to DepositETH`,
+                    description: `Transfer ${amount} VET into the market successfully`,
                   }, key));
 
                 return transaction;

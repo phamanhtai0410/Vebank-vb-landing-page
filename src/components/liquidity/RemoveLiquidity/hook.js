@@ -11,6 +11,7 @@ import {
   selectApprovingState,
   selectFirstTokenExchangeRate,
   selectLiquidityPool,
+  selectLoadingState,
   selectPoolApproval,
   selectRemoveTransactionId,
   selectRemovingFinishState,
@@ -28,6 +29,7 @@ const useRemoveLiquidFacade = () => {
   const txid = useSelector(selectRemoveTransactionId);
   const isApproving = useSelector(selectApprovingState);
   const approvePoolState = useSelector(selectPoolApproval);
+  const isLoadingDetail = useSelector(selectLoadingState);
   const isRemoving = useSelector(selectRemovingState);
   const removePoolSuccessState = useSelector(selectRemovingFinishState);
   const liquidityPool = useSelector(selectLiquidityPool);
@@ -75,10 +77,11 @@ const useRemoveLiquidFacade = () => {
 
   const removeAvailable = useMemo(() => {
     return (
+      isLoadingDetail === false &&
       amountPercentage > 0 &&
       approvePoolState >= removeAmount
     );
-  }, [amountPercentage, approvePoolState, removeAmount]);
+  }, [amountPercentage, approvePoolState, isLoadingDetail, removeAmount]);
 
   const closeModal = () => {
     navigation(-1);
@@ -141,6 +144,15 @@ const useRemoveLiquidFacade = () => {
       })
     );
   };
+
+  useEffect(() => {
+    if (isLoadingDetail === true) {
+      setContinueAvailable(false);
+      setPrimaryButtonLabel("Loading details...");
+    } else {
+      setPrimaryButtonLabel("Remove");
+    }
+  }, [isLoadingDetail]);
 
   useEffect(() => {
     if (amountPercentage !== 0) {

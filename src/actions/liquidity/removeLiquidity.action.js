@@ -4,14 +4,12 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { poolConstants } from "../../constants";
 import ERC20ABI_ROUTER from "../../_contracts/router.json";
 import { selectPoolInfoByAddress } from "../../reducers/assetsPool.reducer";
-import {
-  getAmountInWeiFormatted,
-  isContainVET,
-} from "../../utils/lib";
+import { getAmountInWeiFormatted, isContainVET } from "../../utils/lib";
 import ERC20ABI_PAIR from "../../_contracts/pair.json";
 import { selectLiquidityPool } from "../../reducers/removeLiquidity.reducer";
 import { getUserTokenAmounts } from "../pool.action";
 import PartialConstants from "../../constants/partial.constants";
+import * as actions from "../index";
 
 const ADDRESS_ROUTER = process.env.REACT_APP_ADDRESS_ROUTER;
 
@@ -32,11 +30,6 @@ export const loadDetailRemoveLiquidity = createAsyncThunk(
     let abExchangeRate, baExchangeRate;
 
     if (poolAddress && account) {
-      // const poolInfo = selectPoolInfoByAddress(currentState, poolAddress);
-      // const poolInfo = selectPoolInfoByAddress(
-      //   currentState,
-      //   poolAddress
-      // );
 
       const contractPair = new web3.eth.Contract(ERC20ABI_PAIR, poolAddress);
       addressTokenA = await contractPair.methods.token0().call();
@@ -72,7 +65,7 @@ export const loadDetailRemoveLiquidity = createAsyncThunk(
       abExchangeRate = reserve2 / reserve1;
       baExchangeRate = reserve1 / reserve2;
 
-      balanceAccount = liquidityPool
+      balanceAccount = liquidityPool;
     }
     return {
       addressTokenA,
@@ -89,10 +82,7 @@ export const loadDetailRemoveLiquidity = createAsyncThunk(
 
 export const approvePoolLiquidity = createAsyncThunk(
   poolConstants.APPROVE_POOL_ADDRESS,
-  async (
-    { poolAddress },
-    { getState }
-  ) => {
+  async ({ poolAddress }, { getState }) => {
     if (!poolAddress) return;
 
     const state = getState();
@@ -130,7 +120,7 @@ export const removeLiquidity = createAsyncThunk(
   poolConstants.REMOVE_LIQUIDITY,
   async (
     { amount, amountTokenA, amountTokenB, tokenAInfo, tokenBInfo },
-    { getState }
+    { getState, dispatch }
   ) => {
     const currentState = getState();
 
@@ -153,16 +143,6 @@ export const removeLiquidity = createAsyncThunk(
     const methodRemoveLiquidity = connex.thor
       .account(ADDRESS_ROUTER)
       .method(removeLiquidityABI);
-
-    // "removeLiquidity(
-    //     address tokenA,
-    //     address tokenB,
-    //     uint liquidity,
-    //     uint amountAMin,
-    //     uint amountBMin,
-    //     address to,
-    //     uint deadline
-    // )"
 
     console.log("liquidityPool", liquidityPool);
 
@@ -250,6 +230,17 @@ export const removeLiquidity = createAsyncThunk(
         .comment(`transaction remove pool ${assetsPoolName} from VeBank`)
         .request();
     }
+
+    transaction &&
+      dispatch(
+        actions.alertActions.success({
+          title: "Remove liquidity success",
+          details: {
+            txid: transaction.txid,
+            message: "View on Chain",
+          },
+        })
+      );
     return transaction;
   }
 );

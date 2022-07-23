@@ -61,62 +61,56 @@ export const web3Connect = (isLogin) => async (dispatch) => {
       )
     );
 
+    await connex.vendor
+    .sign("cert", {
+      purpose: "identification",
+      payload: {
+        type: "text",
+        content: "Please sign the certificate to continue purchase",
+      },
+    })
+    .accepted(() => alert("accepted"))
+    .request()
+    .then((signer) => {
+      _acc = signer.annex.signer;
+      _sign = JSON.stringify(signer);
 
-    try {
-      await connex.vendor
-      .sign("cert", {
-        purpose: "agreement",
-        payload: {
-          type: "text",
-          content: "agreement",
-        },
-      })
-      .request()
-      .then((signer) => {
-        _acc = signer.annex.signer;
-        _sign = JSON.stringify(signer);
+      localStorage.setItem("_acc", _acc);
+      localStorage.setItem("_sign", _sign);
 
-        localStorage.setItem("_acc", _acc);
-        localStorage.setItem("_sign", _sign);
-
-        dispatch({
-          type: web3Constants.WEB3_CONNECT,
-          connex,
-          web3,
-          signer,
-          account: _acc,
-        });
-
-        dispatch(
-          actions.alertActions.update(
-            {
-              status: "success",
-              title: "Connected",
-              description: `Wallet: ${addressWalletCompact(_acc)}`,
-            },
-            key
-          )
-        );
-
-        return _acc;
-      })
-      .catch((e) => {
-        dispatch(
-          actions.alertActions.update(
-            {
-              title: "Connect",
-              status: "warning",
-              description: e.message,
-            },
-            key
-          )
-        );
+      dispatch({
+        type: web3Constants.WEB3_CONNECT,
+        connex,
+        web3,
+        signer,
+        account: _acc,
       });
 
-    } catch (error) {
-      console.log("error web3 actions:",error);
-    }
-    // Ask user to sign the agreement
+      dispatch(
+        actions.alertActions.update(
+          {
+            status: "success",
+            title: "Connected",
+            description: `Wallet: ${addressWalletCompact(_acc)}`,
+          },
+          key
+        )
+      );
+
+      return _acc;
+    })
+    .catch((e) => {
+      dispatch(
+        actions.alertActions.update(
+          {
+            title: "Connect",
+            status: "warning",
+            description: e.message,
+          },
+          key
+        )
+      );
+    });
     
   } else {
     dispatch({

@@ -146,6 +146,11 @@ export const supplyMarket = (dataToken, amount) => async (dispatch, getState) =>
 
     const { account, connex } = state.web3;
 
+    if(!account){
+        dispatch(actions.web3Connect(true));
+        return;
+    }
+
     if (connex && account && dataToken.assetsAddress) {
 
         const key = randomKeyUUID();

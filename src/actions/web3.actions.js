@@ -51,16 +51,6 @@ export const web3Connect = (isLogin) => async (dispatch) => {
   } else if (!_acc && isLogin) {
     const key = randomKeyUUID();
 
-    dispatch(
-      actions.alertActions.loading(
-        {
-          title: "Connecting",
-          description: `Wallet sync2 waiting...`,
-        },
-        key
-      )
-    );
-
     await connex.vendor
     .sign("cert", {
       purpose: "identification",
@@ -69,7 +59,19 @@ export const web3Connect = (isLogin) => async (dispatch) => {
         content: "Please sign the certificate to continue purchase",
       },
     })
-    .accepted(() => alert("accepted"))
+    .accepted((confirm) => {
+      dispatch(
+        actions.alertActions.loading(
+          {
+            title: "Connecting",
+            description: `Wallet sync2 waiting...`,
+          },
+          key
+        )
+      );
+      console.log("confirm",confirm);
+      return _acc;
+    })
     .request()
     .then((signer) => {
       _acc = signer.annex.signer;

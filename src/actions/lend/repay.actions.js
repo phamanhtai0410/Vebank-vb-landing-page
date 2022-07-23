@@ -60,6 +60,8 @@ export const loadModalRepay = (dataToken) => async (dispatch, getState) => {
 
         const accountReserve = await contractAAVE.methods.getUserReserveData(dataToken.assetsAddress, account).call();
 
+        console.log("getUserReserveData", accountReserve);
+
         if (accountReserve.currentVariableDebt !== "0") {
             accountBalanceVariableDebt = ethers.utils.formatUnits(accountReserve.currentVariableDebt, dataToken.assetsDecimals);
             // console.log("accountBalanceVariableDebt", accountBalanceVariableDebt)
@@ -137,7 +139,7 @@ export const approveRepay = (dataToken) => async (dispatch, getState) => {
                     status: "success",
                     title: "Approve success",
                     description: `Approve supply ${dataToken.assetsChain} on VeBank success!`,
-                  }, key));
+                }, key));
 
                 return result;
 

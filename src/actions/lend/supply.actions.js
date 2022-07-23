@@ -147,8 +147,6 @@ export const supplyMarket = (dataToken, amount) => async (dispatch, getState) =>
 
     const { account, connex } = state.web3;
 
-
-
     if (connex && account && dataToken.assetsAddress) {
 
         const key = randomKeyUUID();
@@ -170,39 +168,39 @@ export const supplyMarket = (dataToken, amount) => async (dispatch, getState) =>
 
         // console.log(dataToken.assetsAddress, valueAmount, account, 0);
         methodSupply.transact(dataToken.assetsAddress, valueAmount, account, 0)
-            .comment(`transfer ${amount} ${dataToken.assetsChain} to Supply VeBank`)
-            .request()
-            .then(transaction => {
+        .comment(`transfer ${amount} ${dataToken.assetsChain} to Supply VeBank`)
+        .request()
+        .then(transaction => {
 
-                dispatch({
-                    type: marketplaceConstants.MODAL_SUPPLY_MARKET_SUCCESS,
-                    transaction: 1
-                });
-
-                dispatch(actions.alertActions.update({
-                    status: "success",
-                    title: "Transaction Submitted",
-                    description: `Transfer ${amount} ${dataToken.assetsChain} to Supply VeBank`,
-                  }, key));
-
-                dispatch(actions.reloadAccountAssets());
-
-                return transaction;
-
-            }).catch((e) => {
-
-                console.log("error----", e);
-                dispatch({
-                    type: marketplaceConstants.MODAL_SUPPLY_MARKET_ERROR
-                });
-                dispatch(actions.alertActions.update({
-                    status: "warning",
-                    title: "Transaction Supply Rejected",
-                    description: e.message
-                  }, key));
-                return e;
-
+            dispatch({
+                type: marketplaceConstants.MODAL_SUPPLY_MARKET_SUCCESS,
+                transaction: 1
             });
+
+            dispatch(actions.alertActions.update({
+                status: "success",
+                title: "Transaction Submitted",
+                description: `Transfer ${amount} ${dataToken.assetsChain} to Supply VeBank`,
+                }, key));
+
+            dispatch(actions.reloadAccountAssets());
+
+            return transaction;
+
+        }).catch((e) => {
+
+            console.log("error----", e);
+            dispatch({
+                type: marketplaceConstants.MODAL_SUPPLY_MARKET_ERROR
+            });
+            dispatch(actions.alertActions.update({
+                status: "warning",
+                title: "Transaction Supply Rejected",
+                description: e.message
+                }, key));
+            return e;
+
+        });
 
     }
 

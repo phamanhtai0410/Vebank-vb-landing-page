@@ -120,7 +120,7 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
         accountApprove,
         accountStableDebtApprove,
         accountVariableDebtApprove,
-        accountBalance: formatLocaleString(accountBalance),
+        accountBalance: formatLocaleString(accountBalance,dataToken.assetsDecimals),
         dataToken
     });
 
@@ -221,6 +221,8 @@ export const borrowMarket = (dataToken, amount, rateMode) => async (dispatch, ge
 
     const { account, connex } = state.web3;
 
+    console.log("borrowMarket",amount,dataToken);
+
     if (connex && account && dataToken.assetsAddress) {
 
         const key = randomKeyUUID();
@@ -235,9 +237,13 @@ export const borrowMarket = (dataToken, amount, rateMode) => async (dispatch, ge
         });
 
         const borrowABI = ERC20ABI_POOL.find(({ name, type }) => (name === "borrow" && type === "function"));
-
+console.log("borrowABI",borrowABI);
         const methodBorrow = connex.thor.account(ADDRESS_POOL).method(borrowABI);
+
+        console.log("methodBorrow",methodBorrow);
         const amountBorrow = ethers.utils.parseUnits(amount.toString(), dataToken.assetsDecimals);
+
+        console.log("amountBorrow",amountBorrow);
 
         methodBorrow.transact(dataToken.assetsAddress, amountBorrow, rateMode, 0, account)
             .comment(`transfer ${amount} ${dataToken.assetsChain} to Borrow VeBank`)

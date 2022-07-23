@@ -23,12 +23,12 @@ const AccountAssets = () => {
 
     useEffect(() => {
         if (dataAssets && dataAssets.length > 0 && data.length  === 0) {
-            fetchAccountAssets();
+            fetchAccountAssets(dataAssets);
         }
     }, [dataAssets]);
 
-    async function fetchAccountAssets() {
-        await dispatch(actions.getAccountAssets());
+    async function fetchAccountAssets(dataAssets) {
+        await dispatch(actions.getAccountAssets(dataAssets));
     }
 
     const handlerClickShowAssets = (e) => {

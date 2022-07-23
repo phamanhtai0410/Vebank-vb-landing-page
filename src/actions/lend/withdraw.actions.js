@@ -114,7 +114,7 @@ export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
         type: marketplaceConstants.MODAL_OPEN_WITHDRAW_MARKET,
         loading:false,
         accountApprove,
-        accountBalance:formatLocaleString(accountBalance),
+        accountBalance: formatLocaleString(accountBalance, dataToken.assetsDecimals),
         dataToken
     });
 

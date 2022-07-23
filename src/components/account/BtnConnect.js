@@ -24,10 +24,12 @@ const BtnConnect = () => {
     if (!isConnecting) {
       setIsConnecting(true);
       await dispatch(actions.web3Connect(true))
-        .then(() => {
+        .then((res) => {
+          console.log("connectWalletHandler res",res);
           setIsConnecting(false);
         })
         .catch((e) => {
+          console.log("connectWalletHandler err",e);
           setIsConnecting(false);
         });
     }

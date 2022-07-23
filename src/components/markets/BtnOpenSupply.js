@@ -13,6 +13,7 @@ const BtnOpenSupply = ({ item }) => {
     const dispatch = useDispatch();
 
     const handlerOpenModal = async () => {
+        console.log("handlerOpenModal",item);
 
         if (item && item.assetsAddress) {
             dispatch(actions.loadModalSupply(item))

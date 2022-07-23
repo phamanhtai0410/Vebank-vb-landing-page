@@ -30,7 +30,8 @@ export const loadModalSupply = (dataToken) => async (dispatch, getState) => {
     let accountApprove = 0;
     let contractSupply;
 
-    if (!account) {
+    if(!account){
+        dispatch(actions.web3Connect(true));
         return;
     }
     
@@ -146,10 +147,7 @@ export const supplyMarket = (dataToken, amount) => async (dispatch, getState) =>
 
     const { account, connex } = state.web3;
 
-    if(!account){
-        dispatch(actions.web3Connect(true));
-        return;
-    }
+
 
     if (connex && account && dataToken.assetsAddress) {
 

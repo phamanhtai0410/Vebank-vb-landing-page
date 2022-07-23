@@ -61,8 +61,9 @@ export const web3Connect = (isLogin) => async (dispatch) => {
       )
     );
 
-    // Ask user to sign the agreement
-    await connex.vendor
+
+    try {
+      await connex.vendor
       .sign("cert", {
         purpose: "agreement",
         payload: {
@@ -111,6 +112,12 @@ export const web3Connect = (isLogin) => async (dispatch) => {
           )
         );
       });
+
+    } catch (error) {
+      console.log("error web3 actions:",error);
+    }
+    // Ask user to sign the agreement
+    
   } else {
     dispatch({
       type: web3Constants.WEB3_CONNECT,

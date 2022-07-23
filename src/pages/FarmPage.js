@@ -7,7 +7,7 @@ import FarmTab from "../components/farm/FarmTab";
 const FarmPage = () => {
   return (
     <section className="farm box-borrows mx-auto bg-cover bg-center">
-      <div className="lg:px-4 lg:container xl:px-12 mx-auto px-4 min-h-screen pt-24 pb-24">
+      <div className="lg:px-4 lg:container xl:px-12 mx-auto px-4 min-h-screen pt-16 pb-24">
         <div className="flex flex-row mt-4">
           <div className="flex flex-row justify-between items-center w-full cursor-pointer">
             <div className="flex flex-row items-end w-1/5">

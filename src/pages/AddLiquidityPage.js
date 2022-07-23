@@ -5,7 +5,7 @@ import ModalSelectToken from "../components/liquidity/AddLiquidity/selectToken/M
 const AddLiquidityPage = () => {
   return (
     <section className="box-borrows mx-auto bg-cover bg-center">
-      <div className="w-full h-full pb-9 min-h-screen flex items-start justify-center bg-content -z-50 pt-24">
+      <div className="w-full h-full pb-9 min-h-screen flex items-start justify-center bg-content -z-50 pt-16">
         <AddLiquidity />
       </div>
       <ModalSelectToken />

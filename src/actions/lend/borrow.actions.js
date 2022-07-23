@@ -41,7 +41,8 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
     let accountStableDebtApprove = 0;
     let accountVariableDebtApprove = 0;
 
-    if (!account) {
+    if(!account){
+        dispatch(actions.web3Connect(true));
         return;
     }
 
@@ -65,7 +66,6 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
             accountBalance = accountBalance / dataPrice[dataToken.assetsAddress];
         }
 
-        
         if(contractAAVE ){
 
             const getReserveData = await contractAAVE.methods.getReserveData(dataToken.assetsAddress).call();

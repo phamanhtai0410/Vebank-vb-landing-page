@@ -59,7 +59,7 @@ export const web3Connect = (isLogin) => async (dispatch) => {
         content: "Please sign the certificate to continue purchase",
       },
     })
-    .accepted((confirm) => {
+    .accepted(() => {
       dispatch(
         actions.alertActions.loading(
           {
@@ -69,7 +69,6 @@ export const web3Connect = (isLogin) => async (dispatch) => {
           key
         )
       );
-      console.log("confirm",confirm);
       return _acc;
     })
     .request()

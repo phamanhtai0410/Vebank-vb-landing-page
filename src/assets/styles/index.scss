@@ -103,6 +103,7 @@ header {
   background: rgba(13, 21, 34, 0.5);
   backdrop-filter: blur(100px);
   -webkit-backdrop-filter: blur(100px);
+  border-radius: 8px;
 }
 
 header::before, .navbar-sub-menu::before {
@@ -115,6 +116,7 @@ header::before, .navbar-sub-menu::before {
   left: 0;
   top: 0;
   z-index: -1;
+  border-radius: 8px;
 }
 
 /* Chrome, Safari, Edge, Opera */

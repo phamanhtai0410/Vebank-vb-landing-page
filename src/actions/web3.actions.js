@@ -112,7 +112,7 @@ export const web3Connect = (isLogin) => async (dispatch) => {
         )
       );
     });
-    
+
   } else {
     dispatch({
       type: web3Constants.WEB3_CONNECT,
@@ -171,15 +171,15 @@ export const instantiateVetContracts = () => async (dispatch, getState) => {
 
     const contractVET = new web3.eth.Contract(assetAbi[TOKEN_VET], TOKEN_VET);
     if (contractVET) {
-      console.log(
-        "🐶🐶  ~ instantiateVetContracts ~ contractVET.events",
-        contractVET.events
-      );
+      // console.log(
+      //   "🐶🐶  ~ instantiateVetContracts ~ contractVET.events",
+      //   contractVET.events
+      // );
 
       contractVET.events
         .Approval()
         .on("data", async (data) => {
-          console.log("🐶🐶  ~ contractVET.events.Approval ~ data", data);
+          // console.log("🐶🐶  ~ contractVET.events.Approval ~ data", data);
           // dispatch(instantiateVetContracts());
 
           if (compareString(data.returnValues?.owner, account)) {
@@ -303,15 +303,15 @@ export const instantiateVetContracts = () => async (dispatch, getState) => {
       TOKEN_VTHO
     );
     if (contractVTHO) {
-      console.log(
-        "🐶🐶  ~ instantiateVetContracts ~ contractVTHO.events",
-        contractVTHO.events
-      );
+      // console.log(
+      //   "🐶🐶  ~ instantiateVetContracts ~ contractVTHO.events",
+      //   contractVTHO.events
+      // );
       contractVTHO.events.Approval?.().removeAllListeners?.();
       contractVTHO.events
         .Approval?.()
         .on("data", async (data) => {
-          console.log("🐶🐶  ~ contractVTHO.events.Approval ~ data", data);
+          // console.log("🐶🐶  ~ contractVTHO.events.Approval ~ data", data);
           // dispatch(instantiateVetContracts());
           if (compareString(data.returnValues?.owner, account)) {
             const accInfo = await connex.thor.account(account).get();
@@ -456,7 +456,7 @@ export const instantiateVBContracts = () => async (dispatch, getState) => {
       contractVB.events
         .Approval?.()
         .on("data", async (data) => {
-          console.log("🐶🐶  ~ VB approval event ~ data", data);
+          // console.log("🐶🐶  ~ VB approval event ~ data", data);
 
           if (data.returnValues?.owner?.equals?.(account)) {
             contractVB.methods
@@ -526,12 +526,12 @@ export const instantiateVBContracts = () => async (dispatch, getState) => {
               .balanceOf(account)
               .call()
               .then((balanceBigNumber) => {
-                console.log("🐶🐶  ~ balance VB (raw)", balanceBigNumber);
+                // console.log("🐶🐶  ~ balance VB (raw)", balanceBigNumber);
                 let balance = ethers.utils.formatUnits(
                   balanceBigNumber,
                   PartialConstants.DEFAULT_ASSET_DECIMAL
                 );
-                console.log("🐶🐶  ~ VB formatted ~ balance", balance);
+                // console.log("🐶🐶  ~ VB formatted ~ balance", balance);
                 balance = Math.round(balance * 100) / 100;
                 dispatch({
                   type: web3Constants.INIT_CONTRACT_VB,
@@ -596,7 +596,7 @@ export const instantiateVEUSDContracts = createAsyncThunk(
         contractVEUSD.events
           .Approval?.()
           .on("data", async (data) => {
-            console.log("🐶🐶  ~ contractVEUSD.events.Approval ~ data", data);
+            // console.log("🐶🐶  ~ contractVEUSD.events.Approval ~ data", data);
             if (account.equals?.(data.returnValues?.owner)) {
               contractVEUSD.methods
                 .balanceOf(account)
@@ -639,7 +639,7 @@ export const instantiateVEUSDContracts = createAsyncThunk(
         contractVEUSD.events
           .Transfer()
           .on("data", async function (event) {
-            console.log("onTransferEvent - VeUSD", event);
+            // console.log("onTransferEvent - VeUSD", event);
             // Do something here
             // let balance = Number(selectBalanceById(getState(), TOKEN_VEUSD));
             // const { value, to } = event?.returnValues;

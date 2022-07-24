@@ -72,7 +72,8 @@ const useRemoveLiquidFacade = () => {
   );
 
   const isEnabled = useMemo(() => {
-    return !isApproving && approvePoolState >= removeAmount;
+    console.log('🐶🐶  ~ isEnabled ~ approvePoolState', approvePoolState)
+    return !isApproving && approvePoolState > 0 && approvePoolState >= removeAmount;
   }, [isApproving, removeAmount, approvePoolState]);
 
   const removeAvailable = useMemo(() => {
@@ -137,10 +138,7 @@ const useRemoveLiquidFacade = () => {
     await dispatch(
       actions.approvePoolLiquidity({
         poolAddress,
-        addressTokenA: firstTokenAddress,
-        addressTokenB: secondTokenAddress,
-        tokenAInfo: firstTokenInfo,
-        tokenBInfo: secondTokenInfo,
+        removeAmount
       })
     );
   };
@@ -157,6 +155,7 @@ const useRemoveLiquidFacade = () => {
   useEffect(() => {
     if (amountPercentage !== 0) {
       setPrimaryButtonLabel("Remove");
+      setEnableBtnLabel(isEnabled ? "Enabled" : "Enable")
     } else {
       setPrimaryButtonLabel("Enter an amount");
     }
@@ -166,9 +165,12 @@ const useRemoveLiquidFacade = () => {
     if (!isApproving) {
       if (approvePoolState <= 0) {
         setEnableBtnLabel("Enable");
-      } else {
+      } else if (isEnabled) {
         setEnableBtnLabel("Enabled");
         setContinueAvailable(true);
+      } else {
+        setEnableBtnLabel("Enable");
+        setContinueAvailable(false);
       }
     } else {
       setEnableBtnLabel("Enabling...");

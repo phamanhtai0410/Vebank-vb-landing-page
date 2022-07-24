@@ -213,13 +213,13 @@ export function liquidReducer(state = initialState, action) {
         isApproving: true,
       };
     }
-    case approveSecondTokenAddLiquidity.fulfilled.type: {
-      return {
-        ...state,
-        isApproving: false,
-        approveTokenB: action.payload.approveTokenB,
-      };
-    }
+    // case approveSecondTokenAddLiquidity.fulfilled.type: {
+    //   return {
+    //     ...state,
+    //     isApproving: false,
+    //     approveTokenB: action.payload.approveTokenB,
+    //   };
+    // }
     case approveSecondTokenAddLiquidity.rejected.type: {
       return {
         ...state,

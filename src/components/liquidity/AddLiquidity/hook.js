@@ -349,7 +349,7 @@ const useAddLiquidFacade = () => {
         // User decline or adding liquidity failed
         setStep(2);
       } else if (addLiquidityState === true) {
-        navigate(RouteName.LIQUIDITY);
+        navigate(RouteName.LIQUIDITY, {replace: true});
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

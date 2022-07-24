@@ -82,7 +82,7 @@ export const loadDetailRemoveLiquidity = createAsyncThunk(
 
 export const approvePoolLiquidity = createAsyncThunk(
   poolConstants.APPROVE_POOL_ADDRESS,
-  async ({ poolAddress }, { getState }) => {
+  async ({ poolAddress, removeAmount = 1000 }, { getState }) => {
     if (!poolAddress) return;
 
     const state = getState();
@@ -93,7 +93,7 @@ export const approvePoolLiquidity = createAsyncThunk(
 
     const poolInfo = selectPoolInfoByAddress(state, poolAddress);
 
-    const amountMax = 1_000_000_000;
+    const amountMax = removeAmount;
 
     if (account && contractPair && poolAddress) {
       const approveABI = ERC20ABI_PAIR.find(

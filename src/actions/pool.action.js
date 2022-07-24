@@ -4,7 +4,7 @@ import { poolConstants } from "../constants";
 
 import ERC20ABI_PAIR from "../_contracts/pair.json";
 import ERC20ABI_FACTORY from "../_contracts/factory.json";
-import { getDecimalForAsset } from "../utils/lib";
+import { compareString, getDecimalForAsset } from "../utils/lib";
 import PartialConstants from "../constants/partial.constants";
 import * as actions from "./index";
 
@@ -53,8 +53,9 @@ export const getPoolAssets = () => async (dispatch, getState) => {
         if (contractPair && !_isSubscribed) {
           _pairApproveEvent = contractPair.events.Approval?.();
           _pairApproveEvent.on("data", async (data) => {
+            console.log('🐶🐶  ~ _pairApproveEvent.on ~ data', data)
             // When this pair have a Approve event from anyone, it will be process in this closure
-            if (account.equals(data.returnValues?.owner)) {
+            if (compareString(data.returnValues?.owner, account)) {
               // If this event is triggered by the user
               const balanceBigN = await contractPair.methods
                 .balanceOf(account)

@@ -147,39 +147,31 @@ export const checkApproval = createAsyncThunk(
     let approveTokenA = 0;
     let approveTokenB = 0;
 
-    const contractAddLiquidityA = new web3.eth.Contract(
+    const contractTokenA = new web3.eth.Contract(
       assetAbi[firstTokenAddress],
       firstTokenAddress
     );
 
-    approveTokenA = await contractAddLiquidityA.methods
+    approveTokenA = await contractTokenA.methods
       .allowance(account, ADDRESS_ROUTER)
       .call();
-    const firstTokenInfo = selectAssetByAddress(
-      currentState,
-      firstTokenAddress
-    );
     approveTokenA = ethers.utils.formatUnits(
       approveTokenA,
-      firstTokenInfo.assetsDecimals
+      getDecimalForAsset(firstTokenAddress)
     );
     approveTokenA = Number(approveTokenA);
 
-    const contractAddLiquidityB = new web3.eth.Contract(
+    const contractTokenB = new web3.eth.Contract(
       assetAbi[secondTokenAddress],
       secondTokenAddress
     );
 
-    approveTokenB = await contractAddLiquidityB.methods
+    approveTokenB = await contractTokenB.methods
       .allowance(account, ADDRESS_ROUTER)
       .call();
-    const secondTokenInfo = selectAssetByAddress(
-      currentState,
-      secondTokenAddress
-    );
     approveTokenB = ethers.utils.formatUnits(
       approveTokenB,
-      secondTokenInfo.assetsDecimals
+      getDecimalForAsset(secondTokenAddress)
     );
     approveTokenB = Number(approveTokenB);
 

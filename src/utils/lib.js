@@ -51,7 +51,7 @@ export function formatUriSecure(url) {
   return url + `?st=${secure_link}&e=${expireTime}`;
 }
 
-export function nFormatter(num, digits) {
+export function nFormatter(num, digits=8) {
   var si = [
     { value: 1, symbol: "" },
     { value: 1e3, symbol: "k" },

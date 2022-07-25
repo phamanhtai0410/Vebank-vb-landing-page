@@ -166,7 +166,8 @@ const swapAssetSlice = createSlice({
         state.loadingExchangeRate = false;
         state.reserves1 = action.payload.reserves1;
         state.reserves2 = action.payload.reserves2;
-        state.exchangeRateAB = action.payload.exchangeRateFormat;
+        state.exchangeRateAB = action.payload.exchangeRateFormatAB;
+        state.exchangeRateBA = action.payload.exchangeRateFormatBA;
       })
       .addCase(checkExchangeRatePool.rejected, (state) => {
         state.loadingExchangeRate = false;
@@ -200,7 +201,8 @@ export const selectNameTokenState = (state) => state.swapAsset.nameToken;
 export const selectOpenChooseTokenState = (state) =>
   state.swapAsset.isModalSelectTokenOpen;
 export const selectSymbolPairs = (state) => state.swapAsset.symbolPairs;
-export const selectExchangeRate = (state) => state.swapAsset.exchangeRateAB;
+export const selectExchangeRateAB = (state) => state.swapAsset.exchangeRateAB;
+export const selectExchangeRateBA = (state) => state.swapAsset.exchangeRateBA;
 export const selectIsSwap = (state) => state.swapAsset.isSwap;
 export const selectLoadingFee = (state) => state.swapAsset.loadingFee;
 export const selectPairsFee = (state) => state.swapAsset.pairFee;
@@ -219,3 +221,4 @@ export const selectLoadingExchangeRate = (state) =>
 export const selectPoolErr = (state) => state.swapAsset.poolErr;
 export const selectEmptyAddress = (state) => state.swapAsset.emptyAddress;
 export const selectUserInput = (state) => state.swapAsset.userInput;
+export const selectPoolAddress = (state) => state.swapAsset.poolAddress;

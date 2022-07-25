@@ -24,7 +24,6 @@ import {
   approveSuccess,
   getSymbolPairs,
   refreshDataSwap,
-  updateStatusSwap,
 } from "../reducers/swap.reducer";
 import PartialConstants from "../constants/partial.constants";
 
@@ -155,15 +154,32 @@ export const checkExchangeRatePool = createAsyncThunk(
           : "ether"
       );
 
-      const exchangeRate = await contractFactory.methods
+      const amountsOut = await contractFactory.methods
         .getAmountsOut(amountInUint, [tokenAddressA, tokenAddressB])
         .call();
-      const exchangeRateFormat = ethers.utils.formatUnits(
-        exchangeRate[1],
+      const exchangeRateFormatAB = ethers.utils.formatUnits(
+        amountsOut[1],
         getDecimalForAsset(tokenAddressB)
       );
 
-      return { reserves1, reserves2, exchangeRateFormat };
+
+      const amountOutUint = web3.utils.toWei(
+        "1",
+        getDecimalForAsset(tokenAddressB) === PartialConstants.VEUSD_DECIMAL
+          ? "mwei"
+          : "ether"
+      );
+
+      const amountsIn = await contractFactory.methods
+        .getAmountsIn(amountOutUint, [tokenAddressA, tokenAddressB])
+        .call();
+        
+      const exchangeRateFormatBA = ethers.utils.formatUnits(
+        amountsIn[0],
+        getDecimalForAsset(tokenAddressA)
+      );
+
+      return { reserves1, reserves2, exchangeRateFormatAB, exchangeRateFormatBA  };
     }
   }
 );

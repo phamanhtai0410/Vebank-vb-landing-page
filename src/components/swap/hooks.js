@@ -5,7 +5,8 @@ import {
   selectSourceToken,
   // swapTokenDesire,
   openModalSelectToken,
-  selectExchangeRate,
+  selectExchangeRateAB,
+  selectExchangeRateBA,
   selectIsSwap,
   selectPairsFee,
   selectLoadingFee,
@@ -21,6 +22,7 @@ import {
   selectEmptyAddress,
   selectLoadingApprove,
   selectUserInput,
+  selectPoolAddress,
 } from "../../reducers/swap.reducer";
 import { selectAssetByAddress } from "../../reducers/assetsMarket.reducer";
 import { selectPriceByTokenAddress } from "../../reducers/assetsPrice.reducer";
@@ -31,6 +33,7 @@ import * as actions from "../../actions";
 import {
   checkApproveToken,
   checkAssetExistsPools,
+  checkExchangeRatePool,
   checkTotalSupplyAvailable,
   getAmountsIn,
   getAmountsOut,
@@ -49,10 +52,11 @@ const useSwapFacade = () => {
   const amountsIn = useSelector(selectAmountsIn);
   const [inputAmountIn, setInputAmountIn] = useState(amountsIn);
   const [inputAmountOut, setInputAmountOut] = useState(amountsOut);
-  const [inputSlippage, setInputSlippage] = useState(0.1);
+  const [inputSlippage, setInputSlippage] = useState(0.5);
   const [pressSwap, setPressSwap] = useState(false);
   const [showErr, setShowErr] = useState(false);
-  const [showDetailInfo, setShowDetailInfo] = useState(false);
+  const [showDetailInfo, setShowDetailInfo] = useState(true);
+
   const userInputRef = useRef(userInput);
   const amountInRef = useRef(amountsIn);
   const amountOutRef = useRef(amountsOut);
@@ -60,7 +64,8 @@ const useSwapFacade = () => {
   const sourceTokenAddress = useSelector(selectSourceToken);
   const desireTokenAddress = useSelector(selectDesireToken);
 
-  const exchangeRate = useSelector(selectExchangeRate);
+  const exchangeRateAB = useSelector(selectExchangeRateAB);
+  const exchangeRateBA = useSelector(selectExchangeRateBA);
   const isSwap = useSelector(selectIsSwap);
   const fee = useSelector(selectPairsFee);
   const loadingFee = useSelector(selectLoadingFee);
@@ -74,6 +79,7 @@ const useSwapFacade = () => {
   const swapSuccess = useSelector(selectSwapSuccess);
   const poolErr = useSelector(selectPoolErr);
   const emptyAddress = useSelector(selectEmptyAddress);
+  const poolAddress = useSelector(selectPoolAddress);
 
   const sourceTokenInfo = useSelector((state) =>
     selectAssetByAddress(state, sourceTokenAddress)
@@ -97,10 +103,19 @@ const useSwapFacade = () => {
     selectBalanceById(state, process.env.REACT_APP_TOKEN_VTHO)
   );
 
+  const [exchangeRate, setExchangeRate] = useState(exchangeRateAB);
+
+  const [sourceTokenChain, setSourceTokenChain] = useState(
+    sourceTokenInfo?.assetsChain
+  );
+  const [desireTokenChain, setDesireTokenChain] = useState(
+    desireTokenInfo?.assetsChain
+  );
+
   const isSwapSuccess = useMemo(() => swapSuccess, [swapSuccess]);
 
   const swapFee = useMemo(
-    () => (inputAmountIn * (fee * 0.1)) / 100,
+    () => (inputAmountIn * (fee / 10)) / 100,
     [fee, inputAmountIn]
   );
 
@@ -109,8 +124,8 @@ const useSwapFacade = () => {
     [sourceTokenPrice, desireTokenPrice]
   );
   const desireTokenAmount = useMemo(
-    () => inputAmountIn * exchangeRate,
-    [inputAmountIn, exchangeRate]
+    () => inputAmountIn * exchangeRateAB,
+    [inputAmountIn, exchangeRateAB]
   );
 
   const desirePerSourceTokenPrice = useMemo(
@@ -210,7 +225,7 @@ const useSwapFacade = () => {
         getAmountOutDebounced(value);
       } else {
         setInputAmountOut("");
-        setShowDetailInfo(false);
+        // setShowDetailInfo(false);
       }
     },
     [getAmountOutDebounced]
@@ -231,6 +246,32 @@ const useSwapFacade = () => {
 
   const onShowDetailInfo = () => {
     setShowDetailInfo(!showDetailInfo);
+  };
+
+  const onCheckExchangeRatePool = () => {
+    dispatch(
+      checkExchangeRatePool({
+        tokenAddressA: sourceTokenAddress,
+        tokenAddressB: desireTokenAddress,
+        assetsPoolAddress: poolAddress,
+      })
+    );
+  };
+
+  const onSwitchExchangeRate = () => {
+    setExchangeRate(
+      exchangeRate === exchangeRateAB ? exchangeRateBA : exchangeRateAB
+    );
+    setSourceTokenChain(
+      exchangeRate === exchangeRateAB
+        ? desireTokenInfo?.assetsChain
+        : sourceTokenInfo?.assetsChain
+    );
+    setDesireTokenChain(
+      exchangeRate === exchangeRateAB
+        ? sourceTokenInfo?.assetsChain
+        : desireTokenInfo?.assetsChain
+    );
   };
 
   useEffect(() => {
@@ -303,6 +344,10 @@ const useSwapFacade = () => {
     checkBalance(amountsIn);
   }, [amountsIn]);
 
+  useEffect(() => {
+    onSwitchExchangeRate()
+  }, [exchangeRateAB, exchangeRateBA]);
+
   return {
     isSwap,
     showErr,
@@ -322,7 +367,8 @@ const useSwapFacade = () => {
     desireTokenBalance,
     vthoBalance,
     sourcePerDesireTokenPrice,
-    exchangeRate,
+    exchangeRateAB,
+    exchangeRateBA,
     desireTokenAmount,
     setInputAmountOut,
     onSwapAssetToken,
@@ -347,6 +393,11 @@ const useSwapFacade = () => {
     poolErr,
     emptyAddress,
     loadingApprove,
+    onCheckExchangeRatePool,
+    onSwitchExchangeRate,
+    exchangeRate,
+    sourceTokenChain,
+    desireTokenChain,
   };
 };
 

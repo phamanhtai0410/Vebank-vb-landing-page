@@ -7,12 +7,14 @@ import * as actions from './';
 import ERC20ABI_AAVE from '../_contracts/lend/AaveProtocolDataProvider.json';
 import ERC20ABI_POOL from '../_contracts/lend/Pool.json';
 import ERC20ABI_ISEER_ORACLE from '../_contracts/SeerOracle.json';
+import ERCABI_REWARD from '../_contracts/lend/RewardsController.json';
 
 // VET : dung de staking duy tri he thong
 // VTH0 : dung de tra vi chay smart Contract
 
 const TOKEN_AAVE = process.env.REACT_APP_ADDRESS_PROTOCOL;
 const ADDRESS_POOL = process.env.REACT_APP_ADDRESS_POOL;
+const ADDRESS_REWARD = process.env.REACT_APP_REWARD_CONTROLLER;
 
 const ListKeyISeerOracle = {
     "VET": process.env.REACT_APP_ISO_VET,
@@ -39,13 +41,24 @@ export const getMarketAssets = () => async (dispatch, getState) => {
 
         let contractAAVE = new web3.eth.Contract(ERC20ABI_AAVE, TOKEN_AAVE);
 
+        let contractIcentives = new web3.eth.Contract(ERCABI_REWARD, ADDRESS_REWARD);
+        console.log("contractIcentives",contractIcentives);
+
         const RAY = 10**27; // 10 to the power 27
         const SECONDS_PER_YEAR = 31536000;
-
         let totalChange = 0;
+
         for await (const item of listAsset) {
 
             const getReserveData = await contractAAVE.methods.getReserveData(item.assetsAddress).call();
+            console.log("getReserveData",getReserveData);
+
+            // Get data
+            const rewardsByAsset = await contractIcentives.methods.getRewardsByAsset(item.assetsAddress).call();
+            console.log("rewardsByAsset",rewardsByAsset);
+
+            // const vEmission = contractIcentives.methods.getAssetData(item.assetsAddress);
+            // console.log("aEmission",aEmission);
             
             const {
                 variableBorrowRate,

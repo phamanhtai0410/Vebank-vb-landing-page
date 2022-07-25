@@ -119,7 +119,7 @@ export function assetsMarketReducer(state = initialState, payload) {
   }
 }
 
-export const selectListAssets = (state) => state.assetsMarketReducer.data;
+export const selectListAssets = (state) => state.assetsMarketReducer.listAsset;
 export const selectAssetByAddress = (state, address) => {
   if (address) {
     return state.assetsMarketReducer.assetEntities[address];

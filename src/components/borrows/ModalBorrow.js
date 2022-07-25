@@ -17,6 +17,7 @@ import BtnBorrowApprove from './BtnBorrowApprove';
 
 import * as actions from '../../actions';
 import useAutoFocus from '../common/hooks/useAutoFocus';
+import CurrencyAssetsUSD from '../markets/CurrencyAssetsUSD';
 
 const customStyles = {
     content: {
@@ -160,9 +161,12 @@ const ModalBorrow = () => {
             }
 
         }
-
         return btn;
 
+    }
+
+    if(!dataToken){
+        return<></>;
     }
 
     return (
@@ -311,7 +315,10 @@ const ModalBorrow = () => {
                             <div className='text-[#FAFAFA]'>
                             </div>
                             <div>
-                                <span className='font-poppins font-thin text-sm'>{numberWithCommas(amount)} $</span>
+                                <span className='font-poppins font-thin text-sm'>
+                                    <CurrencyAssetsUSD currencyBalance={amount} assetsAddress={dataToken.assetsAddress} /> 
+                                    <span>$</span>
+                                </span>
                             </div>
                         </div>
 

@@ -56,8 +56,6 @@ const AssetsMarket = () => {
         return !(openRowAssets.indexOf(assetsAddress) === -1);
     }
 
-
-
     const showListAsset = (dataList) => {
 
         if (dataList && dataList.length > 0) {

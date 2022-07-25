@@ -17,6 +17,7 @@ import IcVeChain from '../../assets/images/ic_vechain.svg';
 
 import useAutoFocus from '../common/hooks/useAutoFocus';
 import BtnSupplyApprove from './BtnSupplyApprove';
+import CurrencyAssetsUSD from '../markets/CurrencyAssetsUSD';
 
 const customStyles = {
     content: {
@@ -129,6 +130,10 @@ const ModalSupply = () => {
         return btn;
     }
 
+    if(!dataToken){
+        return<></>;
+    }
+
     return (
 
         <Modal
@@ -211,7 +216,10 @@ const ModalSupply = () => {
                             <div className='text-[#FAFAFA]'>
                             </div>
                             <div>
-                                <span className='font-poppins font-thin text-sm'>{amount} $</span>
+                                <span className='font-poppins font-thin text-sm'>
+                                    <CurrencyAssetsUSD currencyBalance={amount} assetsAddress={dataToken.assetsAddress} /> 
+                                    <span>$</span>
+                                </span>
                             </div>
                         </div>
 

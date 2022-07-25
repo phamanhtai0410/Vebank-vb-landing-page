@@ -212,7 +212,7 @@ const ModalRepay = () => {
                     </div>
 
                     <div className='px-8'>
-                        {loading === false ? <Range
+                        {loading === false  && Number(accountBalance) > 0 ? <Range
                             step={1}
                             min={0}
                             max={accountBalance > 0 ? accountBalance : null}

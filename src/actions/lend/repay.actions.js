@@ -207,7 +207,7 @@ export const repayMarket = (dataToken, amount, rateMode = 2) => async (dispatch,
 
         connex.vendor
             .sign('tx', clauses)
-            .comment(`transfer ${amount} ${dataToken.assetsChain} to Repay VeBank`)
+            .comment(`transfer ${amount} ${dataToken.assetsChain} to Repay on VeBank`)
             .request()
             .then(transaction => {
 
@@ -296,7 +296,7 @@ export const repayETHMarket = (dataToken, amount, rateMode = 2) => async (dispat
 
         connex.vendor
             .sign('tx',clauses)
-            .comment(`transfer ${amount} VET to repayETH`)
+            .comment(`transfer ${amount} VET to Repay on VeBank`)
             .request()
             .then(transaction => {
 

@@ -10,8 +10,6 @@ import GradientStrokeWrapper from "../partials/GradientStrokeWrapper";
 import { addressWalletCompact, copyTextToClipboard } from "../../utils/lib";
 import ModalWallet from "./ModalWallet";
 
-
-
 const BtnConnect = () => {
   
   const [isConnecting, setIsConnecting] = useState(false);
@@ -24,13 +22,15 @@ const BtnConnect = () => {
 
   const connectWalletHandler = async () => {
     if (!isConnecting) {
-      setIsConnecting(true);
+    //  setIsConnecting(true);
       await dispatch(actions.web3Connect(true))
-        .then(() => {
-          setIsConnecting(false);
+        .then((res) => {
+          console.log("connectWalletHandler res",res);
+         // setIsConnecting(false);
         })
         .catch((e) => {
-          setIsConnecting(false);
+          console.log("connectWalletHandler err",e);
+        //  setIsConnecting(false);
         });
     }
   };

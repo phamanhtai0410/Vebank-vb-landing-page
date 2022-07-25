@@ -92,6 +92,8 @@ const useAddLiquidFacade = () => {
 
   const onSelectFirstCurrency = useCallback(
     (e) => {
+      // Open the select token modal and let the reducer know that this current process is selecting the first token of the pool
+      // A warning dialog will be display if user haven't connect to their wallet
       const action = account
         ? actions.selectFirstToken()
         : actions.alertActions.warning({
@@ -104,6 +106,8 @@ const useAddLiquidFacade = () => {
   );
   const onSelectSecondCurrency = useCallback(
     (e) => {
+      // Open the select token modal and let the reducer know that this current process is selecting the second token of the pool
+      // A warning dialog will be display if user haven't connect to their wallet
       const action = account
         ? actions.selectSecondToken()
         : actions.alertActions.warning({
@@ -115,6 +119,7 @@ const useAddLiquidFacade = () => {
     [account, dispatch]
   );
 
+  // Calculate the corresponding amount with the given value
   const getFirstAmount = useCallback(
     (input) =>
       FixedNumber.from(input)
@@ -123,6 +128,7 @@ const useAddLiquidFacade = () => {
     [secondPerFirstTokenExchangeRate]
   );
 
+  // Calculate the corresponding amount with the given value
   const getSecondAmount = useCallback(
     (input) =>
       FixedNumber.from(input)
@@ -133,6 +139,7 @@ const useAddLiquidFacade = () => {
 
   const onChangeFirstTokenAmount = useCallback(
     (value) => {
+      // Check matching format and set the other token amount with the relative rate.
       if (value.isMatch?.(/^\d*\.?\d*$/)) {
         if (totalSupply === 0) {
           setFirstTokenVolume(value);
@@ -160,6 +167,7 @@ const useAddLiquidFacade = () => {
 
   const onChangeSecondTokenAmount = useCallback(
     (value) => {
+      // Check matching format and set the other token amount with the relative rate.
       if (value.isMatch?.(/^\d*\.?\d*$/)) {
         if (totalSupply === 0) {
           setSecondTokenVolume(value);
@@ -245,6 +253,7 @@ const useAddLiquidFacade = () => {
   };
 
   useEffect(() => {
+    // This effect is mainly to update the primary button label while loading detail state is changing
     if (isLoadingLiquidityDetail) {
       setContinueAvailable(false);
       setPrimaryButtonLabel("Loading details...");
@@ -288,6 +297,7 @@ const useAddLiquidFacade = () => {
   }, [isLoadingLiquidityDetail]);
 
   useEffect(() => {
+    // This effect is used to update primary button label and disabled state when input and account changed
     switch (step) {
       case 1: {
         if (!account) {
@@ -327,25 +337,29 @@ const useAddLiquidFacade = () => {
   }, [firstToken, secondToken, firstTokenVolume, secondTokenVolume, account]);
 
   useEffect(() => {
+    // If user change one or another token, the input fields will be cleared.
     setFirstTokenVolume("");
     setSecondTokenVolume("");
   }, [firstToken, secondToken]);
 
   useEffect(() => {
+    // Process the addLiquidity state if it failed, rejected or success
     if (step === 3 && !isAddingLiquidity) {
       if (addLiquidityState === false) {
         // User decline or adding liquidity failed
         setStep(2);
       } else if (addLiquidityState === true) {
-        navigate(RouteName.LIQUIDITY);
+        navigate(RouteName.LIQUIDITY, {replace: true});
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAddingLiquidity, addLiquidityState, step]);
 
   useEffect(() => {
+    // Fetch the detail when page is first loaded
     dispatch(actions.loadDetailAddLiquidity(poolAddress));
     return () => {
+      // When user is leaving this page, this callBack will be triggered to clear the values
       resetFrm();
       dispatch(actions.clearSelectedTokens());
     };

@@ -8,7 +8,6 @@ import ERC20ABI_AAVE from '../_contracts/lend/AaveProtocolDataProvider.json';
 import ERC20ABI_POOL from '../_contracts/lend/Pool.json';
 import ERC20ABI_ISEER_ORACLE from '../_contracts/SeerOracle.json';
 
-
 // VET : dung de staking duy tri he thong
 // VTH0 : dung de tra vi chay smart Contract
 
@@ -22,12 +21,12 @@ const ListKeyISeerOracle = {
     "VEUSD": process.env.REACT_APP_ISO_VEUSD
 }
 
-export const getMarketAssets = (isCurrentUSD) => async (dispatch, getState) => {
+export const getMarketAssets = () => async (dispatch, getState) => {
 
     const state = getState();
 
     const { web3 } = state.web3;
-    const { data } = state.assetsMarketReducer;
+    const { listAsset } = state.assetsMarketReducer;
 
     let dataTotal = {
         totalSupply: 0,
@@ -36,14 +35,15 @@ export const getMarketAssets = (isCurrentUSD) => async (dispatch, getState) => {
 
     let dataList = [];
 
-    if (web3 && TOKEN_AAVE && data.length > 0) {
+    if (web3 && TOKEN_AAVE && listAsset.length > 0) {
 
         let contractAAVE = new web3.eth.Contract(ERC20ABI_AAVE, TOKEN_AAVE);
 
         const RAY = 10**27; // 10 to the power 27
         const SECONDS_PER_YEAR = 31536000;
 
-        for await (const item of data) {
+        let totalChange = 0;
+        for await (const item of listAsset) {
 
             const getReserveData = await contractAAVE.methods.getReserveData(item.assetsAddress).call();
             
@@ -73,14 +73,6 @@ export const getMarketAssets = (isCurrentUSD) => async (dispatch, getState) => {
             //     ["stableBorrowAPY",stableBorrowAPY]
             // ]);
 
-            // if (isCurrentUSD && ListKeyISeerOracle[item.assetsChain]) {
-            //     let contractISeerOracle = new web3.eth.Contract(ERC20ABI_ISEER_ORACLE, ListKeyISeerOracle[item.assetsChain]);
-            //     const currentPrice = await contractISeerOracle.methods.latestAnswer().call();
-            //     console.log(currentPrice);
-            // }
-
-            //const dataConfig = await contractAAVE.methods.getReserveConfigurationData(item.assetsAddress).call();
-
             let balanceSupply = 0;
             if (getReserveData.totalAToken) {
                 balanceSupply = ethers.utils.formatUnits(getReserveData.totalAToken, item.assetsDecimals);
@@ -92,11 +84,7 @@ export const getMarketAssets = (isCurrentUSD) => async (dispatch, getState) => {
 
                 // const totalStableDebt = ethers.utils.formatUnits(getReserveData.totalStableDebt || '0', item.assetsDecimals);
                 const totalVariableDebt = ethers.utils.formatUnits(getReserveData.totalVariableDebt || '0', item.assetsDecimals);
-
-                // balanceBorrow = Number(totalStableDebt) + Number(totalVariableDebt);
                 balanceBorrow = totalVariableDebt;
-                //balanceBorrow = Math.round((balanceBorrow) * 100) / 100;
-
                 dataTotal.totalBorrow = dataTotal.totalBorrow + Number(balanceBorrow);
 
             }
@@ -105,14 +93,18 @@ export const getMarketAssets = (isCurrentUSD) => async (dispatch, getState) => {
                 ...item,
                 totalSupplied: balanceSupply,
                 totalBorrowed: balanceBorrow,
-                supplyAPY: parseFloat((depositAPY * 100).toFixed(5)),
-                borrowAPY: parseFloat((variableBorrowAPY * 100).toFixed(5))
+                supplyAPY: parseFloat((depositAPY * 100).toFixed(2)),
+                borrowAPY: parseFloat((variableBorrowAPY * 100).toFixed(2)),
+                depositAPY,
+                variableBorrowAPY
             })
 
         }
 
-        dataTotal.totalBorrow = dataTotal.totalBorrow.toFixed(2)
-        dataTotal.totalSupply = dataTotal.totalSupply.toFixed(2)
+
+    
+        dataTotal.totalBorrow = dataTotal.totalBorrow.toFixed(2);
+        dataTotal.totalSupply = dataTotal.totalSupply.toFixed(2);
 
         dispatch({
             type: marketplaceConstants.FETCH_ASSETS_MARKET_SUCCESS,
@@ -125,7 +117,7 @@ export const getMarketAssets = (isCurrentUSD) => async (dispatch, getState) => {
         dispatch({
             type: marketplaceConstants.FETCH_ASSETS_MARKET_SUCCESS,
             ...dataTotal,
-            data
+            data:[]
         });
     }
 
@@ -138,13 +130,13 @@ export const getCurrentAssets = () => async (dispatch, getState) => {
     const state = getState();
 
     const { web3 } = state.web3;
-    const { data } = state.assetsMarketReducer;
+    const { listAsset } = state.assetsMarketReducer;
 
     let dataList = {};
 
-    if (web3 && data.length > 0) {
+    if (web3 && listAsset.length > 0) {
 
-        for await (const item of data) {
+        for await (const item of listAsset) {
 
             if (ListKeyISeerOracle[item.assetsChain]) {
 
@@ -171,79 +163,11 @@ export const getCurrentAssets = () => async (dispatch, getState) => {
 
 };
 
-export const getAccountOverview = () => async (dispatch, getState) => {
+export const getAccountAssets = (dataAssets) => async (dispatch, getState) => {
 
     const state = getState();
 
     const { web3, account } = state.web3;
-
-    const dataPrice = state.assetsPriceReducer.data;
-    const dataAccountAssets = state.accountAssetsReducer.data;
-
-    let healthFactor = 0;
-    let dataList = [];
-
-    if (web3 && account && dataPrice && dataAccountAssets) {
-
-        const contractPOOL = new web3.eth.Contract(ERC20ABI_POOL, ADDRESS_POOL);
-
-        let accountTotalSupplied= 0;
-        let accountTotalBorrowed= 0;
-
-        if (contractPOOL && account) {
-
-            try {
-
-                const accountPool = await contractPOOL.methods.getUserAccountData(account).call();
-                if (accountPool && accountPool.healthFactor) {
-                    healthFactor = ethers.utils.formatUnits(accountPool.healthFactor || '0', 18);
-                }
-
-            } catch (error) {
-                console.log("error getUserAccountData:", error);
-            }
-
-            for await (const item of dataAccountAssets) {
-
-                if(item.totalSupplied){
-                    accountTotalSupplied = (dataPrice[item.assetsAddress] * item.totalSupplied) + accountTotalSupplied;
-                }
-
-                if(item.totalBorrowed){
-                    accountTotalBorrowed = (dataPrice[item.assetsAddress] * item.totalBorrowed) + accountTotalBorrowed;
-                }
-                
-            }
-
-        }
-
-        dispatch({
-            type: marketplaceConstants.FETCH_ACCOUNT_OVERVIEW_SUCCESS,
-            data: {
-                accountTotalSupplied,
-                accountTotalBorrowed,
-                healthFactor
-            }
-        });
-
-    } else {
-
-        dispatch({
-            type: marketplaceConstants.FETCH_ACCOUNT_OVERVIEW_SUCCESS,
-            healthFactor
-        });
-    }
-
-    return dataList;
-
-};
-
-export const getAccountAssets = () => async (dispatch, getState) => {
-
-    const state = getState();
-
-    const { web3, account } = state.web3;
-    const { data } = state.assetsMarketReducer;
 
     let dataList = [];
 
@@ -253,7 +177,8 @@ export const getAccountAssets = () => async (dispatch, getState) => {
 
         if (contractAAVE && account) {
 
-            for await (const item of data) {
+
+            for await (const item of dataAssets) {
 
                 const accountReserve = await contractAAVE.methods.getUserReserveData(item.assetsAddress, account).call();
                 
@@ -262,11 +187,6 @@ export const getAccountAssets = () => async (dispatch, getState) => {
 
                     balanceSupply = ethers.utils.formatUnits(accountReserve.currentATokenBalance, item.assetsDecimals);
                     balanceSupply = Number(balanceSupply);
-
-                    // console.log("balanceSupply",balanceSupply);
-                    // balanceSupplyUSD = dataPrice[item.assetsAddress] * balanceSupply;
-                    // console.log("balanceSupplyUSD",balanceSupplyUSD);
-                    // dataUser.accountSupplyBalance = dataUser.accountSupplyBalance + balanceSupplyUSD;
 
                 }
 
@@ -282,13 +202,12 @@ export const getAccountAssets = () => async (dispatch, getState) => {
                     const currentVariableDebt = ethers.utils.formatUnits(accountReserve.currentVariableDebt || '0', item.assetsDecimals);
                     accountVariableDebt = Number(currentVariableDebt);
 
-                    //balanceBorrow = accountStableDebt + accountVariableDebt;
-                    balanceBorrow = accountVariableDebt;
-                    // balanceBorrow = Math.round((balanceBorrow) * 100) / 100;
+                    balanceBorrow = accountVariableDebt + accountStableDebt;
 
                 }
 
                 if (balanceSupply || balanceBorrow) {
+                  
                     dataList.push({
                         ...item,
                         totalSupplied: balanceSupply,
@@ -296,12 +215,11 @@ export const getAccountAssets = () => async (dispatch, getState) => {
                         accountStableDebt: accountStableDebt,
                         accountVariableDebt: accountVariableDebt,
                     })
+                  
                 }
 
             }
 
-            // dataUser.accountSupplyBalance = Number(dataUser.accountSupplyBalance.toFixed(2));
-            // dataUser.accountBorrowBalance = Number(dataUser.accountBorrowBalance.toFixed(2));
 
         }
 
@@ -324,16 +242,89 @@ export const getAccountAssets = () => async (dispatch, getState) => {
 
 };
 
-export const reloadAccountAssets = (addressAsset) => async (dispatch, getState) => {
+export const getAccountOverview = () => async (dispatch, getState) => {
 
     const state = getState();
+
+    const { web3, account } = state.web3;
+
+    const dataPrice = state.assetsPriceReducer.data;
+    const dataAccountAssets = state.accountAssetsReducer.data;
+
+    let healthFactor = 0;
+    let accountTotalSupplied= 0;
+    let accountTotalBorrowed= 0;
+    let netAPY = 0;
+    let dataList = [];
+
+
+    if (web3 && account && dataPrice && dataAccountAssets) {
+
+        const contractPOOL = new web3.eth.Contract(ERC20ABI_POOL, ADDRESS_POOL);
+
+        if (contractPOOL && account) {
+
+            try {
+
+                const accountPool = await contractPOOL.methods.getUserAccountData(account).call();
+                if (accountPool && accountPool.healthFactor) {
+                    healthFactor = ethers.utils.formatUnits(accountPool.healthFactor || '0', 18);
+                }
+
+            } catch (error) {
+                console.log("error getUserAccountData:", error);
+            }
+
+            let supplyAPYChange = 0;
+            let borrowAPYChange = 0;
+
+            for await (const item of dataAccountAssets) {
+
+                if(item.totalSupplied){
+                    supplyAPYChange =  ((dataPrice[item.assetsAddress] * item.totalSupplied) * item.depositAPY) +supplyAPYChange;
+                    accountTotalSupplied = (dataPrice[item.assetsAddress] * item.totalSupplied) + accountTotalSupplied;
+                }
+
+                if(item.totalBorrowed){
+                    borrowAPYChange =  ((dataPrice[item.assetsAddress] * item.totalBorrowed) * item.variableBorrowAPY) +borrowAPYChange;
+                    accountTotalBorrowed = (dataPrice[item.assetsAddress] * item.totalBorrowed) + accountTotalBorrowed;
+                }
+                
+            }
+
+            netAPY = (supplyAPYChange - borrowAPYChange) / accountTotalSupplied;
+
+        }
+
+        dispatch({
+            type: marketplaceConstants.FETCH_ACCOUNT_OVERVIEW_SUCCESS,
+            data: {
+                accountTotalSupplied,
+                accountTotalBorrowed,
+                healthFactor,
+                netAPY
+            }
+        });
+
+    } else {
+
+        dispatch({
+            type: marketplaceConstants.FETCH_ACCOUNT_OVERVIEW_SUCCESS,
+            healthFactor
+        });
+    }
+
+    return dataList;
+
+};
+
+export const reloadAccountAssets = () => async (dispatch, getState) => {
+
+    const state = getState();
+
     const { web3, account } = state.web3;
 
     if (web3 && account) {
-
-        await dispatch(actions.instantiateVetContracts());
-        await dispatch(actions.instantiateVBContracts());
-        await dispatch(actions.instantiateVEUSDContracts());
 
         setTimeout(async () => {
             await dispatch(getAccountAssets());
@@ -344,7 +335,6 @@ export const reloadAccountAssets = (addressAsset) => async (dispatch, getState) 
             await dispatch(getAccountAssets());
             await dispatch(getMarketAssets());
         }, 6000);
-
 
     }
 

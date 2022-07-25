@@ -11,7 +11,7 @@ import ERC20ABI_AAVE from '../../_contracts/lend/AaveProtocolDataProvider.json';
 import ERC20ABI_STABLE_DEBT_TOKEN from '../../_contracts/lend/StableDebtToken.json';
 import ERC20ABI_VARIBLE_DEBT_TOKEN from '../../_contracts/lend/VariableDebtToken.json';
 
-import { randomKeyUUID } from '../../utils/lib';
+import { formatLocaleString, numberWithCommas, randomKeyUUID } from '../../utils/lib';
 import * as actions from '../.';
 
 
@@ -41,7 +41,8 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
     let accountStableDebtApprove = 0;
     let accountVariableDebtApprove = 0;
 
-    if (!account) {
+    if(!account){
+        dispatch(actions.web3Connect(true));
         return;
     }
 
@@ -65,7 +66,6 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
             accountBalance = accountBalance / dataPrice[dataToken.assetsAddress];
         }
 
-        
         if(contractAAVE ){
 
             const getReserveData = await contractAAVE.methods.getReserveData(dataToken.assetsAddress).call();
@@ -75,24 +75,9 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
             totalUserCollateralPool = totalUserCollateralPool.toLocaleString('fullwide', {useGrouping:false});
             totalUserCollateralPool = ethers.utils.formatUnits(totalUserCollateralPool, dataToken.assetsDecimals);
 
-            // const configReserveData = await contractAAVE.methods.getReserveConfigurationData(dataToken.assetsAddress).call();
-
-            // // totalPoolSupply - TotalPoolDebt/(1 - reserveFactor)
-            // let totalBorrowRate = (getReserveData.totalVariableDebt  /(10000-Number(configReserveData.reserveFactor)));
-            
-            // console.log("totalBorrowRate",totalBorrowRate);
-            // totalBorrowRate = Number(getReserveData.totalAToken) - Number(totalBorrowRate);
-            // totalBorrowRate = totalBorrowRate.toLocaleString('fullwide', {useGrouping:false});
-
-            // if(dataToken.assetsAddress === process.env.REACT_APP_TOKEN_VEUSD){
-            //     totalBorrowRate =  web3.utils.toWei(totalBorrowRate, 'micro');
-            // }
-
             // Tổng pool có chép borrow nhỏ hơn giá trị user có thể variableBorrowRate
             if(Number(totalUserCollateralPool) < Number(accountBalance)){
                 accountBalance = totalUserCollateralPool;
-                // accountBalance = ethers.utils.formatUnits(totalBorrowRate, 18);
-                // accountBalance = accountBalance * dataPrice[dataToken.assetsAddress];
             }
             
         }
@@ -128,13 +113,14 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
 
     }
 
+
     dispatch({
         type: marketplaceConstants.MODAL_OPEN_BORROW_MARKET,
         loading:false,
         accountApprove,
         accountStableDebtApprove,
         accountVariableDebtApprove,
-        accountBalance: accountBalance,
+        accountBalance: formatLocaleString(accountBalance,dataToken.assetsDecimals),
         dataToken
     });
 
@@ -235,6 +221,8 @@ export const borrowMarket = (dataToken, amount, rateMode) => async (dispatch, ge
 
     const { account, connex } = state.web3;
 
+    console.log("borrowMarket",amount,dataToken);
+
     if (connex && account && dataToken.assetsAddress) {
 
         const key = randomKeyUUID();
@@ -249,9 +237,13 @@ export const borrowMarket = (dataToken, amount, rateMode) => async (dispatch, ge
         });
 
         const borrowABI = ERC20ABI_POOL.find(({ name, type }) => (name === "borrow" && type === "function"));
-
+console.log("borrowABI",borrowABI);
         const methodBorrow = connex.thor.account(ADDRESS_POOL).method(borrowABI);
+
+        console.log("methodBorrow",methodBorrow);
         const amountBorrow = ethers.utils.parseUnits(amount.toString(), dataToken.assetsDecimals);
+
+        console.log("amountBorrow",amountBorrow);
 
         methodBorrow.transact(dataToken.assetsAddress, amountBorrow, rateMode, 0, account)
             .comment(`transfer ${amount} ${dataToken.assetsChain} to Borrow VeBank`)

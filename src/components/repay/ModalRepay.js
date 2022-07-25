@@ -5,7 +5,7 @@ import { Range } from "react-range";
 import { TailSpin } from 'react-loading-icons';
 
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
-import { numberWithCommas } from '../../utils/lib';
+import { nFormatter, numberWithCommas } from '../../utils/lib';
 
 import { marketplaceConstants } from '../../constants';
 import * as actions from '../../actions';
@@ -15,6 +15,7 @@ import IcNext1 from '../../assets/images/ic_factory.svg';
 
 import BtnRepay from './BtnRepay';
 import BtnRepayApprove from './BtnRepayApprove';
+import CurrencyAssetsUSD from '../markets/CurrencyAssetsUSD';
 
 const customStyles = {
     content: {
@@ -102,7 +103,7 @@ const ModalRepay = () => {
     const onChangeRemainAmount = (values) => {
 
         if (values) {
-            setRemain(accountBalance - Number(values));
+            setRemain(Number(accountBalance) - Number(values));
         } else {
             setRemain(accountBalance);
         }
@@ -141,6 +142,10 @@ const ModalRepay = () => {
         }
         return btn;
 
+    }
+
+    if(!dataToken){
+        return<></>;
     }
 
     return (
@@ -212,7 +217,7 @@ const ModalRepay = () => {
                     </div>
 
                     <div className='px-8'>
-                        {loading === false ? <Range
+                        {loading === false  && Number(accountBalance) > 0 ? <Range
                             step={1}
                             min={0}
                             max={accountBalance > 0 ? accountBalance : null}
@@ -266,7 +271,10 @@ const ModalRepay = () => {
                             <div className='text-[#FAFAFA]'>
                             </div>
                             <div>
-                                <span className='font-poppins font-thin text-sm'>{amount} $</span>
+                                <span className='font-poppins font-thin text-sm'>
+                                    <CurrencyAssetsUSD currencyBalance={amount} assetsAddress={dataToken.assetsAddress} /> 
+                                    <span>$</span>
+                                </span>
                             </div>
                         </div>
 
@@ -276,7 +284,9 @@ const ModalRepay = () => {
                             </div>
                             <div className='flex items-center'>
                                 <img className='w-6 h-6' src={dataToken ? dataToken.icon : ""} alt="Token VEBank" />
-                                <span className='font-poppins font-bold pl-2'>{remain}</span>
+                                <span className='font-poppins font-bold pl-2'>
+                                    { nFormatter(remain) }     
+                                </span>
                                 <span className='text-[#BFBFBF] pl-2'>{dataToken ? dataToken.assetsChain : ""}</span>
                             </div>
                         </div>
@@ -285,7 +295,10 @@ const ModalRepay = () => {
                             <div className='text-[#FAFAFA]'>
                             </div>
                             <div>
-                                <span className='font-poppins font-thin text-sm'>{remain}</span>
+                                <span className='font-poppins font-thin text-sm'>
+                                    <CurrencyAssetsUSD currencyBalance={remain} assetsAddress={dataToken.assetsAddress} />
+                                    <span>$</span>
+                                </span>
                             </div>
                         </div>
 

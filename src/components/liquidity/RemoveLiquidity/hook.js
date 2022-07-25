@@ -11,6 +11,7 @@ import {
   selectApprovingState,
   selectFirstTokenExchangeRate,
   selectLiquidityPool,
+  selectLoadingState,
   selectPoolApproval,
   selectRemoveTransactionId,
   selectRemovingFinishState,
@@ -28,6 +29,7 @@ const useRemoveLiquidFacade = () => {
   const txid = useSelector(selectRemoveTransactionId);
   const isApproving = useSelector(selectApprovingState);
   const approvePoolState = useSelector(selectPoolApproval);
+  const isLoadingDetail = useSelector(selectLoadingState);
   const isRemoving = useSelector(selectRemovingState);
   const removePoolSuccessState = useSelector(selectRemovingFinishState);
   const liquidityPool = useSelector(selectLiquidityPool);
@@ -70,15 +72,17 @@ const useRemoveLiquidFacade = () => {
   );
 
   const isEnabled = useMemo(() => {
-    return !isApproving && approvePoolState >= removeAmount;
+    console.log('🐶🐶  ~ isEnabled ~ approvePoolState', approvePoolState)
+    return !isApproving && approvePoolState > 0 && approvePoolState >= removeAmount;
   }, [isApproving, removeAmount, approvePoolState]);
 
   const removeAvailable = useMemo(() => {
     return (
+      isLoadingDetail === false &&
       amountPercentage > 0 &&
       approvePoolState >= removeAmount
     );
-  }, [amountPercentage, approvePoolState, removeAmount]);
+  }, [amountPercentage, approvePoolState, isLoadingDetail, removeAmount]);
 
   const closeModal = () => {
     navigation(-1);
@@ -134,17 +138,24 @@ const useRemoveLiquidFacade = () => {
     await dispatch(
       actions.approvePoolLiquidity({
         poolAddress,
-        addressTokenA: firstTokenAddress,
-        addressTokenB: secondTokenAddress,
-        tokenAInfo: firstTokenInfo,
-        tokenBInfo: secondTokenInfo,
+        removeAmount
       })
     );
   };
 
   useEffect(() => {
+    if (isLoadingDetail === true) {
+      setContinueAvailable(false);
+      setPrimaryButtonLabel("Loading details...");
+    } else {
+      setPrimaryButtonLabel("Remove");
+    }
+  }, [isLoadingDetail]);
+
+  useEffect(() => {
     if (amountPercentage !== 0) {
       setPrimaryButtonLabel("Remove");
+      setEnableBtnLabel(isEnabled ? "Enabled" : "Enable")
     } else {
       setPrimaryButtonLabel("Enter an amount");
     }
@@ -154,9 +165,12 @@ const useRemoveLiquidFacade = () => {
     if (!isApproving) {
       if (approvePoolState <= 0) {
         setEnableBtnLabel("Enable");
-      } else {
+      } else if (isEnabled) {
         setEnableBtnLabel("Enabled");
         setContinueAvailable(true);
+      } else {
+        setEnableBtnLabel("Enable");
+        setContinueAvailable(false);
       }
     } else {
       setEnableBtnLabel("Enabling...");

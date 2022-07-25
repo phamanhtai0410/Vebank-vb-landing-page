@@ -5,7 +5,7 @@ import { Range } from "react-range";
 import { TailSpin } from 'react-loading-icons';
 
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
-import { numberWithCommas } from '../../utils/lib';
+import {  numberWithCommas } from '../../utils/lib';
 
 import { marketplaceConstants } from '../../constants';
 
@@ -17,6 +17,7 @@ import BtnBorrowApprove from './BtnBorrowApprove';
 
 import * as actions from '../../actions';
 import useAutoFocus from '../common/hooks/useAutoFocus';
+import CurrencyAssetsUSD from '../markets/CurrencyAssetsUSD';
 
 const customStyles = {
     content: {
@@ -160,9 +161,12 @@ const ModalBorrow = () => {
             }
 
         }
-
         return btn;
 
+    }
+
+    if(!dataToken){
+        return<></>;
     }
 
     return (
@@ -228,7 +232,7 @@ const ModalBorrow = () => {
                     </div>
 
                     <div className='px-8'>
-                        {loading === false  && accountBalance? <Range
+                        {loading === false  && Number(accountBalance) > 0? <Range
                             step={1}
                             min={0}
                             max={accountBalance}
@@ -302,7 +306,7 @@ const ModalBorrow = () => {
                             </div>
                             <div className='flex items-center'>
                                 <img className='w-6 h-6' src={dataToken ? dataToken.icon : ""} alt="Token VEBank" />
-                                <span className='font-poppins font-bold pl-2'>{amount}</span>
+                                <span className='font-poppins font-bold pl-2'>{numberWithCommas(amount)}</span>
                                 <span className='text-[#BFBFBF] pl-2'>{dataToken ? dataToken.assetsChain : ""}</span>
                             </div>
                         </div>
@@ -311,7 +315,10 @@ const ModalBorrow = () => {
                             <div className='text-[#FAFAFA]'>
                             </div>
                             <div>
-                                <span className='font-poppins font-thin text-sm'>{amount} $</span>
+                                <span className='font-poppins font-thin text-sm'>
+                                    <CurrencyAssetsUSD currencyBalance={amount} assetsAddress={dataToken.assetsAddress} /> 
+                                    <span>$</span>
+                                </span>
                             </div>
                         </div>
 

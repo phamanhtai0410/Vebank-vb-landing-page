@@ -71,7 +71,7 @@ const ModalSelectToken = () => {
         borderRadius="1rem"
       />
       <div className="header">
-        <h2>Select a token</h2>
+        <span className="font-poppins_bold text-xl text-white">Select a token</span>
         <img
           alt=""
           src={IcCloseWhite}
@@ -80,7 +80,7 @@ const ModalSelectToken = () => {
         />
       </div>
 
-      <div className="content-modal mt-12">
+      <div className="content-modal mt-6">
         {/* STEP 1 */}
         <SearchBar />
         <div className="flex flex-row space-x-2 items-center mt-8">

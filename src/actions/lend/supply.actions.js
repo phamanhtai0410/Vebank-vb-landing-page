@@ -30,7 +30,8 @@ export const loadModalSupply = (dataToken) => async (dispatch, getState) => {
     let accountApprove = 0;
     let contractSupply;
 
-    if (!account) {
+    if(!account){
+        dispatch(actions.web3Connect(true));
         return;
     }
     
@@ -54,8 +55,6 @@ export const loadModalSupply = (dataToken) => async (dispatch, getState) => {
         }
 
     }
-
-    console.log("ADDRESS_POOL",ADDRESS_POOL);
 
     // get the approved coin MSP account
     accountApprove = await contractSupply.methods.allowance(account, ADDRESS_POOL).call();
@@ -97,8 +96,6 @@ export const approveSupply = (dataToken) => async (dispatch, getState) => {
         // if (dataToken.assetsChain === "VET") {
         //     TOKEN_APPROVE = process.env.REACT_APP_ADDRESS_GATEWAY;
         // }
-
-        console.log("approveSupply ADDRESS_POOL",ADDRESS_POOL);
 
         approveMethod
             .transact(TOKEN_APPROVE, web3.utils.toWei(amountMax.toString()))
@@ -171,39 +168,39 @@ export const supplyMarket = (dataToken, amount) => async (dispatch, getState) =>
 
         // console.log(dataToken.assetsAddress, valueAmount, account, 0);
         methodSupply.transact(dataToken.assetsAddress, valueAmount, account, 0)
-            .comment(`transfer ${amount} ${dataToken.assetsChain} to Supply VeBank`)
-            .request()
-            .then(transaction => {
+        .comment(`transfer ${amount} ${dataToken.assetsChain} to Supply VeBank`)
+        .request()
+        .then(transaction => {
 
-                dispatch({
-                    type: marketplaceConstants.MODAL_SUPPLY_MARKET_SUCCESS,
-                    transaction: 1
-                });
-
-                dispatch(actions.alertActions.update({
-                    status: "success",
-                    title: "Transaction Submitted",
-                    description: `Transfer ${amount} ${dataToken.assetsChain} to Supply VeBank`,
-                  }, key));
-
-                dispatch(actions.reloadAccountAssets());
-
-                return transaction;
-
-            }).catch((e) => {
-
-                console.log("error----", e);
-                dispatch({
-                    type: marketplaceConstants.MODAL_SUPPLY_MARKET_ERROR
-                });
-                dispatch(actions.alertActions.update({
-                    status: "warning",
-                    title: "Transaction Supply Rejected",
-                    description: e.message
-                  }, key));
-                return e;
-
+            dispatch({
+                type: marketplaceConstants.MODAL_SUPPLY_MARKET_SUCCESS,
+                transaction: 1
             });
+
+            dispatch(actions.alertActions.update({
+                status: "success",
+                title: "Transaction Submitted",
+                description: `Transfer ${amount} ${dataToken.assetsChain} to Supply VeBank`,
+                }, key));
+
+            dispatch(actions.reloadAccountAssets());
+
+            return transaction;
+
+        }).catch((e) => {
+
+            console.log("error----", e);
+            dispatch({
+                type: marketplaceConstants.MODAL_SUPPLY_MARKET_ERROR
+            });
+            dispatch(actions.alertActions.update({
+                status: "warning",
+                title: "Transaction Supply Rejected",
+                description: e.message
+                }, key));
+            return e;
+
+        });
 
     }
 
@@ -243,7 +240,7 @@ export const supplyDepositETHMarket = (addressAsset, amount) => async (dispatch,
         methodDepositETH.value(web3.utils.toWei(amount.toString()));
 
         methodDepositETH.transact(ADDRESS_POOL, account, 0)
-            .comment(`transfer ${amount} VET to DepositETH`)
+            .comment(`Transfer ${amount} VET to supply to the market`)
             .request()
             .then(transaction => {
 
@@ -257,7 +254,7 @@ export const supplyDepositETHMarket = (addressAsset, amount) => async (dispatch,
                 dispatch(actions.alertActions.update({
                     status: "success",
                     title: "Transaction Submitted",
-                    description: `Transfer ${amount} VET to DepositETH`,
+                    description: `Transfer ${amount} VET into the market successfully`,
                   }, key));
 
                 return transaction;

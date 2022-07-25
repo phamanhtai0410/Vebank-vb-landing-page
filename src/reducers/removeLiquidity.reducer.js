@@ -15,6 +15,7 @@ const initialState = {
   addressTokenA: "",
   addressTokenB: "",
 
+  isLoadingDetail: false,
   isApproving: false,
   isRemoving: false,
   isRemoveSuccess: null,
@@ -46,12 +47,11 @@ const removeLiquiditySlice = createSlice({
       .addCase(approvePoolLiquidity.pending, (state, _) => {
         state.isApproving = true;
       })
-      // .addCase(approvePoolLiquidity.fulfilled, (state, action) => {
-      //   state.isApproving = false;
-      //   state.poolApproval = action.payload.approvePool;
-      // })
       .addCase(approvePoolLiquidity.rejected, (state, _) => {
         state.isApproving = false;
+      })
+      .addCase(loadDetailRemoveLiquidity.pending, (state, _) => {
+        state.isLoadingDetail = true;
       })
       .addCase(loadDetailRemoveLiquidity.fulfilled, (state, action) => {
         state.addressTokenA = action.payload.addressTokenA;
@@ -62,6 +62,10 @@ const removeLiquiditySlice = createSlice({
         state.liquidityPool = action.payload.liquidityPool;
         state.abExchangeRate = action.payload.abExchangeRate;
         state.baExchangeRate = action.payload.baExchangeRate;
+        state.isLoadingDetail = false;
+      })
+      .addCase(loadDetailRemoveLiquidity.rejected, (state, _) => {
+        state.isLoadingDetail = false;
       })
       .addCase(removeLiquidity.pending, (state, _) => {
         state.isRemoving = true;
@@ -78,6 +82,7 @@ const removeLiquiditySlice = createSlice({
         state.isRemoveSuccess = false;
       })
       .addCase(poolConstants.APPROVE_LP_TOKEN, (state, action) => {
+        // Update the current approve LP token process
         const data = action.payload;
         if (data) {
           state.poolApproval = data.approveAmount;
@@ -94,7 +99,7 @@ export const selectApprovingState = (state) =>
 export const selectRemovingState = (state) => state.removeLiquidity.isRemoving;
 export const selectRemovingFinishState = (state) =>
   state.removeLiquidity.isRemoveSuccess;
-
+export const selectLoadingState = state => state.removeLiquidity.isLoadingDetail;
 export const selectPoolApproval = (state) => state.removeLiquidity.poolApproval;
 export const selectAddressTokenA = (state) =>
   state.removeLiquidity.addressTokenA;

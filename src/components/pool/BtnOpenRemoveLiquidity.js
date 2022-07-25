@@ -16,7 +16,7 @@ const BtnOpenRemoveLiquidity = ({ assetsPoolAddress = "" }) => {
   );
 
   const disabledRule = useMemo(() => {
-    return liquidityPool == 0 || !account;
+    return !liquidityPool || liquidityPool == 0 || !account;
   }, [account, liquidityPool]);
 
   const handlerOpenModal = async () => {

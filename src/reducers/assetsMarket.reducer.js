@@ -82,8 +82,9 @@ const initialState = {
     process.env.REACT_APP_TOKEN_VTHO,
     process.env.REACT_APP_TOKEN_VEBANK,
   ],
+  listAsset:listAsset,
   assetEntities: getListKeyAssets(listAsset),
-  data: listAsset || [],
+  data: [],
 };
 
 export function assetsMarketReducer(state = initialState, payload) {

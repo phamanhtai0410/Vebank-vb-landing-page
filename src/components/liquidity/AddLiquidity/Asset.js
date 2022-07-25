@@ -54,7 +54,7 @@ const Asset = ({
           )}
         </div>
       </div>
-      <div className="flex flex-1 mt-4 relative">
+      <div className="flex flex-col justify-center mt-4 relative">
         <input
           placeholder="0.0"
           min={0}

@@ -28,7 +28,13 @@ export const getPoolAssets = () => async (dispatch, getState) => {
     );
 
     for await (const item of dataAssets) {
-      const { addressTokenA, addressTokenB, isSubscribeListener } = item;
+      const {
+        addressTokenA,
+        addressTokenB,
+        isSubscribeListener,
+        pairTransferEvent,
+        pairApproveEvent,
+      } = item;
       const assetsPoolAddress = await contractFactory.methods
         .getPair(addressTokenA, addressTokenB)
         .call();
@@ -41,11 +47,16 @@ export const getPoolAssets = () => async (dispatch, getState) => {
         );
 
         let _isSubscribed = isSubscribeListener ?? false;
+        let _pairApproveEvent = pairApproveEvent,
+          _pairTransferEvent = pairTransferEvent;
 
         if (contractPair && !_isSubscribed) {
-          contractPair.events.Approval?.().on("data", async (data) => {
-            console.log("🐶🐶  ~ contractPair.events.Approval?. ~ data", data);
-            if (account.equals(data.returnValues?.owner)) {
+          _pairApproveEvent = contractPair.events.Approval?.();
+          _pairApproveEvent.on("data", async (data) => {
+            console.log('🐶🐶  ~ _pairApproveEvent.on ~ data', data)
+            // When this pair have a Approve event from anyone, it will be process in this closure
+            if (compareString(data.returnValues?.owner, account)) {
+              // If this event is triggered by the user
               const balanceBigN = await contractPair.methods
                 .balanceOf(account)
                 .call();
@@ -59,7 +70,9 @@ export const getPoolAssets = () => async (dispatch, getState) => {
                   PartialConstants.DEFAULT_ASSET_DECIMAL
                 )
               );
+              // This dispatch is used to update user approval in removeLiquidity.reducer
               dispatch(liquidityPoolApproved(assetsPoolAddress, approveAmount));
+              // This is used to update if user's liquidity pool has changed.
               dispatch(
                 actions.updateLiquidityPool({
                   poolAddress: assetsPoolAddress,
@@ -69,14 +82,18 @@ export const getPoolAssets = () => async (dispatch, getState) => {
             }
           });
 
-          contractPair.events.Transfer().on("data", async (data) => {
-            console.log("Pair Transfer event emitted");
-            console.log(
-              "🐶🐶  ~ contractPair.events.allEvents().TransFer() ~ event",
-              data
-            );
-            const { from, to } = data.returnValues;
+          _pairTransferEvent = contractPair.events.Transfer?.();
+          _pairTransferEvent.on("data", async (data) => {
+            // When this pair have a Transfer event from anyone, it will be process in this closure
+            const { from, to, value } = data.returnValues;
             if (from.equals(account) || to.equals(account)) {
+              // This Transfer event is caused by user. If it's from user,
+              // the user is removing the pool, if it's to, user is adding the pool
+
+              // This call may receive wrong amount of user tokens in pool because when this Transfer event is emitted,
+              // the total supply of the pool may haven't been updated on Blockchain yet. So inside of this function,
+              // we should check for it's current value stored in redux with the fetched one, and add the value
+              // to get the latest value of the total LP.
               const { amountTokenA, amountTokenB, liquidityPool } =
                 await getUserTokenAmounts({
                   contractPair,
@@ -85,6 +102,7 @@ export const getPoolAssets = () => async (dispatch, getState) => {
                   addressTokenB,
                 });
 
+              // Push this update into userAssetPools.reducer to update data in pool page and liquidity page.
               dispatch(
                 actions.updateUserAssets({
                   assetsPoolAddress,
@@ -93,18 +111,20 @@ export const getPoolAssets = () => async (dispatch, getState) => {
                   amountTokenB,
                 })
               );
-              const isUserReceiving = to?.equals(account);
-              dispatch(
-                actions.alertActions.success({
-                  title: isUserReceiving
-                    ? "Add liquidity Confirmed"
-                    : "Remove liquidity Transaction Sent",
-                  details: {
-                    txid: data.meta?.txID ?? "",
-                    message: "View on Chain",
-                   }
-                })
-              );
+
+              // This is attempt to display if the LP have moved into or out of user's wallet notification.
+              // const isUserReceiving = to?.equals(account);
+              // dispatch(
+              //   actions.alertActions.success({
+              //     title: isUserReceiving
+              //       ? "Add liquidity Confirmed"
+              //       : "Remove liquidity Transaction Sent",
+              //     details: {
+              //       txid: data.meta?.txID ?? "",
+              //       message: "View on Chain",
+              //      }
+              //   })
+              // );
             }
           });
           _isSubscribed = true;
@@ -112,13 +132,11 @@ export const getPoolAssets = () => async (dispatch, getState) => {
 
         //Lấy tổng liquidity
         let totalSupply = await contractPair.methods.totalSupply().call();
-        console.log('🐶🐶  ~ raw fetch from blockchain ~ totalSupply', totalSupply)
         if (totalSupply) {
           totalSupply = ethers.utils.formatUnits(
             totalSupply,
             PartialConstants.DEFAULT_ASSET_DECIMAL
           );
-          console.log('🐶🐶  ~ formatted by ether ~ totalSupply', totalSupply)
         }
 
         dataList.push({
@@ -126,6 +144,8 @@ export const getPoolAssets = () => async (dispatch, getState) => {
           isSubscribeListener: _isSubscribed,
           liquidity: totalSupply,
           assetsPoolAddress,
+          pairApproveEvent: _pairApproveEvent,
+          pairTransferEvent: _pairTransferEvent,
         });
       }
     }
@@ -200,11 +220,19 @@ export const getPoolAssetsByAccount =
     return dataList;
   };
 
+/**
+ * This function will mainly calculate the amount of user tokens in pool
+ * @param contractPair the Contract of the pair which is need to be calculated
+ * @param account the account address of the user.
+ * @param addressTokenA the address of the first token of the pair.
+ * @param addressTokenB the address of the second token of the pair.
+ * @returns the value of all data that needs for liquidity operation
+ */
 export const getUserTokenAmounts = async ({
   contractPair,
   account,
   addressTokenA,
-  addressTokenB,
+  addressTokenB
 }) => {
   if (!contractPair) throw new Error("contractPair is missing");
   else if (!account) throw new Error("account is missing");
@@ -220,12 +248,12 @@ export const getUserTokenAmounts = async ({
 
   try {
     const balanceBigN = await contractPair.methods.balanceOf(account).call();
-    console.log('🐶🐶  ~ liquidityPool(raw)', balanceBigN)
+    // console.log('🐶🐶  ~ liquidityPool(raw)', balanceBigN)
     liquidityPool = await ethers.utils.formatUnits(
       balanceBigN,
       PartialConstants.DEFAULT_ASSET_DECIMAL
     );
-    console.log('🐶🐶  ~ liquidityPool(formatted)', liquidityPool)
+    // console.log('🐶🐶  ~ liquidityPool(formatted)', liquidityPool)
     liquidityPool = FixedNumber.from(liquidityPool);
     totalSupply = await contractPair.methods.totalSupply().call();
     if (totalSupply) {
@@ -256,14 +284,10 @@ export const getUserTokenAmounts = async ({
       getDecimalForAsset(addressTokenB)
     );
     _reserve1 = FixedNumber.from(_reserve1);
+
+    // Using calculation like this to avoid auto rounding numbers of JS
     if (liquidityPool >= 0 && totalSupply > 0) {
-      // amountTokenA = (BigNumber.from(liquidityPool)
-      //   .mul(BigNumber.from(formattedReserve0))
-      //   .div(BigNumber.from(totalLP))).toString();
       amountTokenA = liquidityPool.mulUnsafe(_reserve0).divUnsafe(totalSupply);
-      // amountTokenB = (BigNumber.from(liquidityPool)
-      //   .mul(BigNumber.from(formattedReserve1))
-      //   .div(BigNumber.from(totalLP))).toString();
       amountTokenB = liquidityPool.mulUnsafe(_reserve1).divUnsafe(totalSupply);
     }
     [reserve1, reserve2] = [_reserve0, _reserve1];

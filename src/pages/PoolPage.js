@@ -6,7 +6,7 @@ import FrmSearchPool from "../components/pool/FrmSearchPool";
 const PoolPage = () => {
   return (
     <section className="box-borrows mx-auto bg-cover bg-center">
-      <div className="lg:px-4 lg:container xl:px-12 mx-auto px-4 min-h-screen pt-24 pb-24">
+      <div className="lg:px-4 lg:container xl:px-12 mx-auto px-4 min-h-screen pt-10 pb-24">
         <div className="flex flex-row mt-4">
           <div className="flex  flex-row justify-start items-center space-x-4 w-full text-right cursor-pointer">
             <span className="font-poppins text-base font-montserrat">

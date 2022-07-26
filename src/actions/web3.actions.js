@@ -456,28 +456,17 @@ export const instantiateVBContracts = () => async (dispatch, getState) => {
       contractVB.events
         .Approval?.()
         .on("data", async (data) => {
-          // console.log("🐶🐶  ~ VB approval event ~ data", data);
+          console.log("🐶🐶  ~ VB approval event ~ data", data);
 
           if (data.returnValues?.owner?.equals?.(account)) {
-            contractVB.methods
-              .balanceOf(account)
-              .call()
-              .then((balanceBigNumber) => {
-                let balance = ethers.utils.formatEther(balanceBigNumber);
-                balance = Math.round(balance * 100) / 100;
-                dispatch({
-                  type: web3Constants.INIT_CONTRACT_VB,
-                  contractVB,
-                  balance,
-                });
-              });
-
+       
             const approveAmount = Number(
               ethers.utils.formatEther(
                 data.returnValues?.value,
                 PartialConstants.DEFAULT_ASSET_DECIMAL
               )
             );
+
             dispatch({
               type: poolConstants.APPROVE_TOKEN,
               payload: {
@@ -485,6 +474,7 @@ export const instantiateVBContracts = () => async (dispatch, getState) => {
                 approveAmount,
               },
             });
+            
           }
         })
         .on("error", async (err) => {

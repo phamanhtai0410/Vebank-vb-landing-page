@@ -96,6 +96,7 @@ export const approveFirstTokenAddLiquidity = createAsyncThunk(
         .request();
 
       return { result, approveTokenA: amountMax };
+      
     }
   }
 );
@@ -348,8 +349,7 @@ export const addLiquidity = createAsyncThunk(
 
     const deadline = Math.round(new Date().getTime() / 1000) + 3600;
 
-    console.table(
-    [
+    console.table([
       ["tokenA", firstToken],
       ["tokenB", secondToken],
       ["transactionFee", transactionFee],
@@ -359,8 +359,7 @@ export const addLiquidity = createAsyncThunk(
       ["amountBMin", amountBMin],
       ["account", account],
       ["deadline", deadline]
-    ]
-    );
+    ] );
 
     let transaction;
 

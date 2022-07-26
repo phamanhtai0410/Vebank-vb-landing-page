@@ -348,17 +348,17 @@ export const addLiquidity = createAsyncThunk(
 
     const deadline = Math.round(new Date().getTime() / 1000) + 3600;
 
-    // console.table(
-    //   ["tokenA", firstToken],
-    //   ["tokenB", secondToken],
-    //   ["transactionFee", transactionFee],
-    //   ["amountA", amountA],
-    //   ["amountB", amountB],
-    //   ["amountAMin", amountAMin],
-    //   ["amountBMin", amountBMin],
-    //   ["account", account],
-    //   ["deadline", deadline]
-    // );
+    console.table(
+      ["tokenA", firstToken],
+      ["tokenB", secondToken],
+      ["transactionFee", transactionFee],
+      ["amountA", amountA],
+      ["amountB", amountB],
+      ["amountAMin", amountAMin],
+      ["amountBMin", amountBMin],
+      ["account", account],
+      ["deadline", deadline]
+    );
 
     let transaction;
 
@@ -387,6 +387,8 @@ export const addLiquidity = createAsyncThunk(
           amountETHMin: amountB,
         };
       }
+
+      console.log("tokenDesired",tokenDesired);
 
       methodAddLiquidityETH.value(tokenDesired.amountETHMin);
 

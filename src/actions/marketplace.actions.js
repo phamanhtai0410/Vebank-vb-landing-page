@@ -305,7 +305,7 @@ export const getAccountOverview = () => async (dispatch, getState) => {
                 
             }
 
-            netAPY = (supplyAPYChange - borrowAPYChange) / accountTotalSupplied;
+            netAPY =( (supplyAPYChange - borrowAPYChange) / accountTotalSupplied)*100;
 
         }
 

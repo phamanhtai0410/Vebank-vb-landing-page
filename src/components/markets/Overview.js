@@ -43,7 +43,7 @@ const Overview = () => {
                 {accountTotalSupplied && accountTotalBorrowed ? <>
                     <div className='flex-1'>
                         <p className='text-xs font-normal text-slate-50'>Net APY</p>
-                        <span className='text-xl font-bold'>${netAPY ? netAPY.toFixed(2) :0}</span>
+                        <span className='text-xl font-bold'>{netAPY ? netAPY.toFixed(2) :0} %</span>
                     </div>|
                 </> : ""}
 

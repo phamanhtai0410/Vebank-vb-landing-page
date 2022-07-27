@@ -1,5 +1,6 @@
 import React from "react";
-import AddLiquidity from "../components/liquidity/AddLiquidity/FrmAddLiquidity";
+// import AddLiquidity from "../components/liquidity/AddLiquidity/FrmAddLiquidity";
+import AddLiquidity from "../components/liquidity/AddLiquidity/FormAddLiquidity";
 import ModalSelectToken from "../components/liquidity/AddLiquidity/selectToken/ModalSelectToken";
 
 const AddLiquidityPage = () => {

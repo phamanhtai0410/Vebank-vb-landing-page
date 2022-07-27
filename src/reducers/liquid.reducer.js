@@ -197,13 +197,13 @@ export function liquidReducer(state = initialState, action) {
         isApproving: true,
       };
     }
-    // case approveFirstTokenAddLiquidity.fulfilled.type: {
-    //   return {
-    //     ...state,
-    //     // isApproving: false,
-    //     approveTokenA: action.payload.approveTokenA,
-    //   };
-    // }
+    case approveFirstTokenAddLiquidity.fulfilled.type: {
+      return {
+        ...state,
+        isApproving: false,
+        approveTokenA: action.payload.approveTokenA,
+      };
+    }
     case approveFirstTokenAddLiquidity.rejected.type: {
       return {
         ...state,
@@ -217,13 +217,13 @@ export function liquidReducer(state = initialState, action) {
         isApproving: true,
       };
     }
-    // case approveSecondTokenAddLiquidity.fulfilled.type: {
-    //   return {
-    //     ...state,
-    //     isApproving: false,
-    //     approveTokenB: action.payload.approveTokenB,
-    //   };
-    // }
+    case approveSecondTokenAddLiquidity.fulfilled.type: {
+      return {
+        ...state,
+        isApproving: false,
+        approveTokenB: action.payload.approveTokenB,
+      };
+    }
     case approveSecondTokenAddLiquidity.rejected.type: {
       return {
         ...state,

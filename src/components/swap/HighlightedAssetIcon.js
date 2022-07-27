@@ -6,7 +6,7 @@ const HighlightedAssetIcon = ({ icon, svgConfig }) => {
     <div className="relative flex items-center justify-center w-[32px] h-[32px] min-w-[32px] min-h-[32px]">
       <GradientStrokeSymbol config={svgConfig} />
       <div className="absolute w-[24px] h-[24px]">
-        <img src={icon} alt="" />
+        <img src={icon} alt="" className="w-full h-full" />
       </div>
     </div>
   );

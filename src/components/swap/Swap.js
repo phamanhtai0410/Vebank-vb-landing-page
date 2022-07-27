@@ -1,21 +1,20 @@
 import React from "react";
 
-// import IcSwap from "../../assets/images/ic_swap.svg";
 import IcGas from "../../assets/images/gas.svg";
 import IcBtnSwap from "../../assets/images/swap_btn.svg";
 import IcDown from "../../assets/images/down_fill.svg";
 import IcUp from "../../assets/images/up_fill.svg";
 import IcDropDown from "../../assets/images/ic_dropdown.svg";
-// import IcReload from "../../assets/images/ic_reload.svg";
+import BtnConnectInPage from "../account/BtnConnectInPage";
 import IcLoading from "../../assets/images/loading_swap.svg";
 import IcSwitch from "../../assets/images/vertical_switch.svg";
-// import IcSetting from "../../assets/images/buttons/ic_setting_outline.svg";
-// import IcQuestionCircle from "../../assets/images/ic_question_circle.svg";
 import IcQuestionCircleBlue from "../../assets/images/question_circle_blue.svg";
 import IcQuestionCircleYellow from "../../assets/images/question_circle_yellow.svg";
+// import IcSwap from "../../assets/images/ic_swap.svg";
+// import IcReload from "../../assets/images/ic_reload.svg";
+// import IcSetting from "../../assets/images/buttons/ic_setting_outline.svg";
+// import IcQuestionCircle from "../../assets/images/ic_question_circle.svg";
 // import IcSwapWhiteNoBackground from "../../assets/images/ic_swap_white_no_background.svg";
-
-import BtnConnectInPage from "../account/BtnConnectInPage";
 // import BtnOpenSwap from "./BtnOpenSwap";
 
 import useSwapFacade from "./hooks";
@@ -26,10 +25,9 @@ import "./styles.scss";
 
 const Swap = () => {
   const {
-    poolErr,
-    isSwap,
+    priceImpact,
+    poolErrRef,
     swapFee,
-    showErr,
     account,
     loadingFee,
     userInputRef,
@@ -39,11 +37,11 @@ const Swap = () => {
     inputSlippage,
     sourceTokenInfo,
     desireTokenInfo,
-    // sourceTokenPrice,
-    // desireTokenPrice,
     sourceTokenBalance,
     desireTokenBalance,
     vthoBalance,
+    // sourceTokenPrice,
+    // desireTokenPrice,
     // sourcePerDesireTokenPrice,
     // desireTokenAmount,
     // setInputAmount,
@@ -61,7 +59,6 @@ const Swap = () => {
     loadingExchangeRate,
     onShowDetailInfo,
     showDetailInfo,
-    isSwapSuccess,
     emptyAddress,
     loadingApprove,
     onCheckExchangeRatePool,
@@ -72,27 +69,13 @@ const Swap = () => {
   } = useSwapFacade();
 
   const renderTitleButton = () => {
-    if (accountApprove === 0) {
-      if (poolErr !== "") {
-        return poolErr;
-      } else {
-        if (loadingApprove) {
-          return "Approving...";
-        } else {
-          return "Approve";
-        }
-      }
+    if (poolErrRef.current !== "") {
+      return poolErrRef.current;
     } else {
-      if (showErr || poolErr !== "") {
-        if (showErr) {
-          return `Insufficient ${sourceTokenInfo?.assetsChain} balance `;
-        } else {
-          return poolErr;
-        }
-      } else if (loadingSwap) {
-        return "Swapping...";
+      if (accountApprove === 0) {
+        return loadingApprove ? "Approving..." : "Approve";
       } else {
-        return "Swap";
+        return loadingSwap ? "Swapping..." : "Swap";
       }
     }
   };
@@ -121,7 +104,7 @@ const Swap = () => {
         </div>
         <div className="flex flex-col">
           <div className="flex flex-row w-full justify-between">
-            <div className="flex flex-row w-full items-center">
+            <div className="flex flex-row w-fit items-center">
               <button
                 className="flex flex-row items-center space-x-2"
                 onClick={() =>
@@ -137,7 +120,7 @@ const Swap = () => {
                 </h1>
                 <img className="w-4" src={IcDropDown} alt="" />
               </button>
-              <div className="w-[1px] h-[28px] bg-[#7694DE] sm:ml-4 ml-8"></div>
+              <div className="w-[1px] h-[28px] bg-[#7694DE] ml-8"></div>
               <div className="flex flex-row text-[#647BB4] space-x-1 ml-4">
                 <button
                   onClick={() => onChangeSourceInput(sourceTokenBalance)}
@@ -215,8 +198,8 @@ const Swap = () => {
           <p className="text-sm">Balance: {desireTokenBalance}</p>
         </div>
         <div className="flex flex-col">
-          <div className="flex flex-row w-full justify-between">
-            <div className="flex flex-row w-full items-center">
+          <div className="flex flex-row w-full justify-between items-center">
+            <div className="flex flex-row w-fit items-center">
               <button
                 className="flex flex-row items-center space-x-2"
                 onClick={() =>
@@ -260,22 +243,20 @@ const Swap = () => {
             >
               {desireTokenAmount || 0.0}
             </p> */}
-              <div className="relative flex flex-col w-full ml-4 items-end">
-                {loadingGetAmountOut ? (
-                  <div className="loading" />
-                ) : (
-                  <input
-                    className="w-full bg-transparent focus:outline-none placeholder-vbDisableText font-poppins_medium text-base text-grey-1 text-right"
-                    type="number"
-                    min={1}
-                    value={inputAmountOut}
-                    onChange={(event) =>
-                      onChangeDesireInput(event.target.value)
-                    }
-                    placeholder="0.0"
-                  />
-                )}
-              </div>
+            </div>
+            <div className="relative flex flex-col w-full ml-4 items-end">
+              {loadingGetAmountOut ? (
+                <div className="loading" />
+              ) : (
+                <input
+                  className="w-full bg-transparent focus:outline-none placeholder-vbDisableText font-poppins_medium text-base text-grey-1 text-right"
+                  type="number"
+                  min={1}
+                  value={inputAmountOut}
+                  onChange={(event) => onChangeDesireInput(event.target.value)}
+                  placeholder="0.0"
+                />
+              )}
             </div>
           </div>
           {/* <p className="float-right">${inputAmountOut * desireTokenPrice}</p> */}
@@ -283,7 +264,7 @@ const Swap = () => {
       </div>
 
       <div className="col-x-center justify-center space-y-4">
-        {userInputRef.current !== "" && !isSwapSuccess && !emptyAddress && (
+        {userInputRef.current !== "" && !emptyAddress && (
           <div className="flex flex-col w-full space-y-2 relative">
             <button
               onClick={onShowDetailInfo}
@@ -317,7 +298,10 @@ const Swap = () => {
               </div>
             </button>
 
-            <button className="absolute flex flex-row items-center left-4" onClick={onSwitchExchangeRate}>
+            <button
+              className="absolute flex flex-row items-center left-4"
+              onClick={onSwitchExchangeRate}
+            >
               {loadingGetAmountOut || loadingGetAmountIn ? (
                 <div className="loading mr-2" />
               ) : (
@@ -381,7 +365,11 @@ const Swap = () => {
                     {" "}
                     {`-0.01% / -0.1 ${sourceTokenInfo?.assetsChain}`}{" "}
                   </p> */}
-                  <p className="text-vbLine"> &lt; 0.1% </p>
+                  <p className="text-vbLine">
+                    {" "}
+                    {priceImpact < 0.1 ? <>&lt;</> : ""}
+                    {priceImpact.toFixed(2)}%{" "}
+                  </p>
                 </div>
                 <div className="flex justify-between flex-row w-full items-center">
                   <div className="flex space-x-2 w-full">
@@ -396,6 +384,9 @@ const Swap = () => {
                       max={50}
                       value={inputSlippage}
                       onChange={(event) => {
+                        setInputSlippage(event.target.value);
+                      }}
+                      onBlur={(event) => {
                         if (event.target.value >= 50) {
                           setInputSlippage(50);
                         } else if (event.target.value <= 0.5) {
@@ -432,21 +423,13 @@ const Swap = () => {
             {account && (
               <button
                 disabled={
-                  !isSwap ||
-                  loadingSwap ||
-                  loadingApprove ||
-                  showErr ||
-                  poolErr !== ""
+                  loadingSwap || loadingApprove || poolErrRef.current !== ""
                 }
                 onClick={
                   accountApprove === 0 ? onApproveToken : onSwapAssetToken
                 }
                 className={`w-full ${
-                  isSwap &&
-                  !loadingSwap &&
-                  !loadingApprove &&
-                  !showErr &&
-                  poolErr === ""
+                  !loadingSwap && !loadingApprove && poolErrRef.current === ""
                     ? "btn-veb"
                     : "bg-btn-veb-disabled rounded-lg"
                 }  h-12`}

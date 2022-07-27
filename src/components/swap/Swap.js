@@ -1,21 +1,20 @@
 import React from "react";
 
-// import IcSwap from "../../assets/images/ic_swap.svg";
 import IcGas from "../../assets/images/gas.svg";
 import IcBtnSwap from "../../assets/images/swap_btn.svg";
 import IcDown from "../../assets/images/down_fill.svg";
 import IcUp from "../../assets/images/up_fill.svg";
 import IcDropDown from "../../assets/images/ic_dropdown.svg";
-// import IcReload from "../../assets/images/ic_reload.svg";
+import BtnConnectInPage from "../account/BtnConnectInPage";
 import IcLoading from "../../assets/images/loading_swap.svg";
 import IcSwitch from "../../assets/images/vertical_switch.svg";
-// import IcSetting from "../../assets/images/buttons/ic_setting_outline.svg";
-// import IcQuestionCircle from "../../assets/images/ic_question_circle.svg";
 import IcQuestionCircleBlue from "../../assets/images/question_circle_blue.svg";
 import IcQuestionCircleYellow from "../../assets/images/question_circle_yellow.svg";
+// import IcSwap from "../../assets/images/ic_swap.svg";
+// import IcReload from "../../assets/images/ic_reload.svg";
+// import IcSetting from "../../assets/images/buttons/ic_setting_outline.svg";
+// import IcQuestionCircle from "../../assets/images/ic_question_circle.svg";
 // import IcSwapWhiteNoBackground from "../../assets/images/ic_swap_white_no_background.svg";
-
-import BtnConnectInPage from "../account/BtnConnectInPage";
 // import BtnOpenSwap from "./BtnOpenSwap";
 
 import useSwapFacade from "./hooks";
@@ -366,7 +365,11 @@ const Swap = () => {
                     {" "}
                     {`-0.01% / -0.1 ${sourceTokenInfo?.assetsChain}`}{" "}
                   </p> */}
-                  <p className="text-vbLine"> &lt; {priceImpact.toFixed(2)}% </p>
+                  <p className="text-vbLine">
+                    {" "}
+                    {priceImpact < 0.1 ? <>&lt;</> : ""}
+                    {priceImpact.toFixed(2)}%{" "}
+                  </p>
                 </div>
                 <div className="flex justify-between flex-row w-full items-center">
                   <div className="flex space-x-2 w-full">

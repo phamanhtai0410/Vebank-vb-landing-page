@@ -58,6 +58,7 @@ export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
             totalUserCollateralPool = getReserveData.totalAToken - (getReserveData.totalStableDebt  + getReserveData.totalVariableDebt)
             totalUserCollateralPool = totalUserCollateralPool.toLocaleString('fullwide', {useGrouping:false});
             totalUserCollateralPool = ethers.utils.formatUnits(totalUserCollateralPool, dataToken.assetsDecimals);
+            totalUserCollateralPool = Number(totalUserCollateralPool);
         }
 
         const contractPOOL = new web3.eth.Contract(ERC20ABI_POOL, ADDRESS_POOL);
@@ -73,20 +74,21 @@ export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
                 // totalUserCollateralPool : Tổng số lượng amount mà pool đang có thể withdraw
                 // totalUserWithdraw : Tổng số lượng amount mà user có thể withdraw
 
-                let totalUserWithdraw = accountData.totalCollateralBase - (accountData.totalDebtBase /(accountData.ltv/10000));
-                totalUserWithdraw = totalUserWithdraw.toLocaleString('fullwide', {useGrouping:false});
-                totalUserWithdraw = ethers.utils.formatEther(totalUserWithdraw) / dataPrice[dataToken.assetsAddress];
+                let availableWithdraw = accountData.totalCollateralBase - (accountData.totalDebtBase /(accountData.ltv/10000));
+                availableWithdraw = availableWithdraw.toLocaleString('fullwide', {useGrouping:false});
+                availableWithdraw = ethers.utils.formatEther(availableWithdraw) / dataPrice[dataToken.assetsAddress];
 
                 console.log("currentATokenBalance", accountBalance); 
-                console.log("totalUserWithdraw", totalUserWithdraw); 
+                console.log("Available to withdraw", availableWithdraw); 
                 console.log("totalUserCollateralPool", totalUserCollateralPool);
             
-                if(accountBalance > totalUserWithdraw  ){ // luong có thể withdraw nhỏ hơn aToken trong pool
-                    accountBalance = totalUserWithdraw;
-                }else if(accountBalance > Number(totalUserCollateralPool)){ // Pool ko đủ
-                    accountBalance = totalUserWithdraw;
-                }
+                // if(accountBalance > totalUserWithdraw  ){ // luong có thể withdraw nhỏ hơn aToken trong pool
+                //     accountBalance = totalUserWithdraw;
+                // }else if(accountBalance > Number(totalUserCollateralPool)){ // Pool ko đủ
+                //     accountBalance = totalUserWithdraw;
+                // }
 
+                accountBalance = Math.min(accountBalance, availableWithdraw, totalUserCollateralPool);
                 
             }
 

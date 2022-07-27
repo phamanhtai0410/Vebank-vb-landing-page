@@ -51,8 +51,8 @@ const useAddLiquidFacade = () => {
   const account = useSelector(selectAccount);
   const userCurrentLiquidityPool = useSelector(selectLiquidityPool);
   const totalSupply = useSelector(selectTotalSupply);
-  const reserveB = useSelector(selectReserveA);
-  const reserveA = useSelector(selectReserveB);
+  const reserveB = useSelector(selectReserveB);
+  const reserveA = useSelector(selectReserveA);
 
   const [step, setStep] = useState(1);
   const [continueAvailable, setContinueAvailable] = useState(false);

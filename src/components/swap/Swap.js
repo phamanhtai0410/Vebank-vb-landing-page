@@ -26,6 +26,7 @@ import "./styles.scss";
 
 const Swap = () => {
   const {
+    priceImpact,
     poolErrRef,
     swapFee,
     account,
@@ -365,7 +366,7 @@ const Swap = () => {
                     {" "}
                     {`-0.01% / -0.1 ${sourceTokenInfo?.assetsChain}`}{" "}
                   </p> */}
-                  <p className="text-vbLine"> &lt; 0.1% </p>
+                  <p className="text-vbLine"> &lt; {priceImpact.toFixed(2)}% </p>
                 </div>
                 <div className="flex justify-between flex-row w-full items-center">
                   <div className="flex space-x-2 w-full">

@@ -151,3 +151,5 @@ export const selectLoadingGetAmountIn = (state) =>
 export const selectAccountApprove = (state) => state.swapAsset.accountApprove;
 export const selectEmptyAddress = (state) => state.swapAsset.emptyAddress;
 export const selectPoolAddress = (state) => state.swapAsset.poolAddress;
+export const selectReserveFrom = (state) => state.swapAsset.reserves1;
+export const selectReserveTo = (state) => state.swapAsset.reserves2;

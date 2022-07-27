@@ -14,6 +14,8 @@ import {
   selectAccountApprove,
   selectEmptyAddress,
   selectPoolAddress,
+  selectReserveFrom,
+  selectReserveTo,
 } from "../../reducers/swap.reducer";
 import { selectAssetByAddress } from "../../reducers/assetsMarket.reducer";
 import { selectPriceByTokenAddress } from "../../reducers/assetsPrice.reducer";
@@ -46,6 +48,7 @@ const useSwapFacade = () => {
   const [showDetailInfo, setShowDetailInfo] = useState(true);
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingSwap, setLoadingSwap] = useState(false);
+  const [priceImpact, setPriceImpact] = useState(0);
   const poolErrRef = useRef("");
 
   const userInputRef = useRef("");
@@ -61,8 +64,8 @@ const useSwapFacade = () => {
   const loadingFee = useSelector(selectLoadingFee);
   const loadingGetAmountOut = useSelector(selectLoadingGetAmountOut);
   const loadingGetAmountIn = useSelector(selectLoadingGetAmountIn);
-  // const loadingSwap = useSelector(selectLoadingSwap);
-  // const loadingApprove = useSelector(selectLoadingApprove);
+  const reserveFrom = useSelector(selectReserveFrom);
+  const reserveTo = useSelector(selectReserveTo);
   // const loadingExchangeRate = useSelector(selectLoadingExchangeRate);
 
   const accountApprove = useSelector(selectAccountApprove);
@@ -123,6 +126,16 @@ const useSwapFacade = () => {
     [inputAmountOut, desirePerSourceTokenPrice]
   );
 
+  const constantProduct = useMemo(
+    () => reserveFrom * reserveTo,
+    [reserveFrom, reserveTo]
+  );
+
+  const marketPrice = useMemo(
+    () => reserveFrom / reserveTo,
+    [reserveFrom, reserveTo]
+  );
+
   const amountOutMin = useMemo(
     () =>
       getDecimalForAsset(desireTokenInfo.assetsAddress) ===
@@ -145,9 +158,7 @@ const useSwapFacade = () => {
   };
 
   const getExchangeRateLoop = async (milliseconds) => {
-    if (!emptyAddress) {
-      await onCheckExchangeRatePool();
-    }
+    await onCheckExchangeRatePool();
     await sleep(milliseconds);
     getExchangeRateLoop(30000);
   };
@@ -219,6 +230,15 @@ const useSwapFacade = () => {
       }
     }
   }, [desireTokenAddress, sourceTokenAddress]);
+
+  const onCountPriceImpact = () => {
+    const newTokenTo = Number(constantProduct) / (Number(reserveFrom) + Number(inputAmountIn));
+    const tokenToReceived = Number(reserveTo) - newTokenTo;
+    const pricePaidPerTokenTo = Number(inputAmountIn) / tokenToReceived;
+    const priceImpact =
+      ((pricePaidPerTokenTo - Number(marketPrice)) / Number(marketPrice)) * 100;
+    setPriceImpact(priceImpact);
+  };
 
   const onSwapDesireToken = () => {
     setPressSwap(true);
@@ -307,6 +327,7 @@ const useSwapFacade = () => {
         const { amountsOutFormat } = originalPromiseResult;
         setInputAmountOut(amountsOutFormat);
         onCheckTotalSupplyAvailable(amountsOutFormat);
+        onCountPriceImpact();
       })
       .catch((rejectedValueOrSerializedError) => {});
   };
@@ -328,6 +349,7 @@ const useSwapFacade = () => {
       .then((originalPromiseResult) => {
         const { amountsInFormat } = originalPromiseResult;
         checkBalance(amountsInFormat);
+        onCountPriceImpact();
       })
       .catch((rejectedValueOrSerializedError) => {});
   };
@@ -456,6 +478,7 @@ const useSwapFacade = () => {
   };
 
   return {
+    priceImpact,
     swapFee,
     account,
     loadingFee,

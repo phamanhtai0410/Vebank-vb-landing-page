@@ -20,11 +20,7 @@ import {
 } from "../utils/lib";
 
 import { selectAssetByAddress } from "../reducers/assetsMarket.reducer";
-import {
-  approveSuccess,
-  getSymbolPairs,
-  refreshDataSwap,
-} from "../reducers/swap.reducer";
+import { getSymbolPairs } from "../reducers/swap.reducer";
 import PartialConstants from "../constants/partial.constants";
 
 // const ADDRESS_GATEWAY = process.env.REACT_APP_ADDRESS_GATEWAY; // WETHGateway (chinh là VET Asset)
@@ -39,8 +35,6 @@ export const checkAssetExistsPools = createAsyncThunk(
   swapConstants.checkAssetExistsPools,
   async ({ tokenAInfo, tokenBInfo }, { dispatch, getState }) => {
     const state = getState();
-    let poolErr = "";
-    let isSwap = true;
     const assetsPoolName = `${tokenAInfo?.assetsChain} - ${tokenBInfo?.assetsChain}`;
 
     const addressTokenA = tokenAInfo?.assetsAddress || "";
@@ -59,17 +53,15 @@ export const checkAssetExistsPools = createAsyncThunk(
 
       const emptyAddress = /^0x0+$/.test(assetsPoolAddress); // true chưa có
 
-      dispatch(
-        checkExchangeRatePool({
-          tokenAddressA: addressTokenA,
-          tokenAddressB: addressTokenB,
-          assetsPoolAddress: assetsPoolAddress,
-        })
-      );
+      // dispatch(
+      //   checkExchangeRatePool({
+      //     tokenAddressA: addressTokenA,
+      //     tokenAddressB: addressTokenB,
+      //     assetsPoolAddress: assetsPoolAddress,
+      //   })
+      // );
 
       if (!emptyAddress && assetsPoolAddress) {
-        poolErr = "";
-        isSwap = true;
         const contractPair = new web3.eth.Contract(
           ERC20ABI_PAIR,
           assetsPoolAddress
@@ -90,14 +82,12 @@ export const checkAssetExistsPools = createAsyncThunk(
           });
         }
       } else {
-        isSwap = false;
-        poolErr = `${assetsPoolName} not existing in pools`;
         const key = randomKeyUUID();
         dispatch(
           actions.alertActions.warning(
             {
               title: "Warning",
-              description: `${tokenAInfo?.assetsChain} - ${tokenBInfo?.assetsChain} not existing in pools`,
+              description: `${assetsPoolName} not existing in pools`,
             },
             key
           )
@@ -105,8 +95,6 @@ export const checkAssetExistsPools = createAsyncThunk(
       }
       return {
         assetsPoolAddress: assetsPoolAddress,
-        poolErr: poolErr,
-        isSwap: isSwap,
         emptyAddress: emptyAddress,
       };
     }
@@ -162,7 +150,6 @@ export const checkExchangeRatePool = createAsyncThunk(
         getDecimalForAsset(tokenAddressB)
       );
 
-
       const amountOutUint = web3.utils.toWei(
         "1",
         getDecimalForAsset(tokenAddressB) === PartialConstants.VEUSD_DECIMAL
@@ -173,13 +160,18 @@ export const checkExchangeRatePool = createAsyncThunk(
       const amountsIn = await contractFactory.methods
         .getAmountsIn(amountOutUint, [tokenAddressA, tokenAddressB])
         .call();
-        
+
       const exchangeRateFormatBA = ethers.utils.formatUnits(
         amountsIn[0],
         getDecimalForAsset(tokenAddressA)
       );
 
-      return { reserves1, reserves2, exchangeRateFormatAB, exchangeRateFormatBA  };
+      return {
+        reserves1,
+        reserves2,
+        exchangeRateFormatAB,
+        exchangeRateFormatBA,
+      };
     }
   }
 );
@@ -216,11 +208,10 @@ export const checkTotalSupplyAvailable = createAsyncThunk(
       ) {
         return {
           totalSupply: totalSupply,
-          isSwap: false,
-          poolErr: "Pool not enough volume",
+          isVolumeAvailable: false,
         };
       } else {
-        return { totalSupply: totalSupply, isSwap: true, poolErr: "" };
+        return { totalSupply: totalSupply, isVolumeAvailable: true };
       }
     }
   }
@@ -357,7 +348,7 @@ export const onApproveTokenForAccount = createAsyncThunk(
     const state = getState();
     const { web3, account, connex } = state.web3;
     const { contractSwap } = state.swapAsset;
-    let amountMax = 0;
+    let amountMax = 1000000000;
 
     const addressToken = tokenInfo?.assetsAddress || "";
 
@@ -396,7 +387,6 @@ export const onApproveTokenForAccount = createAsyncThunk(
 
         if (res) {
           amountMax = 1000000000;
-          dispatch(approveSuccess({ accountApprove: amountMax }));
           dispatch(
             actions.alertActions.update(
               {
@@ -543,7 +533,6 @@ export const swapAsset = createAsyncThunk(
           .comment(`transaction swap ${assetsPoolName} from VeBank`)
           .request()
           .then((transaction) => {
-            dispatch(refreshDataSwap());
             dispatch(
               actions.alertActions.update(
                 {
@@ -586,7 +575,6 @@ export const swapAsset = createAsyncThunk(
           .comment(`transaction swap ${assetsPoolName} from VeBank`)
           .request()
           .then((transaction) => {
-            dispatch(refreshDataSwap());
             dispatch(
               actions.alertActions.update(
                 {
@@ -629,7 +617,6 @@ export const swapAsset = createAsyncThunk(
         .comment(`transaction swap ${assetsPoolName} from VeBank`)
         .request()
         .then((transaction) => {
-          dispatch(refreshDataSwap());
           dispatch(
             actions.alertActions.update(
               {
@@ -657,6 +644,7 @@ export const swapAsset = createAsyncThunk(
               key
             )
           );
+          return null;
         });
     }
     return transaction;

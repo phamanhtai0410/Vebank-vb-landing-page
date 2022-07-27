@@ -5,12 +5,18 @@ import { v4 as uuidv4 } from "uuid";
 
 var CryptoJS = require("crypto-js");
 
-export function formatLocaleString(x,digits){
-  return x.toLocaleString('en-IN',{ currency:"USD", maximumSignificantDigits:  digits || 10 })
+export function formatLocaleString(x, digits, isFixed) {
+  if (isFixed) {
+    x = x.toFixed(digits);
+  }
+  return x.toLocaleString("en-IN", {
+    currency: "USD",
+    maximumSignificantDigits: digits || 10,
+  });
 }
 
 export function numberWithCommas(num) {
-  num = num.toLocaleString('en-IN',{ maximumSignificantDigits: 10  });
+  num = num.toLocaleString("en-IN", { maximumSignificantDigits: 10 });
   let x = num.toString().split(".");
   x[0] = x[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return x.join(".");
@@ -51,7 +57,7 @@ export function formatUriSecure(url) {
   return url + `?st=${secure_link}&e=${expireTime}`;
 }
 
-export function nFormatter(num, digits=8) {
+export function nFormatter(num, digits = 8) {
   var si = [
     { value: 1, symbol: "" },
     { value: 1e3, symbol: "k" },

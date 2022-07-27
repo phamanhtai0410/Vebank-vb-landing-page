@@ -96,6 +96,7 @@ export const approveFirstTokenAddLiquidity = createAsyncThunk(
         .request();
 
       return { result, approveTokenA: amountMax };
+      
     }
   }
 );
@@ -348,17 +349,17 @@ export const addLiquidity = createAsyncThunk(
 
     const deadline = Math.round(new Date().getTime() / 1000) + 3600;
 
-    // console.table(
-    //   ["tokenA", firstToken],
-    //   ["tokenB", secondToken],
-    //   ["transactionFee", transactionFee],
-    //   ["amountA", amountA],
-    //   ["amountB", amountB],
-    //   ["amountAMin", amountAMin],
-    //   ["amountBMin", amountBMin],
-    //   ["account", account],
-    //   ["deadline", deadline]
-    // );
+    console.table([
+      ["tokenA", firstToken],
+      ["tokenB", secondToken],
+      ["transactionFee", transactionFee],
+      ["amountA", amountA],
+      ["amountB", amountB],
+      ["amountAMin", amountAMin],
+      ["amountBMin", amountBMin],
+      ["account", account],
+      ["deadline", deadline]
+    ] );
 
     let transaction;
 
@@ -377,18 +378,22 @@ export const addLiquidity = createAsyncThunk(
           address: secondToken,
           amountTokenDesired: amountB,
           amountTokenMin: amountBMin,
-          amountETHMin: amountA,
+          amountETH: amountA,
+          amountETHMin: amountAMin,
         };
       } else {
         tokenDesired = {
           address: firstToken,
           amountTokenDesired: amountA,
           amountTokenMin: amountAMin,
-          amountETHMin: amountB,
+          amountETH: amountB,
+          amountETHMin: amountBMin,
         };
       }
 
-      methodAddLiquidityETH.value(tokenDesired.amountETHMin);
+      console.log("tokenDesired",tokenDesired);
+
+      methodAddLiquidityETH.value(tokenDesired.amountETH);
 
       transaction = await methodAddLiquidityETH
         .transact(

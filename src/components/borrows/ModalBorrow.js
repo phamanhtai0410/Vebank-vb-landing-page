@@ -94,7 +94,7 @@ const ModalBorrow = () => {
 
          // Giá trị rỗng
          if(e.target.value === ""){
-            setAmount(value)
+            setAmount(value);
             setValues([0]);
         }
 
@@ -106,7 +106,7 @@ const ModalBorrow = () => {
         // kiêm tra input number
         let pattern = /^\d+\.?\d*$/;
         if (pattern.test(value)) {
-            setAmount(value)
+            setAmount(value);
             setValues([value]);
         }
 
@@ -151,7 +151,6 @@ const ModalBorrow = () => {
     const showBtnView = () => {
 
         let btn = "";
-
         if (dataToken) {
 
             if (accountApprove === 0) {

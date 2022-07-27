@@ -5,7 +5,7 @@ export const routerHeaderTitle = {
 };
 
 export const svgSymbolConfig = {
-  r: 16,
+  r: 24,
   opacity: "0.4",
   strokeWidth: "8",
   linearGradient: [

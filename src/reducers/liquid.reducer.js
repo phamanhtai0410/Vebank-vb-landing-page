@@ -9,6 +9,8 @@ import {
 import { poolConstants } from "../constants";
 import { selectAssetByAddress } from "./assetsMarket.reducer";
 
+import {compareString} from '../utils/lib';
+
 const initialState = {
   isSelectTokenModalOpen: false,
   pending: false,
@@ -170,22 +172,15 @@ export function liquidReducer(state = initialState, action) {
       };
     }
 
-    case approveFirstTokenAddLiquidity.pending.type: {
-      return {
-        ...state,
-        isApproving: true,
-      };
-    }
-
     case poolConstants.APPROVE_TOKEN: {
       const data = action.payload;
-      if (state.firstToken === data?.assetAddress) {
+      if (  compareString(state.firstToken,data?.assetAddress )) {
         return {
           ...state,
           approveTokenA: state.approveTokenA + data?.approveAmount || 0,
           isApproving: false,
         };
-      } else if (state.secondToken === data?.assetAddress) {
+      } else if (compareString(state.secondToken ,data?.assetAddress)) {
         return {
           ...state,
           approveTokenB: state.approveTokenB + data?.approveAmount || 0,
@@ -194,32 +189,41 @@ export function liquidReducer(state = initialState, action) {
       }
       return state;
     }
-    // case approveFirstTokenAddLiquidity.fulfilled.type: {
-    //   return {
-    //     ...state,
-    //     // isApproving: false,
-    //     approveTokenA: action.payload.approveTokenA,
-    //   };
-    // }
+
+    // APPROVE_TOKEN 1
+    case approveFirstTokenAddLiquidity.pending.type: {
+      return {
+        ...state,
+        isApproving: true,
+      };
+    }
+    case approveFirstTokenAddLiquidity.fulfilled.type: {
+      return {
+        ...state,
+        isApproving: false,
+        approveTokenA: action.payload.approveTokenA,
+      };
+    }
     case approveFirstTokenAddLiquidity.rejected.type: {
       return {
         ...state,
         isApproving: false,
       };
     }
+
     case approveSecondTokenAddLiquidity.pending.type: {
       return {
         ...state,
         isApproving: true,
       };
     }
-    // case approveSecondTokenAddLiquidity.fulfilled.type: {
-    //   return {
-    //     ...state,
-    //     isApproving: false,
-    //     approveTokenB: action.payload.approveTokenB,
-    //   };
-    // }
+    case approveSecondTokenAddLiquidity.fulfilled.type: {
+      return {
+        ...state,
+        isApproving: false,
+        approveTokenB: action.payload.approveTokenB,
+      };
+    }
     case approveSecondTokenAddLiquidity.rejected.type: {
       return {
         ...state,

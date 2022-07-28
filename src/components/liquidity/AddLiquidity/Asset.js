@@ -60,7 +60,7 @@ const Asset = ({
           )}
         </div>
         <div className="flex flex-row w-full items-center justify-between">
-          <div className="flex flex-row w-1/2 items-center">
+          <div className="flex flex-row w-[55%] items-center">
             <button
               className="flex flex-row w-full items-center space-x-[10px]"
               onClick={onClickSelectCurrency}
@@ -78,15 +78,15 @@ const Asset = ({
             <div className="flex text-[#647BB4] space-x-1 ml-3">
               {assetInfo && (
                 <div className="flex flex-row w-full items-center space-x-1">
-                  <div className="w-[1px] h-8 bg-hint mr-2"></div>
+                  <div className="w-[1px] h-9 bg-hint mr-2"></div>
                   <button
-                    className="flex items-center font-poppins_medium px-1 py-3 h-2/3 bg-[#203557] rounded text-[#647BB4] text-xs"
+                    className="flex items-center font-poppins_medium px-2 py-3 h-[75%] bg-[#203557] rounded text-[#647BB4] text-sm"
                     onClick={onClickMaxButton}
                   >
                     Max
                   </button>
                   <button
-                    className="flex items-center font-poppins_medium px-1 py-3 h-2/3 bg-[#203557] rounded text-[#647BB4] text-xs"
+                    className="flex items-center font-poppins_medium px-2 py-3 h-[75%] bg-[#203557] rounded text-[#647BB4] text-sm"
                     onClick={onClickMaxButton}
                   >
                     Half
@@ -101,7 +101,7 @@ const Asset = ({
             value={volume}
             pattern="^[0-9]*\.?[0-9]*$"
             onChange={(e) => onVolumeChange(e.target.value)}
-            className="w-1/2 px-4 py-1 focus:outline-none placeholder:text-white font-poppins_semi_bold text-lg text-right rounded-lg bg-transparent"
+            className="w-[45%] px-4 py-1 focus:outline-none placeholder:text-white font-poppins_semi_bold text-lg text-right rounded-lg bg-transparent"
             type="text"
           />
         </div>

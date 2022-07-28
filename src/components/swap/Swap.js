@@ -100,7 +100,9 @@ const Swap = () => {
       <div className="bg-itemForm rounded-lg p-4 space-y-4 text-hint border-vbDisableText border-[1px]">
         <div className="full-row-between-center">
           <p className="text-sm">From</p>
-          <p className="text-sm">Balance: {sourceTokenBalance}</p>
+          <p className="text-sm">
+            Balance: {sourceTokenBalance ? sourceTokenBalance : "--"}
+          </p>
         </div>
         <div className="flex flex-col">
           <div className="flex flex-row w-full justify-between">
@@ -195,7 +197,9 @@ const Swap = () => {
       <div className="bg-itemForm rounded-lg p-4 space-y-4 text-hint border-vbDisableText border-[1px]">
         <div className="full-row-between-center">
           <p className="text-sm">To</p>
-          <p className="text-sm">Balance: {desireTokenBalance}</p>
+          <p className="text-sm">
+            Balance: {desireTokenBalance ? desireTokenBalance : "--"}
+          </p>
         </div>
         <div className="flex flex-col">
           <div className="flex flex-row w-full justify-between items-center">
@@ -468,8 +472,10 @@ const Swap = () => {
           </button>
         ) */}
         <div className="flex space-x-2">
-          <p className="text-balanceVTHO">VTHO balance: {vthoBalance}</p>
-          <img src={IcQuestionCircleYellow} alt="" />
+          <p className="text-balanceVTHO">
+            VTHO balance: {vthoBalance ? vthoBalance : "--"}
+          </p>
+          {/* <img src={IcQuestionCircleYellow} alt="" /> */}
         </div>
       </div>
     </div>

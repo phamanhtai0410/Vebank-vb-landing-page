@@ -275,200 +275,205 @@ const Swap = () => {
       </div>
 
       <div className="col-x-center justify-center space-y-4">
-        {userInputRef.current !== "" && !emptyAddress && (
-          <div className="flex flex-col w-full space-y-2 relative">
-            <button
-              onClick={onShowDetailInfo}
-              className="px-4 h-12 text-sm w-full rounded-lg bg-transparent border-[1px] border-vbDisableText"
-            >
-              <div className="flex flex-row justify-end items-center">
-                <div className="sm:max-w-[156px] w-fit max-w-[162px] flex flex-row items-center justify-end">
-                  {!showDetailInfo && (
-                    <div className="bg-itemForm rounded-lg p-2 flex flex-row items-center w-fit group relative">
-                      <img src={IcGas} alt="gas" className="w-4" />
-                      <p className="ml-1">
-                        {swapFee.toString().length > 6
-                          ? swapFee.toFixed(6)
-                          : swapFee}{" "}
-                        {sourceTokenInfo?.assetsChain}
-                      </p>
-                      {/* <div class="absolute bottom-0 flex-col items-center hidden mb-6 group-hover:flex">
+        {userInputRef.current !== "" &&
+          !emptyAddress &&
+          userInputRef.current !== "0" &&
+          userInputRef.current !== "0." && (
+            <div className="flex flex-col w-full space-y-2 relative">
+              <button
+                onClick={onShowDetailInfo}
+                className="px-4 h-12 text-sm w-full rounded-lg bg-transparent border-[1px] border-vbDisableText"
+              >
+                <div className="flex flex-row justify-end items-center">
+                  <div className="sm:max-w-[156px] w-fit max-w-[162px] flex flex-row items-center justify-end">
+                    {!showDetailInfo && (
+                      <div className="bg-itemForm rounded-lg p-2 flex flex-row items-center w-fit group relative">
+                        <img src={IcGas} alt="gas" className="w-4" />
+                        <p className="ml-1">
+                          {swapFee.toString().length > 6
+                            ? swapFee.toFixed(6)
+                            : swapFee}{" "}
+                          {sourceTokenInfo?.assetsChain}
+                        </p>
+                        {/* <div class="absolute bottom-0 flex-col items-center hidden mb-6 group-hover:flex">
                             <span class="relative z-10 px-2 py-3 text-xs leading-none text-white whitespace-no-wrap border-[1px] border-vbDisableText bg-itemForm rounded-lg shadow-lg">
                               {swapFee} {sourceTokenInfo?.assetsChain}
                             </span>
                             <div class="w-3 h-3 -mt-2 rotate-45 bg-itemForm  border-[1px] border-vbDisableText"></div>
                           </div> */}
-                    </div>
-                  )}
-                  <img
-                    src={showDetailInfo ? IcUp : IcDown}
-                    alt="IcDown"
-                    className="w-4 ml-2"
-                  />
+                      </div>
+                    )}
+                    <img
+                      src={showDetailInfo ? IcUp : IcDown}
+                      alt="IcDown"
+                      className="w-4 ml-2"
+                    />
+                  </div>
                 </div>
-              </div>
-            </button>
+              </button>
 
-            <button
-              className="absolute flex flex-row items-center left-4"
-              onClick={onSwitchExchangeRate}
-            >
-              {loadingGetAmountOut || loadingGetAmountIn ? (
-                <div className="loading mr-2" />
-              ) : (
-                <img src={IcSwitch} alt="Switch" className="w-4" />
-              )}
-              {loadingGetAmountOut || loadingGetAmountIn ? (
-                <p>Fetching price...</p>
-              ) : (
-                <div className="w-full flex flex-row items-center justify-between">
-                  <div className="row-center space-x-2 w-fit group relative">
-                    <p className="ml-2">
-                      1{" "}
-                      {isSwitch
-                        ? desireTokenInfo?.assetsChain
-                        : sourceTokenInfo?.assetsChain}{" "}
-                      &asymp;{" "}
-                      {isSwitch
-                        ? pricePaidPerB.toString().length >= 6
-                          ? `${parseFloat(pricePaidPerB).toFixed(6)}`
-                          : pricePaidPerB
-                        : pricePaidPerA.toString().length >= 6
-                        ? `${parseFloat(pricePaidPerA).toFixed(6)}`
-                        : pricePaidPerA}{" "}
-                      {isSwitch
-                        ? sourceTokenInfo?.assetsChain
-                        : desireTokenInfo?.assetsChain}
-                    </p>
-                    {/* tooltip */}
-                    {/* <div class="absolute bottom-0 right-[-24px] flex-col items-center hidden mb-6 group-hover:flex">
+              <button
+                className="absolute flex flex-row items-center left-4"
+                onClick={onSwitchExchangeRate}
+              >
+                {loadingGetAmountOut || loadingGetAmountIn ? (
+                  <div className="loading mr-2" />
+                ) : (
+                  <img src={IcSwitch} alt="Switch" className="w-4" />
+                )}
+                {loadingGetAmountOut || loadingGetAmountIn ? (
+                  <p>Fetching price...</p>
+                ) : (
+                  <div className="w-full flex flex-row items-center justify-between">
+                    <div className="row-center space-x-2 w-fit group relative">
+                      <p className="ml-2">
+                        1{" "}
+                        {isSwitch
+                          ? desireTokenInfo?.assetsChain
+                          : sourceTokenInfo?.assetsChain}{" "}
+                        &asymp;{" "}
+                        {isSwitch
+                          ? pricePaidPerB.toString().length >= 6
+                            ? `${parseFloat(pricePaidPerB).toFixed(6)}`
+                            : pricePaidPerB
+                          : pricePaidPerA.toString().length >= 6
+                          ? `${parseFloat(pricePaidPerA).toFixed(6)}`
+                          : pricePaidPerA}{" "}
+                        {isSwitch
+                          ? sourceTokenInfo?.assetsChain
+                          : desireTokenInfo?.assetsChain}
+                      </p>
+                      {/* tooltip */}
+                      {/* <div class="absolute bottom-0 right-[-24px] flex-col items-center hidden mb-6 group-hover:flex">
                         <span class="relative z-10 px-2 py-3 text-xs leading-none text-white whitespace-no-wrap border-[1px] border-vbDisableText bg-itemForm rounded-lg shadow-lg">
                           {exchangeRateAB} {desireTokenInfo?.assetsChain}
                         </span>
                         <div class="w-3 h-3 -mt-2 rotate-45 bg-itemForm  border-[1px] border-vbDisableText"></div>
                       </div> */}
-                    {/* <p>{`($${(exchangeRate * desireTokenPrice).toFixed(
+                      {/* <p>{`($${(exchangeRate * desireTokenPrice).toFixed(
                         3
                       )})`}</p> */}
+                    </div>
                   </div>
-                </div>
-              )}
-            </button>
+                )}
+              </button>
 
-            <div
-              className={`${
-                showDetailInfo ? "more__info__show" : "more__info__hidden"
-              } h-fit w-full overflow-hidden`}
-            >
-              <div className="px-4 py-5 space-y-4 rounded-lg border border-vbDisableText my-2">
-                <div className="flex justify-between">
-                  <div className="flex space-x-2">
-                    <p className="text-grey-3">Swapping Through</p>
-                    <img src={IcQuestionCircleBlue} alt="" className="w-4" />
+              <div
+                className={`${
+                  showDetailInfo ? "more__info__show" : "more__info__hidden"
+                } h-fit w-full overflow-hidden`}
+              >
+                <div className="px-4 py-5 space-y-4 rounded-lg border border-vbDisableText my-2">
+                  <div className="flex justify-between">
+                    <div className="flex space-x-2">
+                      <p className="text-grey-3">Swapping Through</p>
+                      <img src={IcQuestionCircleBlue} alt="" className="w-4" />
+                    </div>
+                    <p>VeBank Pool</p>
                   </div>
-                  <p>VeBank Pool</p>
-                </div>
-                <div className="flex justify-between">
-                  <div className="flex space-x-2">
-                    <p className="text-grey-3">Minimum receive</p>
-                    <img src={IcQuestionCircleBlue} alt="" className="w-4" />
+                  <div className="flex justify-between">
+                    <div className="flex space-x-2">
+                      <p className="text-grey-3">Minimum receive</p>
+                      <img src={IcQuestionCircleBlue} alt="" className="w-4" />
+                    </div>
+                    <p>
+                      {amountOutMin} {desireTokenInfo?.assetsChain}
+                    </p>
                   </div>
-                  <p>
-                    {amountOutMin} {desireTokenInfo?.assetsChain}
-                  </p>
-                </div>
-                <div className="flex justify-between">
-                  <div className="flex space-x-2">
-                    <p className="text-grey-3">Price Impact</p>
-                    <img src={IcQuestionCircleBlue} alt="" className="w-4" />
-                  </div>
-                  {/* <p className="text-vbLine">
+                  <div className="flex justify-between">
+                    <div className="flex space-x-2">
+                      <p className="text-grey-3">Price Impact</p>
+                      <img src={IcQuestionCircleBlue} alt="" className="w-4" />
+                    </div>
+                    {/* <p className="text-vbLine">
                     {" "}
                     {`-0.01% / -0.1 ${sourceTokenInfo?.assetsChain}`}{" "}
                   </p> */}
-                  <p className="text-vbLine">
-                    {" "}
-                    {priceImpact < 0.1 ? <>&lt;</> : ""}
-                    {priceImpact.toFixed(2)}%{" "}
-                  </p>
-                </div>
-                <div className="flex justify-between flex-row w-full items-center">
-                  <div className="flex space-x-2 w-full">
-                    <p className="text-grey-3 min-w-fit">Slippage tolerance</p>
-                    <img src={IcQuestionCircleBlue} alt="" className="w-4" />
+                    <p className="text-vbLine">
+                      {" "}
+                      {priceImpact < 0.1 ? <>&lt;</> : ""}
+                      {priceImpact.toFixed(2)}%{" "}
+                    </p>
                   </div>
-                  <div className="w-20 flex flex-row justify-evenly items-center bg-itemForm rounded border-vbDisableText border px-2 py-[0.0625rem]">
-                    <input
-                      className="bg-transparent w-10 rounded focus:outline-none placeholder-vbDisableText font-poppins_medium text-base text-grey-1"
-                      type="text"
-                      min={0.5}
-                      max={50}
-                      value={inputSlippage}
-                      onChange={(event) => {
-                        if (event.target.value === "") {
-                          setInputSlippage("");
-                        } else {
-                          let pattern = /^\d+\.?\d*$/;
-                          if (pattern.test(event.target.value)) {
+                  <div className="flex justify-between flex-row w-full items-center">
+                    <div className="flex space-x-2 w-full">
+                      <p className="text-grey-3 min-w-fit">
+                        Slippage tolerance
+                      </p>
+                      <img src={IcQuestionCircleBlue} alt="" className="w-4" />
+                    </div>
+                    <div className="w-20 flex flex-row justify-evenly items-center bg-itemForm rounded border-vbDisableText border px-2 py-[0.0625rem]">
+                      <input
+                        className="bg-transparent w-10 rounded focus:outline-none placeholder-vbDisableText font-poppins_medium text-base text-grey-1"
+                        type="text"
+                        min={0.5}
+                        max={50}
+                        value={inputSlippage}
+                        onChange={(event) => {
+                          if (event.target.value === "") {
+                            setInputSlippage("");
+                          } else {
+                            let pattern = /^\d+\.?\d*$/;
+                            if (pattern.test(event.target.value)) {
+                              setInputSlippage(event.target.value);
+                            }
+                          }
+                        }}
+                        onBlur={(event) => {
+                          if (event.target.value === "") {
+                            setInputSlippage(0.5);
+                          } else if (parseFloat(event.target.value) >= 50.0) {
+                            setInputSlippage(50);
+                          } else if (parseFloat(event.target.value) <= 0.5) {
+                            setInputSlippage(0.5);
+                          } else {
                             setInputSlippage(event.target.value);
                           }
-                        }
-                      }}
-                      onBlur={(event) => {
-                        if (event.target.value === "") {
-                          setInputSlippage(0.5);
-                        } else if (parseFloat(event.target.value) >= 50.0) {
-                          setInputSlippage(50);
-                        } else if (parseFloat(event.target.value) <= 0.5) {
-                          setInputSlippage(0.5);
-                        } else {
-                          setInputSlippage(event.target.value);
-                        }
-                      }}
-                      placeholder="0.5"
-                    />
-                    <p className="ml-1">%</p>
-                  </div>
-                  {/* <p className="px-4 py-[0.0625rem] rounded bg-item">
+                        }}
+                        placeholder="0.5"
+                      />
+                      <p className="ml-1">%</p>
+                    </div>
+                    {/* <p className="px-4 py-[0.0625rem] rounded bg-item">
                   {" "}
                   &lt; 0.5%{" "}
                 </p> */}
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="flex space-x-2">
-                    <p className="text-grey-3">Swap fee</p>
-                    <img src={IcQuestionCircleBlue} alt="" className="w-4" />
                   </div>
-                  {loadingFee ? (
-                    <div className="loading" />
-                  ) : (
-                    <p>
-                      {swapFee} {sourceTokenInfo?.assetsChain}
-                    </p>
-                  )}
+                  <div className="flex justify-between items-center">
+                    <div className="flex space-x-2">
+                      <p className="text-grey-3">Swap fee</p>
+                      <img src={IcQuestionCircleBlue} alt="" className="w-4" />
+                    </div>
+                    {loadingFee ? (
+                      <div className="loading" />
+                    ) : (
+                      <p>
+                        {swapFee} {sourceTokenInfo?.assetsChain}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {account && (
-              <button
-                disabled={
-                  loadingSwap || loadingApprove || poolErrRef.current !== ""
-                }
-                onClick={
-                  accountApprove === 0 ? onApproveToken : onSwapAssetToken
-                }
-                className={`w-full ${
-                  !loadingSwap && !loadingApprove && poolErrRef.current === ""
-                    ? "btn-veb"
-                    : "bg-btn-veb-disabled rounded-lg"
-                }  h-12`}
-              >
-                {renderTitleButton()}
-              </button>
-            )}
-          </div>
-        )}
+              {account && (
+                <button
+                  disabled={
+                    loadingSwap || loadingApprove || poolErrRef.current !== ""
+                  }
+                  onClick={
+                    accountApprove === 0 ? onApproveToken : onSwapAssetToken
+                  }
+                  className={`w-full ${
+                    !loadingSwap && !loadingApprove && poolErrRef.current === ""
+                      ? "btn-veb"
+                      : "bg-btn-veb-disabled rounded-lg"
+                  }  h-12`}
+                >
+                  {renderTitleButton()}
+                </button>
+              )}
+            </div>
+          )}
         {!account && <BtnConnectInPage className="w-full btn-veb h-12" />}
         {/* (
           <button

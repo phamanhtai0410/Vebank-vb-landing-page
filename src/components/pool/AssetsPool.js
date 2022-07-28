@@ -73,15 +73,15 @@ const AssetsPool = () => {
               </div>
 
               <div className="p-4 col-span-2 flex justify-center items-center font-semibold">
-                {`${nFormatter(item.liquidity) } $`}
+                {`$${nFormatter(item.liquidity_usd) }`}
               </div>
 
               <div className="p-4 col-span-2 flex flex-col justify-center items-center content-center">
-                <div className="font-semibold">{item.volume ? nFormatter(item.volume) + ' $' :'-'}</div>
+                <div className="font-semibold">{item.volume ? '$'+ nFormatter(item.volume) :'-'}</div>
               </div>
 
               <div className="p-4 col-span-2 flex justify-center items-center font-semibold">
-                {item.fees ? nFormatter(item.fees) + ' $' :'-'}
+                {item.fees ? '$'+ nFormatter(item.fees) :'-'}
               </div>
 
               <div className="p-4 col-span-2 flex flex-col justify-center items-center content-center">

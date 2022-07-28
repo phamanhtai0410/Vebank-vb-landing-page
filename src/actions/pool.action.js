@@ -101,7 +101,7 @@ export const getPoolAssets = () => async (dispatch, getState) => {
               // the total supply of the pool may haven't been updated on Blockchain yet. So inside of this function,
               // we should check for it's current value stored in redux with the fetched one, and add the value
               // to get the latest value of the total LP.
-              const { amountTokenA, amountTokenB, liquidityPool } =
+              const { amountTokenA, amountTokenB, liquidityPool ,totalSupply } =
                 await getUserTokenAmounts({
                   contractPair,
                   account,
@@ -114,6 +114,7 @@ export const getPoolAssets = () => async (dispatch, getState) => {
                 actions.updateUserAssets({
                   assetsPoolAddress,
                   liquidityPool,
+                  liquidity: totalSupply,
                   amountTokenA,
                   amountTokenB,
                 })
@@ -233,7 +234,8 @@ export const fetchPairs = (query) => async (dispatch, getState) => {
             assetsPoolAddress: e.pair_address,
             assetsDecimals: e.token0.decimals,
             balanceAccount: 0,
-            liquidity: e.reserve_usd,
+            liquidity:0 ,
+            liquidity_usd: e.reserve_usd,
             volume: volumes,
             fees: fees,
             apr: getPoolAPR(fees,e.reserve_usd),

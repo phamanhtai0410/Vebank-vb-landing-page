@@ -30,6 +30,7 @@ const initialState = {
   reserves2: null,
   totalSupply: null,
   emptyAddress: true,
+  amountsOut: "",
 };
 
 const swapAssetSlice = createSlice({
@@ -83,6 +84,7 @@ const swapAssetSlice = createSlice({
       })
       .addCase(getAmountsOut.fulfilled, (state, action) => {
         state.loadingGetAmountOut = false;
+        state.amountsOut = action.payload.amountsOutFormat;
       })
       .addCase(getAmountsOut.rejected, (state, action) => {
         state.loadingGetAmountOut = false;
@@ -92,6 +94,7 @@ const swapAssetSlice = createSlice({
       })
       .addCase(getAmountsIn.fulfilled, (state, action) => {
         state.loadingGetAmountIn = false;
+        state.amountsOut = action.payload.inputAmountOut;
       })
       .addCase(getAmountsIn.rejected, (state, action) => {
         state.loadingGetAmountIn = false;

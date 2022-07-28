@@ -24,23 +24,26 @@ const Liquidity = () => {
     setPoolSelect(poolAddress);
   }
   return (
-    <div className="w-full lg:w-[500px] rounded-2xl p-10 bg-[#182233] mx-auto relative z-0">
+    <div className="w-full lg:w-[500px] rounded-2xl p-10 bg-[#0D1522] mx-auto relative z-0">
       {/*Header*/}
       <GradientStrokeWrapper borderRadius="1rem" className="-z-10" />
 
       <div className="flex flex-row flex-1 items-center justify-between">
         {/* <button className="btn-modal-back" onClick={closeModal} /> */}
         <div className="flex flex-row items-center space-x-6">
-          <div className="flex flex-col space-y-4">
+          <span className="text-white text-2xl font-poppins_medium">
+            Your Liquidity
+          </span>
+          {/* <div className="flex flex-col space-y-4">
             <span className="text-white text-2xl font-poppins_medium">
               Your Liquidity
             </span>
             <span className="text-grey-1 text-base font-poppins_light">
               Remove liquidity to receive tokens back
             </span>
-          </div>
+          </div> */}
         </div>
-        <div className="flex flex-row space-x-8">
+        {/* <div className="flex flex-row space-x-8">
           <img
             src={IcSettingWhite}
             alt="Setting"
@@ -53,7 +56,7 @@ const Liquidity = () => {
             className="w-8 h-8 cursor-pointer"
             // onClick={closeModal}
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="content-modal mt-8">

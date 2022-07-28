@@ -205,6 +205,11 @@ const useAddLiquidFacade = () => {
     setStep(1);
   };
 
+  const closeModalAndDashboard = () => {
+    closeModal();
+    resetFrm();
+  };
+
   const handlerStepToStep = (e) => {
     if (!account) {
       dispatch(actions.web3Connect(true));
@@ -371,6 +376,7 @@ const useAddLiquidFacade = () => {
     slippage,
     closeModal,
     handlerStepToStep,
+    closeModalAndDashboard,
     onSelectFirstCurrency,
     onSelectSecondCurrency,
     onChangeFirstTokenAmount,

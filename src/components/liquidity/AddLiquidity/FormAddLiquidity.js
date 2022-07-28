@@ -230,7 +230,7 @@ const FormAddLiquidity = () => {
           </div>
         </div>
       </div>
-      <div className="footer-modal mt-8">{showConfirmButton()}</div>
+      {step!==2 && <div className="footer-modal mt-8">{showConfirmButton()}</div>}
     </div>
   );
 };

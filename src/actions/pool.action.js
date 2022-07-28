@@ -248,7 +248,8 @@ export const fetchPairs = (query) => async (dispatch, getState) => {
           total
       });
 
-      dispatch(getPoolAssetsByAccount(dataList));
+
+     dispatch(getPoolAssetsByAccount(dataList));
   
     }
     
@@ -272,15 +273,17 @@ export const getPoolAssetsByAccount =
 
     if (account && ADDRESS_FACTORY && dataAssetPool.length > 0) {
       for await (const item of dataAssetPool) {
+
         const { addressTokenA, addressTokenB, assetsPoolAddress } = item;
 
         if (item.assetsPoolAddress && account) {
+
           const contractPair = new web3.eth.Contract(
             ERC20ABI_PAIR,
             item.assetsPoolAddress
           );
 
-          const { amountTokenA, amountTokenB, liquidityPool } =  await getUserTokenAmounts({
+          const { amountTokenA, amountTokenB, liquidityPool ,totalSupply} =  await getUserTokenAmounts({
               contractPair,
               account,
               addressTokenA,
@@ -290,6 +293,7 @@ export const getPoolAssetsByAccount =
           dataList.push({
             ...item,
             balanceAccount: liquidityPool,
+            liquidity:totalSupply,
             amountTokenA,
             amountTokenB,
           });
@@ -342,6 +346,7 @@ export const getUserTokenAmounts = async ({
   let reserve2 = 0;
 
   try {
+    
     const balanceBigN = await contractPair.methods.balanceOf(account).call();
     // console.log('🐶🐶  ~ liquidityPool(raw)', balanceBigN)
     liquidityPool = await ethers.utils.formatUnits(
@@ -351,6 +356,8 @@ export const getUserTokenAmounts = async ({
     // console.log('🐶🐶  ~ liquidityPool(formatted)', liquidityPool)
     liquidityPool = FixedNumber.from(liquidityPool);
     totalSupply = await contractPair.methods.totalSupply().call();
+
+
     if (totalSupply) {
       totalSupply = ethers.utils.formatUnits(
         totalSupply,
@@ -365,7 +372,7 @@ export const getUserTokenAmounts = async ({
 
     // Check if token position is match or not, swap reserve position if it's not match.
     const firstTokenAddress = await contractPair.methods.token0().call();
-    if (firstTokenAddress !== addressTokenA) {
+    if (firstTokenAddress.toLocaleUpperCase() !== addressTokenA.toLocaleUpperCase()) {
       [_reserve0, _reserve1] = [_reserve1, _reserve0];
     }
 
@@ -374,11 +381,13 @@ export const getUserTokenAmounts = async ({
       getDecimalForAsset(addressTokenA)
     );
     _reserve0 = FixedNumber.from(_reserve0);
+
     _reserve1 = ethers.utils.formatUnits(
       _reserve1,
       getDecimalForAsset(addressTokenB)
     );
     _reserve1 = FixedNumber.from(_reserve1);
+  
 
     // Using calculation like this to avoid auto rounding numbers of JS
     if (liquidityPool >= 0 && totalSupply > 0) {

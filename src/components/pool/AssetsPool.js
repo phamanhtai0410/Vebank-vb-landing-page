@@ -29,7 +29,8 @@ const AssetsPool = () => {
   }, [web3]);
 
   async function fetchPoolAssets() {
-    await dispatch(actions.fetchPairs());
+     await dispatch(actions.fetchPairs());
+   // await dispatch(actions.getPoolAssets());
   }
 
   const onClickShowRowAssets = (assetsAddress) => {

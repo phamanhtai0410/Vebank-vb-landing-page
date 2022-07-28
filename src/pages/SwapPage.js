@@ -67,7 +67,7 @@ const SwapPage = () => {
             </div>
           </div> */}
 
-          <div className="rounded-2xl border border-vbLine bg-newForm h-full p-8 w-full md:w-[568px]">
+          <div className="rounded-2xl border border-vbLine bg-newForm h-full p-8 w-full md:w-[490px] xl:w-[530px]">
             <Swap />
           </div>
           {/* <div className="rounded-2xl border border-vbLine bg-popupVb p-8 w-full md:w-[370px] h-[266px]">

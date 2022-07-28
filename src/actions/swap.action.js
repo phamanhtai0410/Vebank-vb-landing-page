@@ -253,32 +253,41 @@ export const getAmountsOut = createAsyncThunk(
   async ({ inputAmountIn, tokenAInfo, tokenBInfo }, { dispatch, getState }) => {
     const state = getState();
 
-    const addressTokenA = tokenAInfo?.assetsAddress || "";
-    const addressTokenB = tokenBInfo?.assetsAddress || "";
+    // const addressTokenA = tokenAInfo?.assetsAddress || "";
+    // const addressTokenB = tokenBInfo?.assetsAddress || "";
 
-    const { web3 } = state.web3;
-    if (web3 && ADDRESS_FACTORY) {
-      let contractFactory = new web3.eth.Contract(
-        ERC20ABI_ROUTER,
-        ADDRESS_ROUTER
-      );
+    // const { web3 } = state.web3;
+    // if (web3 && ADDRESS_FACTORY) {
+    //   let contractFactory = new web3.eth.Contract(
+    //     ERC20ABI_ROUTER,
+    //     ADDRESS_ROUTER
+    //   );
 
-      const amountInUint = web3.utils.toWei(
-        inputAmountIn.toString(),
-        getDecimalForAsset(addressTokenA) === PartialConstants.VEUSD_DECIMAL
-          ? "mwei"
-          : "ether"
-      );
+    //   const amountInUint = web3.utils.toWei(
+    //     inputAmountIn.toString(),
+    //     getDecimalForAsset(addressTokenA) === PartialConstants.VEUSD_DECIMAL
+    //       ? "mwei"
+    //       : "ether"
+    //   );
 
-      const amountsOut = await contractFactory.methods
-        .getAmountsOut(amountInUint, [addressTokenA, addressTokenB])
-        .call();
-      const amountsOutFormat = ethers.utils.formatUnits(
-        amountsOut[1],
-        getDecimalForAsset(addressTokenB)
-      );
-      return { inputAmountIn, amountsOutFormat };
-    }
+    //   const amountsOut = await contractFactory.methods
+    //     .getAmountsOut(amountInUint, [addressTokenA, addressTokenB])
+    //     .call();
+    //   const amountsOutFormat = ethers.utils.formatUnits(
+    //     amountsOut[1],
+    //     getDecimalForAsset(addressTokenB)
+    //   );
+    //   return { inputAmountIn, amountsOutFormat };
+    // }
+
+    const { reserves1, reserves2, pairFee } = state.swapAsset;
+    const amountsOutFormat =
+      (Number(reserves2) *
+        Number(inputAmountIn) *
+        (1 - Number(pairFee) / 1000)) /
+      (Number(reserves1) +
+        Number(inputAmountIn) * (1 - Number(pairFee) / 1000));
+    return { inputAmountIn, amountsOutFormat };
   }
 );
 
@@ -290,32 +299,40 @@ export const getAmountsIn = createAsyncThunk(
   ) => {
     const state = getState();
 
-    const addressTokenA = tokenAInfo?.assetsAddress || "";
-    const addressTokenB = tokenBInfo?.assetsAddress || "";
+    // const addressTokenA = tokenAInfo?.assetsAddress || "";
+    // const addressTokenB = tokenBInfo?.assetsAddress || "";
 
-    const { web3 } = state.web3;
-    if (web3 && ADDRESS_FACTORY) {
-      let contractFactory = new web3.eth.Contract(
-        ERC20ABI_ROUTER,
-        ADDRESS_ROUTER
-      );
+    // const { web3 } = state.web3;
+    // if (web3 && ADDRESS_FACTORY) {
+    //   let contractFactory = new web3.eth.Contract(
+    //     ERC20ABI_ROUTER,
+    //     ADDRESS_ROUTER
+    //   );
 
-      const amountOutUint = web3.utils.toWei(
-        inputAmountOut.toString(),
-        getDecimalForAsset(addressTokenB) === PartialConstants.VEUSD_DECIMAL
-          ? "mwei"
-          : "ether"
-      );
+    //   const amountOutUint = web3.utils.toWei(
+    //     inputAmountOut.toString(),
+    //     getDecimalForAsset(addressTokenB) === PartialConstants.VEUSD_DECIMAL
+    //       ? "mwei"
+    //       : "ether"
+    //   );
 
-      const amountsIn = await contractFactory.methods
-        .getAmountsIn(amountOutUint, [addressTokenA, addressTokenB])
-        .call();
-      const amountsInFormat = ethers.utils.formatUnits(
-        amountsIn[0],
-        getDecimalForAsset(addressTokenA)
-      );
-      return { amountsInFormat, inputAmountOut };
-    }
+    //   const amountsIn = await contractFactory.methods
+    //     .getAmountsIn(amountOutUint, [addressTokenA, addressTokenB])
+    //     .call();
+    //   const amountsInFormat = ethers.utils.formatUnits(
+    //     amountsIn[0],
+    //     getDecimalForAsset(addressTokenA)
+    //   );
+    //   return { amountsInFormat, inputAmountOut };
+    // }
+
+    const { reserves1, reserves2, pairFee } = state.swapAsset;
+    const amountsInFormat =
+      ((Number(reserves1) * Number(inputAmountOut)) /
+        (Number(reserves2) - Number(inputAmountOut))) *
+        (1 - Number(pairFee) / 1000) +
+      1;
+    return { amountsInFormat, inputAmountOut };
   }
 );
 
@@ -541,7 +558,7 @@ export const swapAsset = createAsyncThunk(
                   description: `Swapping ${amountInToSwap} ${tokenAInfo.assetsChain} for ${amountsOut} ${tokenBInfo.assetsChain}`,
                   details: {
                     message: "View on VeChain Stats",
-                    txid: transaction.txID,
+                    txid: transaction.txid,
                   },
                 },
                 key

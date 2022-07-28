@@ -25,6 +25,9 @@ import "./styles.scss";
 
 const Swap = () => {
   const {
+    isSwitch,
+    pricePaidPerA,
+    pricePaidPerB,
     priceImpact,
     poolErrRef,
     swapFee,
@@ -63,9 +66,6 @@ const Swap = () => {
     loadingApprove,
     onCheckExchangeRatePool,
     onSwitchExchangeRate,
-    exchangeRate,
-    sourceTokenChain,
-    desireTokenChain,
   } = useSwapFacade();
 
   const renderTitleButton = () => {
@@ -126,7 +126,7 @@ const Swap = () => {
                   onClick={() => onChangeSourceInput(sourceTokenBalance)}
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
-                  } sm:w-[47px] w-[40px] h-[28px] bg-[#203557] rounded flex flex-row items-center justify-center`}
+                  } sm:w-[40px] w-[36px] h-[28px] bg-[#203557] rounded flex flex-row items-center justify-center text-xs`}
                   disabled={!account}
                 >
                   Max
@@ -135,7 +135,7 @@ const Swap = () => {
                   onClick={() => onChangeSourceInput(sourceTokenBalance / 2.0)}
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
-                  } sm:w-[47px] w-[40px] h-[28px] rounded bg-[#203557]" flex flex-row items-center justify-center`}
+                  } sm:w-[40px] w-[36px] h-[28px] rounded bg-[#203557]" flex flex-row items-center justify-center text-xs`}
                   disabled={!account}
                 >
                   Half
@@ -221,7 +221,7 @@ const Swap = () => {
                   onClick={() => onChangeDesireInput(desireTokenBalance)}
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
-                  } sm:w-[47px] w-[40px] h-[28px] bg-[#203557] rounded flex flex-row items-center justify-center`}
+                  } sm:w-[40px] w-[36px] h-[28px] bg-[#203557] rounded flex flex-row items-center justify-center text-xs`}
                   disabled={!account}
                 >
                   Max
@@ -230,7 +230,7 @@ const Swap = () => {
                   onClick={() => onChangeDesireInput(desireTokenBalance / 2.0)}
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
-                  } sm:w-[47px] w-[40px] h-[28px] rounded bg-[#203557]" flex flex-row items-center justify-center`}
+                  } sm:w-[40px] w-[36px] h-[28px] rounded bg-[#203557]" flex flex-row items-center justify-center text-xs`}
                   disabled={!account}
                 >
                   Half
@@ -313,11 +313,21 @@ const Swap = () => {
                 <div className="w-full flex flex-row items-center justify-between">
                   <div className="row-center space-x-2 w-fit group relative">
                     <p className="ml-2">
-                      1 {sourceTokenChain} &asymp;{" "}
-                      {exchangeRate.toString().length >= 6
-                        ? `${parseFloat(exchangeRate).toFixed(6)}`
-                        : exchangeRate}{" "}
-                      {desireTokenChain}
+                      1{" "}
+                      {isSwitch
+                        ? desireTokenInfo?.assetsChain
+                        : sourceTokenInfo?.assetsChain}{" "}
+                      &asymp;{" "}
+                      {isSwitch
+                        ? pricePaidPerB.toString().length >= 6
+                          ? `${parseFloat(pricePaidPerB).toFixed(6)}`
+                          : pricePaidPerB
+                        : pricePaidPerA.toString().length >= 6
+                        ? `${parseFloat(pricePaidPerA).toFixed(6)}`
+                        : pricePaidPerA}{" "}
+                      {isSwitch
+                        ? sourceTokenInfo?.assetsChain
+                        : desireTokenInfo?.assetsChain}
                     </p>
                     {/* tooltip */}
                     {/* <div class="absolute bottom-0 right-[-24px] flex-col items-center hidden mb-6 group-hover:flex">

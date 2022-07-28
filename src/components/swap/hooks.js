@@ -49,6 +49,9 @@ const useSwapFacade = () => {
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingSwap, setLoadingSwap] = useState(false);
   const [priceImpact, setPriceImpact] = useState(0);
+  const [pricePaidPerA, setPricePaidPerA] = useState(0);
+  const [pricePaidPerB, setPricePaidPerB] = useState(0);
+  const [isSwitch, setIsSwitch] = useState(false);
   const poolErrRef = useRef("");
 
   const userInputRef = useRef("");
@@ -66,7 +69,6 @@ const useSwapFacade = () => {
   const loadingGetAmountIn = useSelector(selectLoadingGetAmountIn);
   const reserveFrom = useSelector(selectReserveFrom);
   const reserveTo = useSelector(selectReserveTo);
-  // const loadingExchangeRate = useSelector(selectLoadingExchangeRate);
 
   const accountApprove = useSelector(selectAccountApprove);
   const emptyAddress = useSelector(selectEmptyAddress);
@@ -92,15 +94,6 @@ const useSwapFacade = () => {
   );
   const vthoBalance = useSelector((state) =>
     selectBalanceById(state, process.env.REACT_APP_TOKEN_VTHO)
-  );
-
-  const [exchangeRate, setExchangeRate] = useState(exchangeRateAB);
-
-  const [sourceTokenChain, setSourceTokenChain] = useState(
-    sourceTokenInfo?.assetsChain
-  );
-  const [desireTokenChain, setDesireTokenChain] = useState(
-    desireTokenInfo?.assetsChain
   );
 
   const swapFee = useMemo(
@@ -172,10 +165,6 @@ const useSwapFacade = () => {
   }, [sourceTokenInfo, account]);
 
   useEffect(() => {
-    onSwitchExchangeRate();
-  }, [exchangeRateAB, exchangeRateBA]);
-
-  useEffect(() => {
     if (pressSwap) {
       amountInRef.current = inputAmountOut;
       if (
@@ -231,10 +220,14 @@ const useSwapFacade = () => {
     }
   }, [desireTokenAddress, sourceTokenAddress]);
 
-  const onCountPriceImpact = () => {
-    const newTokenTo = Number(constantProduct) / (Number(reserveFrom) + Number(inputAmountIn));
+  const onCountPriceImpact = (amountIn) => {
+    const newTokenTo =
+    Number(constantProduct) / (Number(reserveFrom) + Number(amountIn));
     const tokenToReceived = Number(reserveTo) - newTokenTo;
-    const pricePaidPerTokenTo = Number(inputAmountIn) / tokenToReceived;
+    const pricePaidPerTokenFrom = tokenToReceived / Number(amountIn);
+    const pricePaidPerTokenTo = Number(amountIn) / tokenToReceived;
+    setPricePaidPerA(pricePaidPerTokenFrom);
+    setPricePaidPerB(pricePaidPerTokenTo);
     const priceImpact =
       ((pricePaidPerTokenTo - Number(marketPrice)) / Number(marketPrice)) * 100;
     setPriceImpact(priceImpact);
@@ -312,7 +305,7 @@ const useSwapFacade = () => {
 
   const getAmountOutDebounced = useDebouncedCallback((value) => {
     onGetAmountsOut(value);
-  }, 1000);
+  }, 0);
 
   const onGetAmountsOut = (value) => {
     dispatch(
@@ -327,14 +320,14 @@ const useSwapFacade = () => {
         const { amountsOutFormat } = originalPromiseResult;
         setInputAmountOut(amountsOutFormat);
         onCheckTotalSupplyAvailable(amountsOutFormat);
-        onCountPriceImpact();
+        onCountPriceImpact(value);
       })
       .catch((rejectedValueOrSerializedError) => {});
   };
 
   const getAmountsInDebounced = useDebouncedCallback((value) => {
     onGetAmountsIn(value);
-  }, 1000);
+  }, 0);
 
   const onGetAmountsIn = (value) => {
     onCheckTotalSupplyAvailable(value);
@@ -349,7 +342,7 @@ const useSwapFacade = () => {
       .then((originalPromiseResult) => {
         const { amountsInFormat } = originalPromiseResult;
         checkBalance(amountsInFormat);
-        onCountPriceImpact();
+        onCountPriceImpact(amountsInFormat);
       })
       .catch((rejectedValueOrSerializedError) => {});
   };
@@ -390,6 +383,7 @@ const useSwapFacade = () => {
     (value) => {
       userInputRef.current = value;
       setInputAmountOut(value);
+      checkTotalSupplyAvailable({amountOut: value})
       if (value !== "") {
         getAmountsInDebounced(value);
       } else {
@@ -400,19 +394,7 @@ const useSwapFacade = () => {
   );
 
   const onSwitchExchangeRate = () => {
-    setExchangeRate(
-      exchangeRate === exchangeRateAB ? exchangeRateBA : exchangeRateAB
-    );
-    setSourceTokenChain(
-      exchangeRate === exchangeRateAB
-        ? desireTokenInfo?.assetsChain
-        : sourceTokenInfo?.assetsChain
-    );
-    setDesireTokenChain(
-      exchangeRate === exchangeRateAB
-        ? sourceTokenInfo?.assetsChain
-        : desireTokenInfo?.assetsChain
-    );
+    setIsSwitch(!isSwitch);
   };
 
   const onCheckApproveToken = () => {
@@ -522,10 +504,10 @@ const useSwapFacade = () => {
     loadingApprove,
     onCheckExchangeRatePool,
     onSwitchExchangeRate,
-    exchangeRate,
-    sourceTokenChain,
-    desireTokenChain,
     poolAddress,
+    isSwitch,
+    pricePaidPerA,
+    pricePaidPerB,
   };
 };
 

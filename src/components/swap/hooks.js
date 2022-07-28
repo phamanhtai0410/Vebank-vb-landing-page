@@ -136,12 +136,12 @@ const useSwapFacade = () => {
         ? formatLocaleString(
             inputAmountOut - (inputAmountOut * inputSlippage) / 100,
             PartialConstants.VEUSD_DECIMAL,
-            true
+            false
           )
         : formatLocaleString(
             inputAmountOut - (inputAmountOut * inputSlippage) / 100,
             PartialConstants.DEFAULT_ASSET_DECIMAL,
-            true
+            false
           ),
     [desireTokenInfo.assetsAddress, inputAmountOut, inputSlippage]
   );
@@ -222,7 +222,7 @@ const useSwapFacade = () => {
 
   const onCountPriceImpact = (amountIn) => {
     const newTokenTo =
-    Number(constantProduct) / (Number(reserveFrom) + Number(amountIn));
+      Number(constantProduct) / (Number(reserveFrom) + Number(amountIn));
     const tokenToReceived = Number(reserveTo) - newTokenTo;
     const pricePaidPerTokenFrom = tokenToReceived / Number(amountIn);
     const pricePaidPerTokenTo = Number(amountIn) / tokenToReceived;
@@ -368,12 +368,17 @@ const useSwapFacade = () => {
 
   const onChangeSourceInput = useCallback(
     (value) => {
-      userInputRef.current = value;
-      checkBalance(value);
-      if (value !== "") {
-        getAmountOutDebounced(value);
-      } else {
+      if (value === "") {
+        userInputRef.current = value;
+        checkBalance(value);
         setInputAmountOut("");
+      } else {
+        let pattern = /^\d+\.?\d*$/;
+        if (pattern.test(value)) {
+          userInputRef.current = value;
+          checkBalance(value);
+          getAmountOutDebounced(value);
+        }
       }
     },
     [checkBalance, getAmountOutDebounced]
@@ -381,13 +386,18 @@ const useSwapFacade = () => {
 
   const onChangeDesireInput = useCallback(
     (value) => {
-      userInputRef.current = value;
-      setInputAmountOut(value);
-      checkTotalSupplyAvailable({amountOut: value})
-      if (value !== "") {
-        getAmountsInDebounced(value);
-      } else {
+      if (value === "") {
+        userInputRef.current = value;
+        setInputAmountOut(value);
         setInputAmountIn("");
+      } else {
+        let pattern = /^\d+\.?\d*$/;
+        if (pattern.test(value)) {
+          userInputRef.current = value;
+          setInputAmountOut(value);
+          getAmountsInDebounced(value);
+          checkTotalSupplyAvailable({ amountOut: value });
+        }
       }
     },
     [getAmountsInDebounced]

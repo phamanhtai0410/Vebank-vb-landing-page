@@ -14,6 +14,12 @@ export function formatLocaleString(x, digits, isFixed) {
     maximumSignificantDigits: digits || 10,
   });
 }
+export function formatBalanceString(x, digits) {
+  return x.toLocaleString("en-IN", {
+    currency: "USD",
+    maximumFractionDigits: digits || 2,
+  });
+}
 
 export function numberWithCommas(num) {
   num = num.toLocaleString("en-IN", { maximumSignificantDigits: 10 });

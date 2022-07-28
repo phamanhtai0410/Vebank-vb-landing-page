@@ -281,12 +281,11 @@ export const getAmountsOut = createAsyncThunk(
     // }
 
     const { reserves1, reserves2, pairFee } = state.swapAsset;
-    const amountsOutFormat =
-      (Number(reserves2) *
-        Number(inputAmountIn) *
-        (1 - Number(pairFee) / 1000)) /
-      (Number(reserves1) +
-        Number(inputAmountIn) * (1 - Number(pairFee) / 1000));
+    const up =
+      Number(reserves2) * Number(inputAmountIn) * (1 - Number(pairFee) / 1000);
+    const down =
+      Number(reserves1) + Number(inputAmountIn) * (1 - Number(pairFee) / 1000);
+    const amountsOutFormat = up / down;
     return { inputAmountIn, amountsOutFormat };
   }
 );
@@ -327,11 +326,14 @@ export const getAmountsIn = createAsyncThunk(
     // }
 
     const { reserves1, reserves2, pairFee } = state.swapAsset;
-    const amountsInFormat =
-      ((Number(reserves1) * Number(inputAmountOut)) /
-        (Number(reserves2) - Number(inputAmountOut))) *
-        (1 - Number(pairFee) / 1000) +
-      1;
+
+    const up = Number(reserves1) * Number(inputAmountOut);
+    const down =
+      (Number(reserves2) - Number(inputAmountOut)) *
+      (1 - Number(pairFee) / 1000);
+
+    const amountsInFormat = up / down;
+
     return { amountsInFormat, inputAmountOut };
   }
 );

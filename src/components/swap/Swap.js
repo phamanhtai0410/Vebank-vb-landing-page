@@ -9,7 +9,7 @@ import BtnConnectInPage from "../account/BtnConnectInPage";
 import IcLoading from "../../assets/images/loading_swap.svg";
 import IcSwitch from "../../assets/images/vertical_switch.svg";
 import IcQuestionCircleBlue from "../../assets/images/question_circle_blue.svg";
-import IcQuestionCircleYellow from "../../assets/images/question_circle_yellow.svg";
+// import IcQuestionCircleYellow from "../../assets/images/question_circle_yellow.svg";
 // import IcSwap from "../../assets/images/ic_swap.svg";
 // import IcReload from "../../assets/images/ic_reload.svg";
 // import IcSetting from "../../assets/images/buttons/ic_setting_outline.svg";
@@ -22,6 +22,7 @@ import HighlightedAssetIcon from "./HighlightedAssetIcon";
 import { swapConstants } from "../../constants";
 import { svgSymbolConfig } from "../../_helpers/param";
 import "./styles.scss";
+import { formatBalanceString } from "../../utils/lib";
 
 const Swap = () => {
   const {
@@ -101,7 +102,10 @@ const Swap = () => {
         <div className="full-row-between-center">
           <p className="text-sm">From</p>
           <p className="text-sm">
-            Balance: {sourceTokenBalance ? sourceTokenBalance : "--"}
+            Balance:{" "}
+            {sourceTokenBalance
+              ? formatBalanceString(sourceTokenBalance)
+              : "--"}
           </p>
         </div>
         <div className="flex flex-col">
@@ -150,7 +154,7 @@ const Swap = () => {
               ) : (
                 <input
                   className="bg-transparent w-full focus:outline-none placeholder-vbDisableText font-poppins_medium text-base text-grey-1 text-right"
-                  type="number"
+                  type="text"
                   min={1}
                   value={inputAmountIn}
                   onChange={(event) => onChangeSourceInput(event.target.value)}
@@ -198,7 +202,10 @@ const Swap = () => {
         <div className="full-row-between-center">
           <p className="text-sm">To</p>
           <p className="text-sm">
-            Balance: {desireTokenBalance ? desireTokenBalance : "--"}
+            Balance:{" "}
+            {desireTokenBalance
+              ? formatBalanceString(desireTokenBalance)
+              : "--"}
           </p>
         </div>
         <div className="flex flex-col">
@@ -254,7 +261,7 @@ const Swap = () => {
               ) : (
                 <input
                   className="w-full bg-transparent focus:outline-none placeholder-vbDisableText font-poppins_medium text-base text-grey-1 text-right"
-                  type="number"
+                  type="text"
                   min={1}
                   value={inputAmountOut}
                   onChange={(event) => onChangeDesireInput(event.target.value)}
@@ -393,17 +400,26 @@ const Swap = () => {
                   <div className="w-20 flex flex-row justify-evenly items-center bg-itemForm rounded border-vbDisableText border px-2 py-[0.0625rem]">
                     <input
                       className="bg-transparent w-10 rounded focus:outline-none placeholder-vbDisableText font-poppins_medium text-base text-grey-1"
-                      type="number"
+                      type="text"
                       min={0.5}
                       max={50}
                       value={inputSlippage}
                       onChange={(event) => {
-                        setInputSlippage(event.target.value);
+                        if (event.target.value === "") {
+                          setInputSlippage("");
+                        } else {
+                          let pattern = /^\d+\.?\d*$/;
+                          if (pattern.test(event.target.value)) {
+                            setInputSlippage(event.target.value);
+                          }
+                        }
                       }}
                       onBlur={(event) => {
-                        if (event.target.value >= 50) {
+                        if (event.target.value === "") {
+                          setInputSlippage(0.5);
+                        } else if (parseFloat(event.target.value) >= 50.0) {
                           setInputSlippage(50);
-                        } else if (event.target.value <= 0.5) {
+                        } else if (parseFloat(event.target.value) <= 0.5) {
                           setInputSlippage(0.5);
                         } else {
                           setInputSlippage(event.target.value);
@@ -449,15 +465,6 @@ const Swap = () => {
                 }  h-12`}
               >
                 {renderTitleButton()}
-                {/* {accountApprove === 0
-                  ? "Approve"
-                  : showErr || poolErr !== ""
-                  ? showErr
-                    ? `Your ${sourceTokenInfo?.assetsChain} balance is not enough`
-                    : poolErr
-                  : loadingSwap
-                  ? "Swapping..."
-                  : "Swap"} */}
               </button>
             )}
           </div>
@@ -473,7 +480,8 @@ const Swap = () => {
         ) */}
         <div className="flex space-x-2">
           <p className="text-balanceVTHO">
-            VTHO balance: {vthoBalance ? vthoBalance : "--"}
+            VTHO balance:{" "}
+            {vthoBalance ? formatBalanceString(vthoBalance) : "--"}
           </p>
           {/* <img src={IcQuestionCircleYellow} alt="" /> */}
         </div>

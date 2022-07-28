@@ -1,4 +1,5 @@
 import { ethers, FixedNumber } from "ethers";
+import queryString from 'query-string';
 
 import { poolConstants } from "../constants";
 
@@ -8,7 +9,10 @@ import { compareString, getDecimalForAsset } from "../utils/lib";
 import PartialConstants from "../constants/partial.constants";
 import * as actions from "./index";
 
+import { formatUriSecure } from '../utils/lib';
+
 const ADDRESS_FACTORY = process.env.REACT_APP_ADDRESS_FACTORY;
+const pageSize = 10;
 
 // ------------------------ POOL ------------------------ //
 
@@ -22,12 +26,14 @@ export const getPoolAssets = () => async (dispatch, getState) => {
   let dataAssets = data.length === 0 ? listAsset : data;
 
   if (web3 && ADDRESS_FACTORY && dataAssets.length > 0) {
+
     let contractFactory = new web3.eth.Contract(
       ERC20ABI_FACTORY,
       ADDRESS_FACTORY
     );
 
     for await (const item of dataAssets) {
+
       const {
         addressTokenA,
         addressTokenB,
@@ -35,6 +41,7 @@ export const getPoolAssets = () => async (dispatch, getState) => {
         pairTransferEvent,
         pairApproveEvent,
       } = item;
+
       const assetsPoolAddress = await contractFactory.methods
         .getPair(addressTokenA, addressTokenB)
         .call();
@@ -147,7 +154,9 @@ export const getPoolAssets = () => async (dispatch, getState) => {
           pairApproveEvent: _pairApproveEvent,
           pairTransferEvent: _pairTransferEvent,
         });
+
       }
+
     }
 
     dispatch({
@@ -157,6 +166,7 @@ export const getPoolAssets = () => async (dispatch, getState) => {
     });
 
     dispatch(getPoolAssetsByAccount(dataList));
+
   } else {
     dispatch({
       type: poolConstants.FETCH_POOL_ASSETS_SUCCESS,
@@ -166,6 +176,89 @@ export const getPoolAssets = () => async (dispatch, getState) => {
 
   return dataList;
 };
+
+function getPairVolumeAndFees(dataList){
+  let fees = 0;
+  let volumes = 0;
+  dataList.map((item) => {
+    fees =fees + Number(item.fee_usd);
+    volumes =volumes + Number(item.volume_usd);
+  })
+  return{fees, volumes};
+}
+
+function getPoolAPR(fee,liquidity){
+  return( ((fee/(24*3600))/liquidity)*365*24*3600)
+}
+
+export const fetchPairs = (query) => async (dispatch, getState) => {
+
+  const state = getState();
+  const { assetEntities } = state.assetsMarketReducer;
+
+  let querySearch = {
+    page: 1,
+    page_size: pageSize,
+  }
+
+  if (query) {
+    querySearch = { ...querySearch, ...query };
+  }
+
+  const linkQuery = queryString.stringify(querySearch);
+  const url = `${process.env.REACT_APP_API_ENDPOINT}${formatUriSecure('/v1/pool/exchange')}&${linkQuery}`;
+
+  try {
+
+    const response = await fetch(url);
+    const responseBody = await response.json();
+  
+    if(responseBody && responseBody.data){
+  
+      const { pairs, total } = responseBody.data;
+  
+      const dataList = pairs.map(e => {
+
+        const {fees,volumes} = getPairVolumeAndFees(e.hour_data);
+
+        return {
+            ...e,
+            iconOrigin: assetEntities[e.token0.address?.toLowerCase()]?.icon,
+            iconAssets: assetEntities[e.token1.address?.toLowerCase()]?.icon,
+            assetsPoolName: e.token0.symbol + ' - ' + e.token1.symbol,
+            assetsChainA: e.token0.symbol,
+            addressTokenA: e.token0.address,
+            assetsChainB: e.token1.symbol,
+            addressTokenB: e.token1.address,
+            assetsPoolAddress: e.pair_address,
+            assetsDecimals: e.token0.decimals,
+            balanceAccount: 0,
+            liquidity: e.reserve_usd,
+            volume: volumes,
+            fees: fees,
+            apr: getPoolAPR(fees,e.reserve_usd),
+          }
+      })
+
+      dispatch({
+          type: poolConstants.FETCH_POOL_ASSETS_SUCCESS,
+          data: dataList || [],
+          total
+      });
+
+      dispatch(getPoolAssetsByAccount(dataList));
+  
+    }
+    
+  } catch (error) {
+    dispatch({
+      type: poolConstants.FETCH_POOL_ASSETS_ERROR,
+      message: error
+    });
+  }
+
+}
+
 
 export const getPoolAssetsByAccount =
   (dataAssetPool) => async (dispatch, getState) => {
@@ -185,21 +278,20 @@ export const getPoolAssetsByAccount =
             item.assetsPoolAddress
           );
 
-          const { amountTokenA, amountTokenB, liquidityPool, totalSupply } =
-            await getUserTokenAmounts({
+          const { amountTokenA, amountTokenB, liquidityPool } =  await getUserTokenAmounts({
               contractPair,
               account,
               addressTokenA,
               addressTokenB,
-            });
+          });
 
           dataList.push({
             ...item,
-            liquidity: totalSupply,
             balanceAccount: liquidityPool,
             amountTokenA,
             amountTokenB,
           });
+
           dispatch(
             actions.updateUserAssets({
               assetsPoolAddress,
@@ -208,6 +300,7 @@ export const getPoolAssetsByAccount =
               amountTokenB,
             })
           );
+
         }
       }
 

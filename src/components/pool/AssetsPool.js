@@ -9,6 +9,7 @@ import PoolRowAction from "./PoolRowAction";
 
 import * as actions from "../../actions";
 import LiquidPairIcon from "../partials/LiquidPairIcon";
+import { nFormatter } from "../../utils/lib";
 
 const AssetsPool = () => {
   const [openRowAssets, setOpenRowAssets] = useState([]);
@@ -28,7 +29,7 @@ const AssetsPool = () => {
   }, [web3]);
 
   async function fetchPoolAssets() {
-    await dispatch(actions.getPoolAssets());
+    await dispatch(actions.fetchPairs());
   }
 
   const onClickShowRowAssets = (assetsAddress) => {
@@ -66,25 +67,25 @@ const AssetsPool = () => {
                   iconAsset1={item.iconOrigin}
                   iconAsset2={item.iconAssets}
                 />
-                <span className="text-lg font-semibold text-left w-28">
+                <span className="text-base font-semibold text-left w-28">
                   {item.assetsPoolName}
                 </span>
               </div>
 
               <div className="p-4 col-span-2 flex justify-center items-center font-semibold">
-                {item.liquidity}
+                {`${nFormatter(item.liquidity) } $`}
               </div>
 
               <div className="p-4 col-span-2 flex flex-col justify-center items-center content-center">
-                <div className="font-semibold">${item.volume}</div>
+                <div className="font-semibold">{item.volume ? nFormatter(item.volume) + ' $' :'-'}</div>
               </div>
 
               <div className="p-4 col-span-2 flex justify-center items-center font-semibold">
-                ${item.fees}
+                {item.fees ? nFormatter(item.fees) + ' $' :'-'}
               </div>
 
               <div className="p-4 col-span-2 flex flex-col justify-center items-center content-center">
-                <div className="font-semibold">{item.apr} %</div>
+                <div className="font-semibold">{ nFormatter(item.apr,2)} %</div>
               </div>
 
               <div className="p-4 col-span-1 flex justify-center items-center cursor-pointer">

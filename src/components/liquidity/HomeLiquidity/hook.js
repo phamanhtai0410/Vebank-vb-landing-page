@@ -7,6 +7,7 @@ import { selectAllAddresses, selectUserAddedPoolsAddresses } from "../../../redu
 import { selectAccount, selectWeb3 } from "../../../reducers/web3.reducer";
 
 const useLiquidityFacade = () => {
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -14,6 +15,8 @@ const useLiquidityFacade = () => {
   const account = useSelector(selectAccount);
   const poolAddresses = useSelector(selectAllAddresses)
   const userPoolAddresses = useSelector(selectUserAddedPoolsAddresses);
+  
+  useEffect(() => fetchPoolAssets(), [account]);
 
   const addLiquidity = () => {
     navigate(RouteName.ADD_LIQUIDITY);
@@ -21,16 +24,9 @@ const useLiquidityFacade = () => {
 
   const onFindOtherLPClicked = () => navigate(RouteName.POOL);
 
-  // useEffect(() => {
-  //   if (web3) {
-  //     fetchPoolAssets();
-  //   }
-  // }, [web3]);
-
-  useEffect(() => fetchPoolAssets(), [account])
-
   async function fetchPoolAssets() {
-    await dispatch(actions.getPoolAssets());
+    // await dispatch(actions.getPoolAssets());
+    await dispatch(actions.fetchPairs());
   }
 
   return {

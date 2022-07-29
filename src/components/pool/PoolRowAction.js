@@ -40,7 +40,7 @@ const PoolRowAction = ({ assetsPoolAddress = "" }) => {
             Your Liquidity
           </label>
           <div className="font-montserrat text-[16px] text-[#3EE8FF]">
-            ${nFormatter(showAmountUSD(), 2)}
+            ${nFormatter(poolInfo.yourLiquidityUSD, 2)}
           </div>
           {/* <div className="font-montserrat text-[16px] text-[#3EE8FF]">
             {userLiquidity || 0} LP

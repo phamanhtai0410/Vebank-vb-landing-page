@@ -122,23 +122,23 @@ const AssetsPool = () => {
         <div className="grid grid-cols-12 justify-items-center content-around font-poppins text-[14px]">
           <div className="px-2 py-2 col-span-3 flex">
             <span>Assets</span>
-            <img className="ml-1" src={IcCaretDown} alt={IcCaretDown} />
+            <img className="ml-1 w-4" src={IcCaretDown} alt={IcCaretDown} />
           </div>
           <div className="px-2 py-2 col-span-2 flex">
             <span>Liquidity</span>
-            <img className="ml-1" src={IcCaretDown} alt={IcCaretDown} />
+            <img className="ml-1 w-4" src={IcCaretDown} alt={IcCaretDown} />
           </div>
           <div className="px-2 py-2 col-span-2 flex">
             <span>Volume (24H)</span>
-            <img className="ml-1" src={IcCaretDown} alt={IcCaretDown} />
+            <img className="ml-1 w-4" src={IcCaretDown} alt={IcCaretDown} />
           </div>
           <div className="px-2 py-2 col-span-2 flex">
             <span>Fees (24H)</span>
-            <img className="ml-1" src={IcCaretDown} alt={IcCaretDown} />
+            <img className="ml-1 w-4" src={IcCaretDown} alt={IcCaretDown} />
           </div>
           <div className="px-2 py-2 col-span-2 flex">
             <span>APR</span>
-            <img className="ml-1" src={IcCaretDown} alt={IcCaretDown} />
+            <img className="ml-1 w-4" src={IcCaretDown} alt={IcCaretDown} />
           </div>
           <div className="col-span-1"></div>
         </div>

@@ -182,8 +182,13 @@ function getPairVolumeAndFees(dataList){
   let fees = 0;
   let volumes = 0;
   dataList.map((item) => {
-    fees =fees + Number(item.fee_usd);
-    volumes =volumes + Number(item.volume_usd);
+
+    fees= fees + item.fee_usd;
+    volumes= volumes + item.volume_usd;
+
+    // fees = FixedNumber.from(fees).addUnsafe( FixedNumber.from(item.fee_usd) );
+    // volumes =  FixedNumber.from(volumes).addUnsafe( FixedNumber.from(item.volume_usd)  ); 
+
   })
   return{fees, volumes};
 }
@@ -220,7 +225,7 @@ export const fetchPairs = (query) => async (dispatch, getState) => {
   
       const dataList = pairs.map(e => {
 
-        const {fees,volumes} = getPairVolumeAndFees(e.hour_data);
+        const { fees, volumes} = getPairVolumeAndFees(e.hour_data);
 
         return {
             ...e,
@@ -236,6 +241,7 @@ export const fetchPairs = (query) => async (dispatch, getState) => {
             balanceAccount: 0,
             liquidity:0 ,
             liquidity_usd: e.reserve_usd,
+            yourLiquidityUSD:0,
             volume: volumes,
             fees: fees,
             apr: getPoolAPR(fees,e.reserve_usd),
@@ -290,10 +296,18 @@ export const getPoolAssetsByAccount =
               addressTokenB,
           });
 
+          // console.log("liquidityPool",liquidityPool);
+          const percentYour = liquidityPool/totalSupply;
+          // console.log("percentYour",percentYour);
+
+          let yourLiquidityUSD = percentYour > 0 ? item.liquidity_usd*percentYour :0;
+          // console.log("yourLiquidityUSD",yourLiquidityUSD);
+
           dataList.push({
             ...item,
             balanceAccount: liquidityPool,
             liquidity:totalSupply,
+            yourLiquidityUSD,
             amountTokenA,
             amountTokenB,
           });

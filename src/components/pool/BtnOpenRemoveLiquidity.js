@@ -1,15 +1,16 @@
 import { useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import ImgRemove from "../../assets/images/buttons/img_remove_btn.svg";
 
 import { useNavigate } from "react-router-dom";
 import { selectUserLiquidityPoolByPoolAddress } from "../../reducers/userAssetPools.reducer";
 import RouteName from "../../constants/routeName.constants";
 import { selectAccount } from "../../reducers/web3.reducer";
+import * as actions from "../../actions";
 
 const BtnOpenRemoveLiquidity = ({ assetsPoolAddress = "" }) => {
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const account = useSelector(selectAccount);
   const liquidityPool = useSelector((state) =>
     selectUserLiquidityPoolByPoolAddress(state, assetsPoolAddress ?? "")
@@ -21,8 +22,9 @@ const BtnOpenRemoveLiquidity = ({ assetsPoolAddress = "" }) => {
 
   const handlerOpenModal = async () => {
     // if (item && item.assetsAddress && disabledRule === false) {
-    navigate(`${RouteName.REMOVE_LIQUIDITY}/${assetsPoolAddress ?? ""}`);
+    // navigate(`${RouteName.REMOVE_LIQUIDITY}/${assetsPoolAddress ?? ""}`);
     // }
+    dispatch(actions.openModalRemoveLiquidity(assetsPoolAddress));
   };
 
   return (

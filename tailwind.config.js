@@ -84,6 +84,15 @@ module.exports = {
       "color-item-modal-wallet": "#182844",
       "color-item-hover-modal-wallet": "#232E49",
     },
+    fontSize: {
+      'xs'  : ['12px', { lineHeight: '16px' }],
+      'sm'  :  ['14px', { lineHeight: '20px' }],
+      'base':  ['16px', { lineHeight: '24px' }],
+      'lg'  :  ['18px', { lineHeight: '28px' }],
+      'xl'  :  ['20px', { lineHeight: '28px' }],
+      '2xl' :  ['24px', { lineHeight: '32px' }],
+      '3xl' :  ['30px', { lineHeight: '36px' }],
+    },
   },
   plugins: [],
 };

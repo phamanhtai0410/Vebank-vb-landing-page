@@ -189,9 +189,8 @@ const FormAddLiquidity = () => {
                   <div className="flex flex-row item-center border border-vbDisableText rounded px-2 py-1">
                     <input
                       value={slippage}
-                      pattern="^[0-9]*\.?[0-9]*$"
                       onChange={(e) => onChangeSlippage(e.target.value)}
-                      className="font-poppins_medium text-sm text-white text-right rounded-lg bg-transparent focus:outline-none w-[50px]"
+                      className="font-poppins_medium text-sm text-white text-right bg-transparent focus:outline-none w-[50px]"
                       type="text"
                     />
                     <span className="font-poppins_medium text-sm text-white ml-[2px]">%</span>

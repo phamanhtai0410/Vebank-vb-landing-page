@@ -141,6 +141,32 @@ export function liquidReducer(state = initialState, action) {
       return newState;
     }
 
+    case poolConstants.MODAL_DEFAULT_FIRST_TOKEN: {
+      const newState = {
+        ...state,
+        isSelectTokenModalOpen: false,
+        tokenSelecting: "",
+        errorCode: null,
+        message: null,
+      };
+      const newToken = action.payload;
+      newState.firstToken = newToken;
+      return newState;
+    }
+
+    case poolConstants.MODAL_DEFAULT_SECOND_TOKEN: {
+      const newState = {
+        ...state,
+        isSelectTokenModalOpen: false,
+        tokenSelecting: "",
+        errorCode: null,
+        message: null,
+      };
+      const newToken = action.payload;
+      newState.secondToken = newToken;
+      return newState;
+    }
+
     case poolConstants.MODAL_CLOSE_SELECT_TOKEN:
       return {
         ...state,

@@ -55,6 +55,16 @@ export const selectToken = (dataToken) => ({
   payload: dataToken,
 });
 
+export const selectDefaultFirstToken = (dataToken) => ({
+  type: poolConstants.MODAL_DEFAULT_FIRST_TOKEN,
+  payload: dataToken,
+});
+
+export const selectDefaultSecondToken = (dataToken) => ({
+  type: poolConstants.MODAL_DEFAULT_SECOND_TOKEN,
+  payload: dataToken,
+});
+
 export const closeSelectToken = () => ({
   type: poolConstants.MODAL_CLOSE_SELECT_TOKEN,
 });

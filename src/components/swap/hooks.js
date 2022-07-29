@@ -366,14 +366,7 @@ const useSwapFacade = () => {
 
   const onGetAmountsIn = async (value) => {
     try {
-      const resultAction = await dispatch(
-        checkTotalSupplyAvailable({
-          amountOut: value,
-        })
-      );
-      const originalPromiseResult = unwrapResult(resultAction);
-      const { isVolumeAvailable } = originalPromiseResult;
-      if (isVolumeAvailable) {
+      if (Number(value) < Number(reserveTo)) {
         setError("");
         poolErrRef.current = "";
         dispatch(

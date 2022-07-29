@@ -7,6 +7,7 @@ import { selectBalanceById } from "../../../reducers/accountBalance.reducer";
 import { selectAssetByAddress } from "../../../reducers/assetsMarket.reducer";
 import HighlightedAssetIcon from "../../swap/HighlightedAssetIcon";
 import { svgSymbolConfig } from "../../../_helpers/param";
+import { formatBalanceString } from "../../../utils/lib";
 
 const Asset = ({
   assetAddress,
@@ -24,6 +25,10 @@ const Asset = ({
 
   const onClickMaxButton = () => {
     onVolumeChange(assetBalance.toString());
+  };
+
+  const onClickHalfButton = () => {
+    onVolumeChange((assetBalance / 2).toString());
   };
 
   const isBalanceAvailable = useMemo(
@@ -49,13 +54,10 @@ const Asset = ({
           )}
           <img src={IcDropDown} alt={"Dropdown"} className="w-2 h-2" />
         </div> */}
-        <div className="flex flex-row space-x-1 items-center justify-end">
-          <span className="text-hint font-poppins text-xs mr-1.5">
-            {isBalanceAvailable ? "Balance: " : "Balance: --"}
-          </span>
+        <div className="flex items-center justify-end">
           {isBalanceAvailable && (
-            <span className="text-hint font-poppins text-xs ml-2">
-              {assetBalance || "0"}
+            <span className="text-hint font-poppins text-xs">
+              Balance: {assetBalance ? formatBalanceString(assetBalance) : "--"}
             </span>
           )}
         </div>
@@ -74,20 +76,20 @@ const Asset = ({
               </span>
               <img className="w-[10px] h-[8px]" src={IcDropDown} alt="" />
             </button>
-            
+
             <div className="flex text-[#647BB4] space-x-1 ml-3">
               {assetInfo && (
                 <div className="flex flex-row w-full items-center space-x-1">
-                  <div className="w-[1px] h-9 bg-hint mr-2"></div>
+                  <div className="w-[1px] h-8 bg-hint mr-2"></div>
                   <button
-                    className="flex items-center font-poppins_medium px-2 py-3 h-[75%] bg-[#203557] rounded text-[#647BB4] text-sm"
+                    className="flex flex-row items-center justify-center sm:w-[40px] w-[36px] h-[28px] rounded bg-[#203557] text-xs"
                     onClick={onClickMaxButton}
                   >
                     Max
                   </button>
                   <button
-                    className="flex items-center font-poppins_medium px-2 py-3 h-[75%] bg-[#203557] rounded text-[#647BB4] text-sm"
-                    onClick={onClickMaxButton}
+                    className="flex flex-row items-center justify-center sm:w-[40px] w-[36px] h-[28px] rounded bg-[#203557] text-xs"
+                    onClick={onClickHalfButton}
                   >
                     Half
                   </button>
@@ -101,7 +103,7 @@ const Asset = ({
             value={volume}
             pattern="^[0-9]*\.?[0-9]*$"
             onChange={(e) => onVolumeChange(e.target.value)}
-            className="w-[45%] px-4 py-1 focus:outline-none placeholder:text-white font-poppins_semi_bold text-lg text-right rounded-lg bg-transparent"
+            className="w-[45%] pl-4 py-1 focus:outline-none placeholder:text-white font-poppins_semi_bold text-lg text-right rounded-lg bg-transparent"
             type="text"
           />
         </div>

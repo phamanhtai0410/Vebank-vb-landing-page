@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 
 import IcBtnSwap from "../../assets/images/swap_btn.svg";
 import IcDown from "../../assets/images/down_fill.svg";
@@ -105,9 +105,11 @@ const Swap = () => {
           <p className="text-sm">From</p>
           <p className="text-sm">
             Balance:{" "}
-            {sourceTokenBalance
+            {!account
+              ? "--"
+              : sourceTokenBalance
               ? formatBalanceString(sourceTokenBalance)
-              : "--"}
+              : 0}
           </p>
         </div>
         <div className="flex flex-col">
@@ -138,7 +140,8 @@ const Swap = () => {
                   disabled={
                     !account ||
                     error === errExistedLiquidity ||
-                    loadingExchangeRate
+                    loadingExchangeRate ||
+                    !sourceTokenBalance
                   }
                 >
                   Max
@@ -151,7 +154,8 @@ const Swap = () => {
                   disabled={
                     !account ||
                     error === errExistedLiquidity ||
-                    loadingExchangeRate
+                    loadingExchangeRate ||
+                    !sourceTokenBalance
                   }
                 >
                   Half
@@ -218,9 +222,11 @@ const Swap = () => {
           <p className="text-sm">To</p>
           <p className="text-sm">
             Balance:{" "}
-            {desireTokenBalance
+            {!account
+              ? "--"
+              : desireTokenBalance
               ? formatBalanceString(desireTokenBalance)
-              : "--"}
+              : 0}
           </p>
         </div>
         <div className="flex flex-col">
@@ -251,7 +257,8 @@ const Swap = () => {
                   disabled={
                     !account ||
                     error === errExistedLiquidity ||
-                    loadingExchangeRate
+                    loadingExchangeRate ||
+                    !desireTokenBalance
                   }
                 >
                   Max
@@ -264,7 +271,8 @@ const Swap = () => {
                   disabled={
                     !account ||
                     error === errExistedLiquidity ||
-                    loadingExchangeRate
+                    loadingExchangeRate ||
+                    !desireTokenBalance
                   }
                 >
                   Half
@@ -307,7 +315,8 @@ const Swap = () => {
           !emptyAddress &&
           userInputRef.current !== "0" &&
           userInputRef.current !== "0." &&
-          userInputRef.current !== "0.0" && (
+          sourceTokenBalance &&
+          desireTokenBalance && (
             <div className="flex flex-col w-full space-y-2 relative">
               <button
                 onClick={onShowDetailInfo}
@@ -493,7 +502,11 @@ const Swap = () => {
         <div className="flex space-x-2">
           <p className="text-balanceVTHO">
             VTHO balance:{" "}
-            {vthoBalance ? formatBalanceString(vthoBalance) : "--"}
+            {!account
+              ? "--"
+              : vthoBalance
+              ? formatBalanceString(vthoBalance)
+              : 0}
           </p>
           {/* <img src={IcQuestionCircleYellow} alt="" /> */}
         </div>

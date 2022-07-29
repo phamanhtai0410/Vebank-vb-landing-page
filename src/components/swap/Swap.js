@@ -1,6 +1,5 @@
 import React from "react";
 
-import IcGas from "../../assets/images/gas.svg";
 import IcBtnSwap from "../../assets/images/swap_btn.svg";
 import IcDown from "../../assets/images/down_fill.svg";
 import IcUp from "../../assets/images/up_fill.svg";
@@ -15,6 +14,7 @@ import IcQuestionCircleBlue from "../../assets/images/question_circle_blue.svg";
 // import IcSetting from "../../assets/images/buttons/ic_setting_outline.svg";
 // import IcQuestionCircle from "../../assets/images/ic_question_circle.svg";
 // import IcSwapWhiteNoBackground from "../../assets/images/ic_swap_white_no_background.svg";
+// import IcGas from "../../assets/images/gas.svg";
 // import BtnOpenSwap from "./BtnOpenSwap";
 
 import useSwapFacade from "./hooks";
@@ -26,11 +26,11 @@ import { formatBalanceString } from "../../utils/lib";
 
 const Swap = () => {
   const {
+    error,
     isSwitch,
     pricePaidPerA,
     pricePaidPerB,
     priceImpact,
-    poolErrRef,
     swapFee,
     account,
     loadingFee,
@@ -69,9 +69,11 @@ const Swap = () => {
     onSwitchExchangeRate,
   } = useSwapFacade();
 
+  const errExistedLiquidity = "Not existed liquidity.";
+
   const renderTitleButton = () => {
-    if (poolErrRef.current !== "") {
-      return poolErrRef.current;
+    if (error !== "") {
+      return error;
     } else {
       if (accountApprove === 0) {
         return loadingApprove ? "Approving..." : "Approve";
@@ -133,7 +135,11 @@ const Swap = () => {
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
                   } sm:w-[40px] w-[36px] h-[28px] bg-[#203557] rounded flex flex-row items-center justify-center text-xs`}
-                  disabled={!account}
+                  disabled={
+                    !account ||
+                    error === errExistedLiquidity ||
+                    loadingExchangeRate
+                  }
                 >
                   Max
                 </button>
@@ -142,7 +148,11 @@ const Swap = () => {
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
                   } sm:w-[40px] w-[36px] h-[28px] rounded bg-[#203557]" flex flex-row items-center justify-center text-xs`}
-                  disabled={!account}
+                  disabled={
+                    !account ||
+                    error === errExistedLiquidity ||
+                    loadingExchangeRate
+                  }
                 >
                   Half
                 </button>
@@ -153,6 +163,11 @@ const Swap = () => {
                 <div className="loading" />
               ) : (
                 <input
+                  disabled={
+                    loadingExchangeRate || error === errExistedLiquidity
+                      ? true
+                      : false
+                  }
                   className="bg-transparent w-full focus:outline-none placeholder-vbDisableText font-poppins_medium text-base text-grey-1 text-right"
                   type="text"
                   min={1}
@@ -233,7 +248,11 @@ const Swap = () => {
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
                   } sm:w-[40px] w-[36px] h-[28px] bg-[#203557] rounded flex flex-row items-center justify-center text-xs`}
-                  disabled={!account}
+                  disabled={
+                    !account ||
+                    error === errExistedLiquidity ||
+                    loadingExchangeRate
+                  }
                 >
                   Max
                 </button>
@@ -242,7 +261,11 @@ const Swap = () => {
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
                   } sm:w-[40px] w-[36px] h-[28px] rounded bg-[#203557]" flex flex-row items-center justify-center text-xs`}
-                  disabled={!account}
+                  disabled={
+                    !account ||
+                    error === errExistedLiquidity ||
+                    loadingExchangeRate
+                  }
                 >
                   Half
                 </button>
@@ -260,6 +283,11 @@ const Swap = () => {
                 <div className="loading" />
               ) : (
                 <input
+                  disabled={
+                    loadingExchangeRate || error === errExistedLiquidity
+                      ? true
+                      : false
+                  }
                   className="w-full bg-transparent focus:outline-none placeholder-vbDisableText font-poppins_medium text-base text-grey-1 text-right"
                   type="text"
                   min={1}
@@ -286,23 +314,6 @@ const Swap = () => {
               >
                 <div className="flex flex-row justify-end items-center">
                   <div className="sm:max-w-[156px] w-fit max-w-[162px] flex flex-row items-center justify-end">
-                    {!showDetailInfo && (
-                      <div className="bg-itemForm rounded-lg p-2 flex flex-row items-center w-fit group relative">
-                        <img src={IcGas} alt="gas" className="w-4" />
-                        <p className="ml-1">
-                          {swapFee.toString().length > 6
-                            ? swapFee.toFixed(6)
-                            : swapFee}{" "}
-                          {sourceTokenInfo?.assetsChain}
-                        </p>
-                        {/* <div class="absolute bottom-0 flex-col items-center hidden mb-6 group-hover:flex">
-                            <span class="relative z-10 px-2 py-3 text-xs leading-none text-white whitespace-no-wrap border-[1px] border-vbDisableText bg-itemForm rounded-lg shadow-lg">
-                              {swapFee} {sourceTokenInfo?.assetsChain}
-                            </span>
-                            <div class="w-3 h-3 -mt-2 rotate-45 bg-itemForm  border-[1px] border-vbDisableText"></div>
-                          </div> */}
-                      </div>
-                    )}
                     <img
                       src={showDetailInfo ? IcUp : IcDown}
                       alt="IcDown"
@@ -454,26 +465,21 @@ const Swap = () => {
                   </div>
                 </div>
               </div>
-
-              {account && (
-                <button
-                  disabled={
-                    loadingSwap || loadingApprove || poolErrRef.current !== ""
-                  }
-                  onClick={
-                    accountApprove === 0 ? onApproveToken : onSwapAssetToken
-                  }
-                  className={`w-full ${
-                    !loadingSwap && !loadingApprove && poolErrRef.current === ""
-                      ? "btn-veb"
-                      : "bg-btn-veb-disabled rounded-lg"
-                  }  h-12`}
-                >
-                  {renderTitleButton()}
-                </button>
-              )}
             </div>
           )}
+        {account && (
+          <button
+            disabled={loadingSwap || loadingApprove || error !== ""}
+            onClick={accountApprove === 0 ? onApproveToken : onSwapAssetToken}
+            className={`w-full ${
+              !loadingSwap && !loadingApprove && error === ""
+                ? "btn-veb"
+                : "bg-btn-veb-disabled rounded-lg"
+            }  h-12`}
+          >
+            {renderTitleButton()}
+          </button>
+        )}
         {!account && <BtnConnectInPage className="w-full btn-veb h-12" />}
         {/* (
           <button

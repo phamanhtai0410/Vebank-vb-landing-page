@@ -66,6 +66,12 @@ const swapAssetSlice = createSlice({
     getSymbolPairs: (state, action) => {
       state.symbolPairs = action.payload;
     },
+    switchReserves: (state, action) => {
+      const tempReserves1 = state.reserves2;
+      const tempReserves2 = state.reserves1;
+      state.reserves1 = tempReserves1;
+      state.reserves2 = tempReserves2;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -135,6 +141,7 @@ export const {
   selectSourceTokenFromModal,
   selectDesireTokenFromModal,
   getSymbolPairs,
+  switchReserves,
 } = swapAssetSlice.actions;
 
 export const selectSourceToken = (state) => state.swapAsset.sourceTokenAddress;

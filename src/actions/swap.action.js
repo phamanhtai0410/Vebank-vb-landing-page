@@ -35,7 +35,7 @@ export const checkAssetExistsPools = createAsyncThunk(
   swapConstants.checkAssetExistsPools,
   async ({ tokenAInfo, tokenBInfo }, { dispatch, getState }) => {
     const state = getState();
-    const assetsPoolName = `${tokenAInfo?.assetsChain} - ${tokenBInfo?.assetsChain}`;
+    // const assetsPoolName = `${tokenAInfo?.assetsChain} - ${tokenBInfo?.assetsChain}`;
 
     const addressTokenA = tokenAInfo?.assetsAddress || "";
     const addressTokenB = tokenBInfo?.assetsAddress || "";
@@ -82,16 +82,16 @@ export const checkAssetExistsPools = createAsyncThunk(
           });
         }
       } else {
-        const key = randomKeyUUID();
-        dispatch(
-          actions.alertActions.warning(
-            {
-              title: "Warning",
-              description: `${assetsPoolName} not existing in pools`,
-            },
-            key
-          )
-        );
+        // const key = randomKeyUUID();
+        // dispatch(
+        //   actions.alertActions.warning(
+        //     {
+        //       title: "Warning",
+        //       description: `${assetsPoolName} not existing in pools`,
+        //     },
+        //     key
+        //   )
+        // );
       }
       return {
         assetsPoolAddress: assetsPoolAddress,

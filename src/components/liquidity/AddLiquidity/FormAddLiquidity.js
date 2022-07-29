@@ -188,8 +188,6 @@ const FormAddLiquidity = () => {
                   <span className="text-xs text-white">Slippage Tolerance</span>
                   <div className="flex flex-row item-center border border-vbDisableText rounded px-2 py-1">
                     <input
-                      min={0}
-                      max={100}
                       value={slippage}
                       pattern="^[0-9]*\.?[0-9]*$"
                       onChange={(e) => onChangeSlippage(e.target.value)}

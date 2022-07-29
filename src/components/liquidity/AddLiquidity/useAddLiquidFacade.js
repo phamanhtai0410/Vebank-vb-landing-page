@@ -59,7 +59,7 @@ const useAddLiquidFacade = () => {
   const [firstTokenVolume, setFirstTokenVolume] = useState("");
   const [secondTokenVolume, setSecondTokenVolume] = useState("");
   const [primaryButtonLabel, setPrimaryButtonLabel] = useState("Invalid pair");
-  const [slippage, setSlippage] = useState(0.5);
+  const [slippage, setSlippage] = useState("0.5");
 
   const firstPerSecondTokenExchangeRate =
     useSelector(selectFirstTokenExchangeRate) ??
@@ -201,7 +201,7 @@ const useAddLiquidFacade = () => {
   const resetFrm = () => {
     setFirstTokenVolume("");
     setSecondTokenVolume("");
-    setSlippage(0.5);
+    setSlippage("0.5");
     setStep(1);
   };
 
@@ -246,6 +246,9 @@ const useAddLiquidFacade = () => {
     );
   };
   const onChangeSlippage = (value) => {
+    if (Number(value) < 0 || Number(value) > 50) {
+      return;
+    }
     setSlippage(value);
   };
 
@@ -268,7 +271,7 @@ const useAddLiquidFacade = () => {
           if (secondTokenVolume !== secondAmount) {
             setSecondTokenVolume(secondAmount);
           }
-          setPrimaryButtonLabel("Supply");
+          setPrimaryButtonLabel("Add Liquidity");
           setContinueAvailable(true);
         } else if (secondTokenVolume === 0 || secondTokenVolume === "") {
           if (firstTokenVolume !== 0 && firstTokenVolume !== "") {
@@ -276,7 +279,7 @@ const useAddLiquidFacade = () => {
           } else setPrimaryButtonLabel("Enter an amount");
         } else {
           setFirstTokenVolume(getFirstAmount(secondTokenVolume));
-          setPrimaryButtonLabel("Supply");
+          setPrimaryButtonLabel("Add Liquidity");
           setContinueAvailable(true);
         }
       }

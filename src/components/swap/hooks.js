@@ -195,7 +195,6 @@ const useSwapFacade = () => {
           ) {
             setInputAmountIn("");
             setInputAmountOut(userInputRef.current);
-            // checkTotalSupplyAvailable(userInputRef.current);
             getAmountsInDebounced(userInputRef.current);
           }
         }
@@ -344,26 +343,21 @@ const useSwapFacade = () => {
   }, 0);
 
   const onGetAmountsOut = (value) => {
-    const isBalanceInAvailable = checkBalance(value);
-    if (isBalanceInAvailable) {
-      dispatch(
-        getAmountsOut({
-          inputAmountIn: value,
-          tokenAInfo: sourceTokenInfo,
-          tokenBInfo: desireTokenInfo,
-        })
-      )
-        .unwrap()
-        .then((originalPromiseResult) => {
-          const { amountsOutFormat } = originalPromiseResult;
-          setInputAmountOut(amountsOutFormat);
-          // onCheckTotalSupplyAvailable(amountsOutFormat);
-          onCountPriceImpact(value);
-        })
-        .catch((rejectedValueOrSerializedError) => {});
-    } else {
-      setInputAmountOut("");
-    }
+    dispatch(
+      getAmountsOut({
+        inputAmountIn: value,
+        tokenAInfo: sourceTokenInfo,
+        tokenBInfo: desireTokenInfo,
+      })
+    )
+      .unwrap()
+      .then((originalPromiseResult) => {
+        const { amountsOutFormat } = originalPromiseResult;
+        setInputAmountOut(amountsOutFormat);
+        // onCheckTotalSupplyAvailable(amountsOutFormat);
+        onCountPriceImpact(value);
+      })
+      .catch((rejectedValueOrSerializedError) => {});
   };
 
   const getAmountsInDebounced = useDebouncedCallback((value) => {
@@ -406,8 +400,8 @@ const useSwapFacade = () => {
 
   const onChangeSourceInput = useCallback(
     (value) => {
+      userInputRef.current = value;
       if (value === "") {
-        userInputRef.current = value;
         setInputAmountOut("");
         setInputAmountIn("");
         setError("Enter an amount to see more trading details.");
@@ -425,12 +419,12 @@ const useSwapFacade = () => {
             } else if (value === "0.0") {
               setInputAmountIn("0.");
             } else {
-              setInputAmountOut("");
-              checkBalance(value);
+              setInputAmountIn(value);
             }
+            setInputAmountOut("");
             setError("Enter an amount to see more trading details.");
           } else {
-            userInputRef.current = value;
+            checkBalance(value);
             getAmountOutDebounced(value);
           }
         }
@@ -441,10 +435,10 @@ const useSwapFacade = () => {
 
   const onChangeDesireInput = useCallback(
     (value) => {
+      userInputRef.current = value;
       if (value === "") {
-        userInputRef.current = value;
-        setInputAmountOut(value);
         setInputAmountIn("");
+        setInputAmountOut("");
         setError("Enter an amount to see more trading details.");
       } else {
         let pattern = /^\d+\.?\d*$/;
@@ -460,14 +454,11 @@ const useSwapFacade = () => {
               setInputAmountOut("0");
             } else if (value === "0.0") {
               setInputAmountOut("0.");
-            } else {
-              setInputAmountIn("");
             }
+            setInputAmountIn("");
             setError("Enter an amount to see more trading details.");
           } else {
-            userInputRef.current = value;
             getAmountsInDebounced(value);
-            checkTotalSupplyAvailable({ amountOut: value });
           }
         }
       }

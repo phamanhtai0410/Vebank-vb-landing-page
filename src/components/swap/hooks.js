@@ -414,11 +414,11 @@ const useSwapFacade = () => {
       } else {
         let pattern = /^\d+\.?\d*$/;
         if (pattern.test(value)) {
-          userInputRef.current = value;
           if (value === "0" || value === "0." || value === "0.0") {
             setInputAmountOut("");
             setError("Enter an amount to see more trading details.");
           } else {
+            userInputRef.current = value;
             getAmountOutDebounced(value);
           }
         }
@@ -437,12 +437,12 @@ const useSwapFacade = () => {
       } else {
         let pattern = /^\d+\.?\d*$/;
         if (pattern.test(value)) {
-          userInputRef.current = value;
           setInputAmountOut(value);
           if (value === "0" || value === "0." || value === "0.0") {
             setInputAmountIn("");
             setError("Enter an amount to see more trading details.");
           } else {
+            userInputRef.current = value;
             getAmountsInDebounced(value);
             checkTotalSupplyAvailable({ amountOut: value });
           }

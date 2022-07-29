@@ -306,7 +306,8 @@ const Swap = () => {
         {userInputRef.current !== "" &&
           !emptyAddress &&
           userInputRef.current !== "0" &&
-          userInputRef.current !== "0." && (
+          userInputRef.current !== "0." &&
+          userInputRef.current !== "0.0" && (
             <div className="flex flex-col w-full space-y-2 relative">
               <button
                 onClick={onShowDetailInfo}

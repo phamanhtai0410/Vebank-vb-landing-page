@@ -18,7 +18,7 @@ const ADDRESS_ROUTER = process.env.REACT_APP_ADDRESS_ROUTER;
 export const loadDetailRemoveLiquidity = createAsyncThunk(
   poolConstants.LOAD_DETAIL_REMOVE_LIQUIDITY,
   async (poolAddress, { getState }) => {
-    console.log("xxx", poolAddress)
+   
     const currentState = getState();
     const { web3, account } = currentState.web3;
     let approvePool = 0;
@@ -39,16 +39,16 @@ export const loadDetailRemoveLiquidity = createAsyncThunk(
       addressTokenB = await contractPair.methods.token1().call();
 
       if (account) {
-        approvePool = await contractPair.methods
-          .allowance(account, ADDRESS_ROUTER)
-          .call();
-           console.log("approvePool",approvePool)
-        const poolInfo = selectPoolInfoByAddress(currentState, poolAddress);
-        approvePool = ethers.utils.formatUnits(
-          approvePool,
-          poolInfo?.assetsDecimals
-        );
-        approvePool = Number(approvePool);
+        // approvePool = await contractPair.methods
+        //   .allowance(account, ADDRESS_ROUTER)
+        //   .call();
+        //    console.log("approvePool",approvePool)
+        // const poolInfo = selectPoolInfoByAddress(currentState, poolAddress);
+        // approvePool = ethers.utils.formatUnits(
+        //   approvePool,
+        //   poolInfo?.assetsDecimals
+        // );
+        // approvePool = Number(approvePool);
       }
 
       const {
@@ -86,7 +86,7 @@ export const loadDetailRemoveLiquidity = createAsyncThunk(
 
 export const approvePoolLiquidity = createAsyncThunk(
   poolConstants.APPROVE_POOL_ADDRESS,
-  async ({ poolAddress, removeAmount = 1000 }, { getState, dispatch }) => {
+  async ({ poolAddress, removeAmount = 1000000000 }, { getState, dispatch }) => {
     if (!poolAddress) return;
 
     const state = getState();
@@ -121,7 +121,9 @@ export const approvePoolLiquidity = createAsyncThunk(
           title: "Approve success",
         })
       );
-      return { result };
+      
+      return { isApproving:true, poolApproval: amountMax};
+
     }
   }
 );

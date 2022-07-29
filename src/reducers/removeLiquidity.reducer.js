@@ -50,6 +50,13 @@ const removeLiquiditySlice = createSlice({
       .addCase(approvePoolLiquidity.rejected, (state, _) => {
         state.isApproving = false;
       })
+      .addCase(approvePoolLiquidity.fulfilled, (state, action) => {
+        const data = action.payload;
+        if (data) {
+          state.poolApproval = data.poolApproval;
+          state.isApproving = false;
+        }
+      })
       .addCase(loadDetailRemoveLiquidity.pending, (state, _) => {
         state.isLoadingDetail = true;
       })

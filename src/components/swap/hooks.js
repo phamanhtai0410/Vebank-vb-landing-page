@@ -296,6 +296,7 @@ const useSwapFacade = () => {
     setInputAmountOut("");
     poolErrRef.current = "";
     userInputRef.current = "";
+    setError(defaultErr);
   };
 
   const onApproveToken = () => {

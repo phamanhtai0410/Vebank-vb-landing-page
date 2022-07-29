@@ -62,11 +62,11 @@ const useRemoveLiquidFacade = () => {
 
   const amountTokenA = useMemo(() => {
     return firstTokenAmount * (removeValue / liquidityPool) || 0;
-  }, [firstTokenAmount]);
+  }, [firstTokenAmount, removeValue, liquidityPool]);
 
   const amountTokenB = useMemo(() => {
     return secondTokenAmount * (removeValue / liquidityPool) || 0;
-  }, [secondTokenAmount]);
+  }, [secondTokenAmount, removeValue, liquidityPool]);
 
   const isEnabled = useMemo(() => {
     console.log('🐶🐶  ~ isEnabled ~ approvePoolState', approvePoolState)
@@ -177,6 +177,11 @@ const useRemoveLiquidFacade = () => {
   }, [isRemoving, removePoolSuccessState]);
 
   useEffect(() => {
+    console.log("firstTokenAmount", firstTokenAmount);
+    console.log("secondTokenAmount", secondTokenAmount);
+    console.log("liquidityPool", liquidityPool);
+    console.log("amountTokenA", amountTokenA);
+    console.log("amountTokenB", amountTokenB);
     if (Number(removeValue) > Number(liquidityPool)) {
       setPrimaryButtonLabel("Amount Too Large");
     }

@@ -2,10 +2,10 @@ import { swapConstants } from "../constants";
 import * as actions from "../actions";
 import { ethers } from "ethers";
 
-import ERC20ABI_FACTORY from "../_contracts/factory.json";
-import ERC20ABI_ROUTER from "../_contracts/router.json";
+import ERC20ABI_FACTORY from "../_contracts/pool/VeBankV1Factory.json";
+import ERC20ABI_ROUTER from "../_contracts/pool/VeBankV1Router02.json";
+import ERC20ABI_PAIR from "../_contracts/pool/VeBankV1Pair.json";
 
-import ERC20ABI_PAIR from "../_contracts/pair.json";
 import ERC20ABI_VB from "../_contracts/assets/VB.json";
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
@@ -488,11 +488,11 @@ export const swapAsset = createAsyncThunk(
     if (addressTokenA === process.env.REACT_APP_TOKEN_WVET) {
       // Đổi VET sang token khác
       pathAddress = pathAddress.concat([addressTokenA, addressTokenB]);
-      functionName = "swapExactETHForTokens";
+      functionName = "swapExactVETForTokens";
     } else if (addressTokenB === process.env.REACT_APP_TOKEN_WVET) {
       // Đổi token sang VET khác
       pathAddress = pathAddress.concat([addressTokenA, addressTokenB]);
-      functionName = "swapExactTokensForETH";
+      functionName = "swapExactTokensForVET";
     } else {
       // Token to Token
       pathAddress = pathAddress.concat([addressTokenA, addressTokenB]);
@@ -536,7 +536,7 @@ export const swapAsset = createAsyncThunk(
 
     let transaction;
     if (isPairContainVET) {
-      if (functionName === "swapExactETHForTokens") {
+      if (functionName === "swapExactVETForTokens") {
         // swap VET to another tokens
         console.table([
           ["method", functionName],

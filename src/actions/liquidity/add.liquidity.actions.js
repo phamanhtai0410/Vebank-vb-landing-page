@@ -2,9 +2,9 @@ import { ethers, FixedNumber } from "ethers";
 
 import { poolConstants } from "../../constants";
 
-import ERC20ABI_ROUTER from "../../_contracts/router.json";
-import ERC20ABI_FACTORY from "../../_contracts/factory.json";
-import ERC20ABI_PAIR from "../../_contracts/pair.json";
+import ERC20ABI_ROUTER from "../../_contracts/pool/VeBankV1Router02.json";
+import ERC20ABI_FACTORY from "../../_contracts/pool/VeBankV1Factory.json";
+import ERC20ABI_PAIR from "../../_contracts/pool/VeBankV1Pair.json";
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { selectAssetByAddress } from "../../reducers/assetsMarket.reducer";
@@ -374,13 +374,13 @@ export const addLiquidity = createAsyncThunk(
     let transaction;
 
     if (isContainVET(firstToken, secondToken)) {
-      const addLiquidityETHABI = ERC20ABI_ROUTER.find(
-        ({ name, type }) => name === "addLiquidityETH" && type === "function"
+      const addLiquidityVETABI = ERC20ABI_ROUTER.find(
+        ({ name, type }) => name === "addLiquidityVET" && type === "function"
       );
 
-      const methodAddLiquidityETH = connex.thor
+      const methodAddLiquidityVET = connex.thor
         .account(ADDRESS_ROUTER)
-        .method(addLiquidityETHABI);
+        .method(addLiquidityVETABI);
 
       let tokenDesired;
       if (firstToken === process.env.REACT_APP_TOKEN_WVET) {
@@ -388,30 +388,29 @@ export const addLiquidity = createAsyncThunk(
           address: secondToken,
           amountTokenDesired: amountB,
           amountTokenMin: amountBMin,
-          amountETH: amountA,
-          amountETHMin: amountAMin,
+          amountVET: amountA,
+          amountVETMin: amountAMin,
         };
       } else {
         tokenDesired = {
           address: firstToken,
           amountTokenDesired: amountA,
           amountTokenMin: amountAMin,
-          amountETH: amountB,
-          amountETHMin: amountBMin,
+          amountVET: amountB,
+          amountVETMin: amountBMin,
         };
       }
 
       console.log("tokenDesired",tokenDesired);
 
-      methodAddLiquidityETH.value(tokenDesired.amountETH);
+      methodAddLiquidityVET.value(tokenDesired.amountVET);
 
-      transaction = await methodAddLiquidityETH
+      transaction = await methodAddLiquidityVET
         .transact(
           tokenDesired.address,
-          transactionFee,
           tokenDesired.amountTokenDesired,
           tokenDesired.amountTokenMin,
-          tokenDesired.amountETHMin,
+          tokenDesired.amountVETMin,
           account,
           deadline
         )
@@ -431,7 +430,6 @@ export const addLiquidity = createAsyncThunk(
         .transact(
           firstToken,
           secondToken,
-          transactionFee,
           amountA,
           amountB,
           amountAMin,

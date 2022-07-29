@@ -3,8 +3,9 @@ import queryString from 'query-string';
 
 import { poolConstants } from "../constants";
 
-import ERC20ABI_PAIR from "../_contracts/pair.json";
-import ERC20ABI_FACTORY from "../_contracts/factory.json";
+import ERC20ABI_PAIR from "../_contracts/pool/VeBankV1Pair.json";
+import ERC20ABI_FACTORY from "../_contracts/pool/VeBankV1Factory.json";
+
 import { compareString, getDecimalForAsset } from "../utils/lib";
 import PartialConstants from "../constants/partial.constants";
 import * as actions from "./index";

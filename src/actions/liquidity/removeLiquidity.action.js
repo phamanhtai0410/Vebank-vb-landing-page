@@ -2,10 +2,12 @@ import { BigNumber, ethers } from "ethers";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 import { poolConstants } from "../../constants";
-import ERC20ABI_ROUTER from "../../_contracts/router.json";
+import ERC20ABI_ROUTER from "../../_contracts/pool/VeBankV1Router02.json";
+import ERC20ABI_PAIR from "../../_contracts/pool/VeBankV1Pair.json";
+
 import { selectPoolInfoByAddress } from "../../reducers/assetsPool.reducer";
 import { getAmountInWeiFormatted, isContainVET } from "../../utils/lib";
-import ERC20ABI_PAIR from "../../_contracts/pair.json";
+
 import { selectLiquidityPool } from "../../reducers/removeLiquidity.reducer";
 import { getUserTokenAmounts } from "../pool.action";
 import PartialConstants from "../../constants/partial.constants";
@@ -142,7 +144,7 @@ export const removeLiquidity = createAsyncThunk(
 
     const isPairContainVET = isContainVET(addressTokenA, addressTokenB);
     const functionName = isPairContainVET
-      ? "removeLiquidityETH"
+      ? "removeLiquidityVET"
       : "removeLiquidity";
 
     const removeLiquidityABI = ERC20ABI_ROUTER.find(
@@ -153,18 +155,23 @@ export const removeLiquidity = createAsyncThunk(
       .method(removeLiquidityABI);
 
     console.log("liquidityPool", liquidityPool);
+    console.log("amountTokenA",amountTokenA);
+    console.log("amountTokenB",amountTokenB);
+
 
     const amountAMin = getAmountInWeiFormatted(
       web3,
       amountTokenA,
       tokenAInfo?.assetsDecimals
     );
+    console.log("amountAMin",amountAMin);
 
     const amountBMin = getAmountInWeiFormatted(
       web3,
       amountTokenB,
       tokenBInfo?.assetsDecimals
     );
+    console.log("amountBMin",amountBMin);
 
     const deadline = Math.round(new Date().getTime() / 1000) + 3600;
 
@@ -173,12 +180,16 @@ export const removeLiquidity = createAsyncThunk(
       liquidityPool,
       PartialConstants.DEFAULT_ASSET_DECIMAL
     );
+
+    console.log("removeAmount",removeAmount);
     // Calculate this way to prevent rounding from float type of JS
     removeAmount = BigNumber.from(removeAmount)
       .mul(BigNumber.from(amount))
       .div(BigNumber.from(100))
       .toString();
+
     console.log("removeAmount", removeAmount)
+
     let transaction;
     if (isPairContainVET) {
       const assetDesired =
@@ -215,15 +226,16 @@ export const removeLiquidity = createAsyncThunk(
         .comment(`transaction remove pool ${assetsPoolName} from VeBank`)
         .request();
     } else {
-      // console.table([
-      //   ["addressTokenA", addressTokenA],
-      //   ["addressTokenB", addressTokenB],
-      //   ["removeAmount", removeAmount],
-      //   ["amountAMin", "0"],
-      //   ["amountBMin", "0"],
-      //   ["account", account],
-      //   ["deadline", deadline],
-      // ]);
+
+      console.table([
+        ["addressTokenA", addressTokenA],
+        ["addressTokenB", addressTokenB],
+        ["removeAmount", removeAmount],
+        ["amountAMin", "0"],
+        ["amountBMin", "0"],
+        ["account", account],
+        ["deadline", deadline],
+      ]);
 
       transaction = await methodRemoveLiquidity
         .transact(

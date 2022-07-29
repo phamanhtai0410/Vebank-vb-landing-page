@@ -69,7 +69,7 @@ const useRemoveLiquidFacade = () => {
   }, [secondTokenAmount, removeValue, liquidityPool]);
 
   const isEnabled = useMemo(() => {
-    console.log('🐶🐶  ~ isEnabled ~ approvePoolState', approvePoolState)
+    console.log('🐶🐶  ~ isEnabled ~ approvePoolState',isApproving, approvePoolState)
     return !isApproving && approvePoolState > 0 && approvePoolState >= liquidityPool;
   }, [isApproving, approvePoolState, liquidityPool]);
 

@@ -183,8 +183,16 @@ function getPairVolumeAndFees(dataList){
   let volumes = 0;
   dataList.map((item) => {
 
-    fees= fees + item.fee_usd;
-    volumes= volumes + item.volume_usd;
+    // FixedNumber.from(fees)
+    // .addUnsafe(FixedNumber.from(secondPerFirstTokenExchangeRate.toString()))
+    // .toString(),
+
+    //fees = FixedNumber.from(fees).addUnsafe(FixedNumber.from(item.fee_usd)).toString();
+
+    //console.log(fees);
+
+    fees= fees + Number(item.fee_usd);
+    volumes= volumes +Number(item.volume_usd) ;
 
     // fees = FixedNumber.from(fees).addUnsafe( FixedNumber.from(item.fee_usd) );
     // volumes =  FixedNumber.from(volumes).addUnsafe( FixedNumber.from(item.volume_usd)  ); 

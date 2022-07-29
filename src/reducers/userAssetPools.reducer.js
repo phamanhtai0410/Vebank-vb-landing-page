@@ -39,6 +39,7 @@ const userAssetPools = createSlice({
           state.userAddedPoolsAddresses.indexOf(assetsPoolAddress);
         state.userAddedPoolsAddresses.splice(indexOfAsset, 1);
       }
+      console.log("assetsPoolAddress",assetsPoolAddress);
 
       state.data[assetsPoolAddress] = {
         ...state.data[assetsPoolAddress],

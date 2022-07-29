@@ -406,14 +406,15 @@ const useSwapFacade = () => {
 
   const onChangeSourceInput = useCallback(
     (value) => {
-      checkBalance(value);
       if (value === "") {
         userInputRef.current = value;
         setInputAmountOut("");
+        setInputAmountIn("");
         setError("Enter an amount to see more trading details.");
       } else {
         let pattern = /^\d+\.?\d*$/;
         if (pattern.test(value)) {
+          checkBalance(value);
           if (value === "0" || value === "0." || value === "0.0") {
             setInputAmountOut("");
             setError("Enter an amount to see more trading details.");

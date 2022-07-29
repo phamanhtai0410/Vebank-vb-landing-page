@@ -220,31 +220,32 @@ export const checkTotalSupplyAvailable = createAsyncThunk(
 export const getPairsFee = createAsyncThunk(
   swapConstants.getPairsFee,
   async ({ tokenAInfo, tokenBInfo }, { dispatch, getState }) => {
-    const state = getState();
+    // const state = getState();
 
-    const addressTokenA = tokenAInfo?.assetsAddress || "";
-    const addressTokenB = tokenBInfo?.assetsAddress || "";
+    // const addressTokenA = tokenAInfo?.assetsAddress || "";
+    // const addressTokenB = tokenBInfo?.assetsAddress || "";
 
-    const { web3 } = state.web3;
-    if (web3 && ADDRESS_FACTORY) {
-      let contractFactory = new web3.eth.Contract(
-        ERC20ABI_FACTORY,
-        ADDRESS_FACTORY
-      );
+    // const { web3 } = state.web3;
+    // if (web3 && ADDRESS_FACTORY) {
+    //   let contractFactory = new web3.eth.Contract(
+    //     ERC20ABI_FACTORY,
+    //     ADDRESS_FACTORY
+    //   );
 
-      //"getPair(address tokenA, address tokenB),
-      const assetsPoolAddress = await contractFactory.methods
-        .getPair(addressTokenA, addressTokenB)
-        .call();
-      const emptyAddress = /^0x0+$/.test(assetsPoolAddress); // true chưa có
-      let pairFee = 0;
-      if (!emptyAddress && assetsPoolAddress) {
-        pairFee = await contractFactory.methods
-          .getPairsFee(assetsPoolAddress)
-          .call();
-      }
-      return pairFee;
-    }
+    //   //"getPair(address tokenA, address tokenB),
+    //   const assetsPoolAddress = await contractFactory.methods
+    //     .getPair(addressTokenA, addressTokenB)
+    //     .call();
+    //   const emptyAddress = /^0x0+$/.test(assetsPoolAddress); // true chưa có
+    //   let pairFee = 0;
+    //   if (!emptyAddress && assetsPoolAddress) {
+    //     pairFee = await contractFactory.methods
+    //       .getPairsFee(assetsPoolAddress)
+    //       .call();
+    //   }
+    //   return pairFee;
+    // }
+    return 3;
   }
 );
 

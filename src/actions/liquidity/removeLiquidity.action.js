@@ -181,12 +181,11 @@ export const removeLiquidity = createAsyncThunk(
       PartialConstants.DEFAULT_ASSET_DECIMAL
     );
 
-    console.log("removeAmount",removeAmount);
     // Calculate this way to prevent rounding from float type of JS
-    removeAmount = BigNumber.from(removeAmount)
-      .mul(BigNumber.from(amount))
-      .div(BigNumber.from(100))
-      .toString();
+    // removeAmount = BigNumber.from(removeAmount)
+    //   .mul(BigNumber.from(amount))
+    //   .div(BigNumber.from(100))
+    //   .toString();
 
     console.log("removeAmount", removeAmount)
 

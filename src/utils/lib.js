@@ -1,5 +1,4 @@
 /* eslint-disable no-extend-native */
-import { ethers } from "ethers";
 import PartialConstants from "../constants/partial.constants";
 import { v4 as uuidv4 } from "uuid";
 
@@ -14,11 +13,8 @@ export function formatLocaleString(x, digits, isFixed) {
     maximumSignificantDigits: digits || 10,
   });
 }
-export function formatBalanceString(x, digits) {
-  return x.toLocaleString("en-IN", {
-    currency: "USD",
-    maximumFractionDigits: digits || 2,
-  });
+export function formatBalanceString(x) {
+  return x.toLocaleString();
 }
 
 export function numberWithCommas(num) {

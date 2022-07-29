@@ -16,6 +16,7 @@ const ADDRESS_ROUTER = process.env.REACT_APP_ADDRESS_ROUTER;
 export const loadDetailRemoveLiquidity = createAsyncThunk(
   poolConstants.LOAD_DETAIL_REMOVE_LIQUIDITY,
   async (poolAddress, { getState }) => {
+    console.log("xxx", poolAddress)
     const currentState = getState();
     const { web3, account } = currentState.web3;
     let approvePool = 0;
@@ -39,6 +40,7 @@ export const loadDetailRemoveLiquidity = createAsyncThunk(
         approvePool = await contractPair.methods
           .allowance(account, ADDRESS_ROUTER)
           .call();
+           console.log("approvePool",approvePool)
         const poolInfo = selectPoolInfoByAddress(currentState, poolAddress);
         approvePool = ethers.utils.formatUnits(
           approvePool,
@@ -82,7 +84,7 @@ export const loadDetailRemoveLiquidity = createAsyncThunk(
 
 export const approvePoolLiquidity = createAsyncThunk(
   poolConstants.APPROVE_POOL_ADDRESS,
-  async ({ poolAddress, removeAmount = 1000 }, { getState }) => {
+  async ({ poolAddress, removeAmount = 1000 }, { getState, dispatch }) => {
     if (!poolAddress) return;
 
     const state = getState();
@@ -111,6 +113,12 @@ export const approvePoolLiquidity = createAsyncThunk(
       // Approve event from the token's contract will trigger the approve token
       // successfully state and it will be captured in the removeLiquidity.reducer
 
+      result &&
+      dispatch(
+        actions.alertActions.success({
+          title: "Approve success",
+        })
+      );
       return { result };
     }
   }
@@ -170,7 +178,7 @@ export const removeLiquidity = createAsyncThunk(
       .mul(BigNumber.from(amount))
       .div(BigNumber.from(100))
       .toString();
-
+    console.log("removeAmount", removeAmount)
     let transaction;
     if (isPairContainVET) {
       const assetDesired =
@@ -244,3 +252,16 @@ export const removeLiquidity = createAsyncThunk(
     return transaction;
   }
 );
+
+export const openModalRemoveLiquidity = (poolAddress) => async (dispatch, getState) => {
+  const currentState = getState();
+  const { web3 } = currentState.web3;
+  if (poolAddress && web3) {
+    dispatch(actions.loadDetailRemoveLiquidity(poolAddress));
+  }
+  dispatch({type: poolConstants.MODAL_OPEN_REMOVE_LIQUIDITY, poolAddress:poolAddress});
+};
+
+export const closeModalRemoveLiquidity = () => (dispatch) => {
+  dispatch({type: poolConstants.MODAL_CLOSE_REMOVE_LIQUIDITY});
+};

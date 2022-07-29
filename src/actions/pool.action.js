@@ -101,7 +101,7 @@ export const getPoolAssets = () => async (dispatch, getState) => {
               // the total supply of the pool may haven't been updated on Blockchain yet. So inside of this function,
               // we should check for it's current value stored in redux with the fetched one, and add the value
               // to get the latest value of the total LP.
-              const { amountTokenA, amountTokenB, liquidityPool } =
+              const { amountTokenA, amountTokenB, liquidityPool ,totalSupply } =
                 await getUserTokenAmounts({
                   contractPair,
                   account,
@@ -114,6 +114,7 @@ export const getPoolAssets = () => async (dispatch, getState) => {
                 actions.updateUserAssets({
                   assetsPoolAddress,
                   liquidityPool,
+                  liquidity: totalSupply,
                   amountTokenA,
                   amountTokenB,
                 })
@@ -181,8 +182,21 @@ function getPairVolumeAndFees(dataList){
   let fees = 0;
   let volumes = 0;
   dataList.map((item) => {
-    fees =fees + Number(item.fee_usd);
-    volumes =volumes + Number(item.volume_usd);
+
+    // FixedNumber.from(fees)
+    // .addUnsafe(FixedNumber.from(secondPerFirstTokenExchangeRate.toString()))
+    // .toString(),
+
+    //fees = FixedNumber.from(fees).addUnsafe(FixedNumber.from(item.fee_usd)).toString();
+
+    //console.log(fees);
+
+    fees= fees + Number(item.fee_usd);
+    volumes= volumes +Number(item.volume_usd) ;
+
+    // fees = FixedNumber.from(fees).addUnsafe( FixedNumber.from(item.fee_usd) );
+    // volumes =  FixedNumber.from(volumes).addUnsafe( FixedNumber.from(item.volume_usd)  ); 
+
   })
   return{fees, volumes};
 }
@@ -219,7 +233,7 @@ export const fetchPairs = (query) => async (dispatch, getState) => {
   
       const dataList = pairs.map(e => {
 
-        const {fees,volumes} = getPairVolumeAndFees(e.hour_data);
+        const { fees, volumes} = getPairVolumeAndFees(e.hour_data);
 
         return {
             ...e,
@@ -233,7 +247,9 @@ export const fetchPairs = (query) => async (dispatch, getState) => {
             assetsPoolAddress: e.pair_address,
             assetsDecimals: e.token0.decimals,
             balanceAccount: 0,
-            liquidity: e.reserve_usd,
+            liquidity:0 ,
+            liquidity_usd: e.reserve_usd,
+            yourLiquidityUSD:0,
             volume: volumes,
             fees: fees,
             apr: getPoolAPR(fees,e.reserve_usd),
@@ -246,7 +262,8 @@ export const fetchPairs = (query) => async (dispatch, getState) => {
           total
       });
 
-      dispatch(getPoolAssetsByAccount(dataList));
+
+     dispatch(getPoolAssetsByAccount(dataList));
   
     }
     
@@ -270,24 +287,35 @@ export const getPoolAssetsByAccount =
 
     if (account && ADDRESS_FACTORY && dataAssetPool.length > 0) {
       for await (const item of dataAssetPool) {
+
         const { addressTokenA, addressTokenB, assetsPoolAddress } = item;
 
         if (item.assetsPoolAddress && account) {
+
           const contractPair = new web3.eth.Contract(
             ERC20ABI_PAIR,
             item.assetsPoolAddress
           );
 
-          const { amountTokenA, amountTokenB, liquidityPool } =  await getUserTokenAmounts({
+          const { amountTokenA, amountTokenB, liquidityPool ,totalSupply} =  await getUserTokenAmounts({
               contractPair,
               account,
               addressTokenA,
               addressTokenB,
           });
 
+          // console.log("liquidityPool",liquidityPool);
+          const percentYour = liquidityPool/totalSupply;
+          // console.log("percentYour",percentYour);
+
+          let yourLiquidityUSD = percentYour > 0 ? item.liquidity_usd*percentYour :0;
+          // console.log("yourLiquidityUSD",yourLiquidityUSD);
+
           dataList.push({
             ...item,
             balanceAccount: liquidityPool,
+            liquidity:totalSupply,
+            yourLiquidityUSD,
             amountTokenA,
             amountTokenB,
           });
@@ -340,6 +368,7 @@ export const getUserTokenAmounts = async ({
   let reserve2 = 0;
 
   try {
+    
     const balanceBigN = await contractPair.methods.balanceOf(account).call();
     // console.log('🐶🐶  ~ liquidityPool(raw)', balanceBigN)
     liquidityPool = await ethers.utils.formatUnits(
@@ -349,6 +378,8 @@ export const getUserTokenAmounts = async ({
     // console.log('🐶🐶  ~ liquidityPool(formatted)', liquidityPool)
     liquidityPool = FixedNumber.from(liquidityPool);
     totalSupply = await contractPair.methods.totalSupply().call();
+
+
     if (totalSupply) {
       totalSupply = ethers.utils.formatUnits(
         totalSupply,
@@ -363,7 +394,7 @@ export const getUserTokenAmounts = async ({
 
     // Check if token position is match or not, swap reserve position if it's not match.
     const firstTokenAddress = await contractPair.methods.token0().call();
-    if (firstTokenAddress !== addressTokenA) {
+    if (firstTokenAddress.toLocaleUpperCase() !== addressTokenA.toLocaleUpperCase()) {
       [_reserve0, _reserve1] = [_reserve1, _reserve0];
     }
 
@@ -372,11 +403,13 @@ export const getUserTokenAmounts = async ({
       getDecimalForAsset(addressTokenA)
     );
     _reserve0 = FixedNumber.from(_reserve0);
+
     _reserve1 = ethers.utils.formatUnits(
       _reserve1,
       getDecimalForAsset(addressTokenB)
     );
     _reserve1 = FixedNumber.from(_reserve1);
+  
 
     // Using calculation like this to avoid auto rounding numbers of JS
     if (liquidityPool >= 0 && totalSupply > 0) {

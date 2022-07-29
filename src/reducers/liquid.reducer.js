@@ -13,6 +13,7 @@ import {compareString} from '../utils/lib';
 
 const initialState = {
   isSelectTokenModalOpen: false,
+  isRemoveLiquidModalOpen: false,
   pending: false,
 
   transaction: null,
@@ -140,6 +141,32 @@ export function liquidReducer(state = initialState, action) {
       return newState;
     }
 
+    case poolConstants.MODAL_DEFAULT_FIRST_TOKEN: {
+      const newState = {
+        ...state,
+        isSelectTokenModalOpen: false,
+        tokenSelecting: "",
+        errorCode: null,
+        message: null,
+      };
+      const newToken = action.payload;
+      newState.firstToken = newToken;
+      return newState;
+    }
+
+    case poolConstants.MODAL_DEFAULT_SECOND_TOKEN: {
+      const newState = {
+        ...state,
+        isSelectTokenModalOpen: false,
+        tokenSelecting: "",
+        errorCode: null,
+        message: null,
+      };
+      const newToken = action.payload;
+      newState.secondToken = newToken;
+      return newState;
+    }
+
     case poolConstants.MODAL_CLOSE_SELECT_TOKEN:
       return {
         ...state,
@@ -150,6 +177,19 @@ export function liquidReducer(state = initialState, action) {
         data: {},
         message: null,
       };
+
+      case poolConstants.MODAL_OPEN_REMOVE_LIQUIDITY:
+        return {
+          ...state,
+          isRemoveLiquidModalOpen: true,
+          poolAddress: action.poolAddress
+        };
+
+      case poolConstants.MODAL_CLOSE_REMOVE_LIQUIDITY:
+        return {
+          ...state,
+          isRemoveLiquidModalOpen: false
+        };
 
     case loadDetailAddLiquidity.pending.type: {
       return {
@@ -292,6 +332,8 @@ export const selectOpenAddLiquidState = (state) =>
   state.liquidReducer.isAddLiquidModalOpen;
 export const selectOpenRemoveLiquidState = (state) =>
   state.liquidReducer.isRemoveLiquidModalOpen;
+export const selectPoolAddressToRemove = (state) =>
+  state.liquidReducer.poolAddress;
 export const selectFirstTokenExchangeRate = (state) =>
   state.liquidReducer.abExchangeRate;
 export const selectSecondTokenExchangeRate = (state) =>

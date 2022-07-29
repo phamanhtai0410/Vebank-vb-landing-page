@@ -1,5 +1,5 @@
 import React, { Fragment, useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { selectPoolInfoByAddress } from "../../../reducers/assetsPool.reducer";
 import {
   selectUserAmountAByPoolAddress,
@@ -13,10 +13,11 @@ import IcCollapse from "../../../assets/images/buttons/ic_collapse.svg";
 import { useNavigate } from "react-router-dom";
 import RouteName from "../../../constants/routeName.constants";
 import GradientStrokeWrapper from "../../partials/GradientStrokeWrapper";
+import * as actions from "../../../actions";
 
 const LiquidityExcerpt = ({ poolAddress, poolSelect, setPoolSelect }) => {
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const poolInfo = useSelector((state) =>
     selectPoolInfoByAddress(state, poolAddress)
   );
@@ -36,7 +37,8 @@ const LiquidityExcerpt = ({ poolAddress, poolSelect, setPoolSelect }) => {
   );
 
   const removeLiquidity = () => {
-    navigate(`${RouteName.REMOVE_LIQUIDITY}/${poolAddress}`);
+    // navigate(`${RouteName.REMOVE_LIQUIDITY}/${poolAddress}`);
+    dispatch(actions.openModalRemoveLiquidity(poolAddress));
   };
 
   const handleAddLiquidity = () => {

@@ -19,10 +19,10 @@ import PartialConstants from "../../../constants/partial.constants";
 
 import BtnLiquidityApproveA from "./BtnLiquidityApproveA";
 import BtnLiquidityApproveB from "./BtnLiquidityApproveB";
-
-
 import { useSelector } from "react-redux";
 import { selectReserveA, selectReserveB } from "../../../reducers/liquid.reducer";
+import { formatBalanceString } from "../../../utils/lib";
+
 const FormAddLiquidity = () => {
   const {
     step,
@@ -55,7 +55,7 @@ const FormAddLiquidity = () => {
   const reserveB = useSelector(selectReserveB);
 
   const showMaxAmount = () => {
-    return Number(secondTokenVolume) + (Number(secondTokenVolume)*(slippage/100))
+    return formatBalanceString(Number(secondTokenVolume) + (Number(secondTokenVolume)*(slippage/100)));
   }
   const showConfirmButton = useCallback(() => {
     console.log("approveFirstToken", approveFirstToken)
@@ -174,7 +174,7 @@ const FormAddLiquidity = () => {
                 </div>
                 <div className="flex flex-row item-center justify-between py-1">
                   <span className="text-xs text-white">Pool liquidity ({firstTokenInfo?.assetsChain})</span>
-                  <span className="font-poppins_medium text-sm text-white">{`${reserveA} ${firstTokenInfo?.assetsChain}`}</span>
+                  <span className="font-poppins_medium text-sm text-white">{`${formatBalanceString(reserveA)} ${firstTokenInfo?.assetsChain}`}</span>
                 </div>
                 <div className="flex flex-row item-center justify-between py-1">
                   <span className="text-xs text-white">Pool liquidity ({secondTokenInfo?.assetsChain})</span>
@@ -188,12 +188,9 @@ const FormAddLiquidity = () => {
                   <span className="text-xs text-white">Slippage Tolerance</span>
                   <div className="flex flex-row item-center border border-vbDisableText rounded px-2 py-1">
                     <input
-                      min={0}
-                      max={100}
                       value={slippage}
-                      pattern="^[0-9]*\.?[0-9]*$"
                       onChange={(e) => onChangeSlippage(e.target.value)}
-                      className="font-poppins_medium text-sm text-white text-right rounded-lg bg-transparent focus:outline-none w-[50px]"
+                      className="font-poppins_medium text-sm text-white text-right bg-transparent focus:outline-none w-[50px]"
                       type="text"
                     />
                     <span className="font-poppins_medium text-sm text-white ml-[2px]">%</span>

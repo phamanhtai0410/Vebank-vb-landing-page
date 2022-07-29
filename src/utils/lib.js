@@ -92,7 +92,7 @@ export const isContainVET = (...ags) =>
  * @returns the corresponding decimal value of the asset that
  */
 export const getDecimalForAsset = (assetsAddress) =>
-  assetsAddress === process.env.REACT_APP_TOKEN_VEUSD
+  assetsAddress.toLocaleUpperCase() === process.env.REACT_APP_TOKEN_VEUSD.toLocaleUpperCase()
     ? PartialConstants.VEUSD_DECIMAL
     : PartialConstants.DEFAULT_ASSET_DECIMAL;
 

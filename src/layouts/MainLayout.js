@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 
 import Header from '../components/partials/Header';
 import Footer from '../components/partials/Footer';
+import ModalRemoveLiquidity from '../components/liquidity/RemoveLiquidity/ModalRemoveLiquidity';
 
 const MainLayout = () => {
 
@@ -21,6 +22,7 @@ const MainLayout = () => {
         <main className="bg-[#00051e] text-white leading-loose">
             <Header />
             <Outlet />
+            <ModalRemoveLiquidity />
         </main>
     )
 }

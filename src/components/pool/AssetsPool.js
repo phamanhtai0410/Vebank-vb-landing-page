@@ -29,7 +29,8 @@ const AssetsPool = () => {
   }, [web3]);
 
   async function fetchPoolAssets() {
-    await dispatch(actions.fetchPairs());
+     await dispatch(actions.fetchPairs());
+   // await dispatch(actions.getPoolAssets());
   }
 
   const onClickShowRowAssets = (assetsAddress) => {
@@ -73,15 +74,15 @@ const AssetsPool = () => {
               </div>
 
               <div className="p-4 col-span-2 flex justify-center items-center font-semibold">
-                {`${nFormatter(item.liquidity) } $`}
+                {`$${nFormatter(item.liquidity_usd) }`}
               </div>
 
               <div className="p-4 col-span-2 flex flex-col justify-center items-center content-center">
-                <div className="font-semibold">{item.volume ? nFormatter(item.volume) + ' $' :'-'}</div>
+                <div className="font-semibold">{item.volume ? '$'+ nFormatter(item.volume) :'-'}</div>
               </div>
 
               <div className="p-4 col-span-2 flex justify-center items-center font-semibold">
-                {item.fees ? nFormatter(item.fees) + ' $' :'-'}
+                {item.fees ? '$'+ nFormatter(item.fees) :'-'}
               </div>
 
               <div className="p-4 col-span-2 flex flex-col justify-center items-center content-center">
@@ -121,23 +122,23 @@ const AssetsPool = () => {
         <div className="grid grid-cols-12 justify-items-center content-around font-poppins text-[14px]">
           <div className="px-2 py-2 col-span-3 flex">
             <span>Assets</span>
-            <img className="ml-1" src={IcCaretDown} alt={IcCaretDown} />
+            <img className="ml-1 w-4" src={IcCaretDown} alt={IcCaretDown} />
           </div>
           <div className="px-2 py-2 col-span-2 flex">
             <span>Liquidity</span>
-            <img className="ml-1" src={IcCaretDown} alt={IcCaretDown} />
+            <img className="ml-1 w-4" src={IcCaretDown} alt={IcCaretDown} />
           </div>
           <div className="px-2 py-2 col-span-2 flex">
             <span>Volume (24H)</span>
-            <img className="ml-1" src={IcCaretDown} alt={IcCaretDown} />
+            <img className="ml-1 w-4" src={IcCaretDown} alt={IcCaretDown} />
           </div>
           <div className="px-2 py-2 col-span-2 flex">
             <span>Fees (24H)</span>
-            <img className="ml-1" src={IcCaretDown} alt={IcCaretDown} />
+            <img className="ml-1 w-4" src={IcCaretDown} alt={IcCaretDown} />
           </div>
           <div className="px-2 py-2 col-span-2 flex">
             <span>APR</span>
-            <img className="ml-1" src={IcCaretDown} alt={IcCaretDown} />
+            <img className="ml-1 w-4" src={IcCaretDown} alt={IcCaretDown} />
           </div>
           <div className="col-span-1"></div>
         </div>

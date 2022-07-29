@@ -59,7 +59,7 @@ const useAddLiquidFacade = () => {
   const [firstTokenVolume, setFirstTokenVolume] = useState("");
   const [secondTokenVolume, setSecondTokenVolume] = useState("");
   const [primaryButtonLabel, setPrimaryButtonLabel] = useState("Invalid pair");
-  const [slippage, setSlippage] = useState(0.5);
+  const [slippage, setSlippage] = useState("0.5");
 
   const firstPerSecondTokenExchangeRate =
     useSelector(selectFirstTokenExchangeRate) ??
@@ -201,7 +201,7 @@ const useAddLiquidFacade = () => {
   const resetFrm = () => {
     setFirstTokenVolume("");
     setSecondTokenVolume("");
-    setSlippage(0.5);
+    setSlippage("0.5");
     setStep(1);
   };
 
@@ -246,7 +246,16 @@ const useAddLiquidFacade = () => {
     );
   };
   const onChangeSlippage = (value) => {
-    setSlippage(value);
+      if(value === ""){
+        setSlippage(value);
+      }
+      if (Number(value) <= 0 || Number(value) > 50) {
+          return;
+      }
+      let pattern = /^\d+\.?\d*$/;
+      if (pattern.test(value)) {
+        setSlippage(value);
+    }
   };
 
   useEffect(() => {
@@ -268,7 +277,7 @@ const useAddLiquidFacade = () => {
           if (secondTokenVolume !== secondAmount) {
             setSecondTokenVolume(secondAmount);
           }
-          setPrimaryButtonLabel("Supply");
+          setPrimaryButtonLabel("Add Liquidity");
           setContinueAvailable(true);
         } else if (secondTokenVolume === 0 || secondTokenVolume === "") {
           if (firstTokenVolume !== 0 && firstTokenVolume !== "") {
@@ -276,7 +285,7 @@ const useAddLiquidFacade = () => {
           } else setPrimaryButtonLabel("Enter an amount");
         } else {
           setFirstTokenVolume(getFirstAmount(secondTokenVolume));
-          setPrimaryButtonLabel("Supply");
+          setPrimaryButtonLabel("Add Liquidity");
           setContinueAvailable(true);
         }
       }
@@ -349,6 +358,10 @@ const useAddLiquidFacade = () => {
 
   useEffect(() => {
     // Fetch the detail when page is first loaded
+    if (!poolAddress) {
+      dispatch(actions.selectDefaultFirstToken(process.env.REACT_APP_TOKEN_WVET));
+      dispatch(actions.selectDefaultSecondToken(process.env.REACT_APP_TOKEN_VEBANK));
+    }
     dispatch(actions.loadDetailAddLiquidity(poolAddress));
     return () => {
       // When user is leaving this page, this callBack will be triggered to clear the values

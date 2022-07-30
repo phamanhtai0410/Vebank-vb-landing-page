@@ -54,6 +54,7 @@ const useSwapFacade = () => {
   const [isSwitch, setIsSwitch] = useState(false);
 
   const defaultErr = "Enter an amount to see more trading details.";
+  const slippageErr = "Slippage no smaller than 0.5% or no greater than 50%";
   const [error, setError] = useState(defaultErr);
   const poolErrRef = useRef("");
 
@@ -68,8 +69,10 @@ const useSwapFacade = () => {
   const exchangeRateBA = useSelector(selectExchangeRateBA);
   const fee = useSelector(selectPairsFee);
   const loadingFee = useSelector(selectLoadingFee);
-  const loadingGetAmountOut = useSelector(selectLoadingGetAmountOut);
-  const loadingGetAmountIn = useSelector(selectLoadingGetAmountIn);
+  const [loadingGetAmountOut, selectLoadingGetAmountOut] = useState(false);
+  const [loadingGetAmountIn, selectLoadingGetAmountIn] = useState(false);
+  // const loadingGetAmountOut = useSelector(selectLoadingGetAmountOut);
+  // const loadingGetAmountIn = useSelector(selectLoadingGetAmountIn);
   const reserveFrom = useSelector(selectReserveFrom);
   const reserveTo = useSelector(selectReserveTo);
 
@@ -215,28 +218,66 @@ const useSwapFacade = () => {
               setError(defaultErr);
             }
             onGetPairsFee();
-            const isCheckExchangeRate = onCheckExchangeRatePool({
-              assetsPoolAddress: assetsPoolAddress,
-            });
-            if (isCheckExchangeRate) {
-              if (
-                inputAmountIn === userInputRef.current &&
-                inputAmountIn !== ""
-              ) {
-                setInputAmountOut("");
-                const isBalanceInAvailable = checkBalance(userInputRef.current);
-                if (isBalanceInAvailable) {
-                  getAmountOutDebounced(userInputRef.current);
-                }
-              }
-              if (
-                inputAmountOut === userInputRef.current &&
-                inputAmountOut !== ""
-              ) {
-                setInputAmountIn("");
-                getAmountsInDebounced(userInputRef.current);
-              }
+            setLoadingExchangeRate(true);
+            if (
+              inputAmountIn === userInputRef.current &&
+              inputAmountIn !== ""
+            ) {
+              selectLoadingGetAmountOut(true);
             }
+            if (
+              inputAmountOut === userInputRef.current &&
+              inputAmountOut !== ""
+            ) {
+              selectLoadingGetAmountIn(true);
+            }
+            dispatch(
+              checkExchangeRatePool({
+                tokenAddressA: sourceTokenAddress,
+                tokenAddressB: desireTokenAddress,
+                assetsPoolAddress: assetsPoolAddress,
+              })
+            )
+              .unwrap()
+              .then((originalPromiseResult) => {
+                setLoadingExchangeRate(false);
+                if (
+                  inputAmountIn === userInputRef.current &&
+                  inputAmountIn !== ""
+                ) {
+                  setInputAmountOut("");
+                  selectLoadingGetAmountOut(false);
+                  const isBalanceInAvailable = checkBalance(
+                    userInputRef.current
+                  );
+                  if (isBalanceInAvailable) {
+                    getAmountOutDebounced(userInputRef.current);
+                  }
+                }
+                if (
+                  inputAmountOut === userInputRef.current &&
+                  inputAmountOut !== ""
+                ) {
+                  selectLoadingGetAmountIn(false);
+                  setInputAmountIn("");
+                  getAmountsInDebounced(userInputRef.current);
+                }
+              })
+              .catch((rejectedValueOrSerializedError) => {
+                setLoadingExchangeRate(false);
+                if (
+                  inputAmountIn === userInputRef.current &&
+                  inputAmountIn !== ""
+                ) {
+                  selectLoadingGetAmountOut(true);
+                }
+                if (
+                  inputAmountOut === userInputRef.current &&
+                  inputAmountOut !== ""
+                ) {
+                  selectLoadingGetAmountIn(true);
+                }
+              });
           } else {
             setError("Not existed liquidity.");
             userInputRef.current = "";
@@ -505,6 +546,47 @@ const useSwapFacade = () => {
       .catch((rejectedValueOrSerializedError) => {});
   };
 
+  const onChangeSlippage = (value) => {
+    if (value === "") {
+      setInputSlippage("");
+    }
+
+    if (value === "00" || value === "0") {
+      setError(slippageErr);
+      setInputSlippage("0");
+      return;
+    }
+    if (
+      value === "0.0" ||
+      value === "0." ||
+      value === "0.1" ||
+      value === "0.2" ||
+      value === "0.3" ||
+      value === "0.4"
+    ) {
+      setError(slippageErr);
+      setInputSlippage("0.");
+      return;
+    }
+
+    if (value > 50) {
+      setError(slippageErr);
+      return;
+    }
+
+    let regex = /^((?!0)\d{1,10}|0|\.\d{1,2})($|\.$|\.\d{1,2}$)/gm;
+    if (!regex.test(value)) {
+      setError(slippageErr);
+      return;
+    }
+
+    let pattern = /^\d+\.?\d*$/;
+    if (pattern.test(value)) {
+      setError("");
+      setInputSlippage(value);
+    }
+  };
+
   return {
     error,
     priceImpact,
@@ -555,6 +637,7 @@ const useSwapFacade = () => {
     isSwitch,
     pricePaidPerA,
     pricePaidPerB,
+    onChangeSlippage,
   };
 };
 

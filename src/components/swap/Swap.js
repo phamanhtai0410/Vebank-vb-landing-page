@@ -67,6 +67,7 @@ const Swap = () => {
     loadingApprove,
     onCheckExchangeRatePool,
     onSwitchExchangeRate,
+    onChangeSlippage,
   } = useSwapFacade();
 
   const errExistedLiquidity = "Not existed liquidity.";
@@ -371,12 +372,12 @@ const Swap = () => {
                 className="absolute flex flex-row items-center left-4"
                 onClick={onSwitchExchangeRate}
               >
-                {loadingGetAmountOut || loadingGetAmountIn ? (
+                {loadingExchangeRate ? (
                   <div className="loading mr-2" />
                 ) : (
                   <img src={IcSwitch} alt="Switch" className="w-4" />
                 )}
-                {loadingGetAmountOut || loadingGetAmountIn ? (
+                {loadingExchangeRate ? (
                   <p>Fetching price...</p>
                 ) : (
                   <div className="w-full flex flex-row items-center justify-between">
@@ -455,33 +456,15 @@ const Swap = () => {
                     </div>
                     <div className="w-20 flex flex-row justify-evenly items-center bg-itemForm rounded border-vbDisableText border px-2 py-[0.0625rem]">
                       <input
-                        className="bg-transparent w-10 rounded focus:outline-none placeholder-vbDisableText font-poppins_medium text-base text-grey-1"
+                        className="bg-transparent w-10 rounded focus:outline-none placeholder-vbDisableText font-poppins_medium text-grey-1"
                         type="text"
                         min={0.5}
                         max={50}
-                        value={inputSlippage}
-                        onChange={(event) => {
-                          if (event.target.value === "") {
-                            setInputSlippage("");
-                          } else {
-                            let pattern = /^\d+\.?\d*$/;
-                            if (pattern.test(event.target.value)) {
-                              setInputSlippage(event.target.value);
-                            }
-                          }
-                        }}
-                        onBlur={(event) => {
-                          if (event.target.value === "") {
-                            setInputSlippage(0.5);
-                          } else if (parseFloat(event.target.value) >= 50.0) {
-                            setInputSlippage(50);
-                          } else if (parseFloat(event.target.value) <= 0.5) {
-                            setInputSlippage(0.5);
-                          } else {
-                            setInputSlippage(event.target.value);
-                          }
-                        }}
                         placeholder="0.5"
+                        value={inputSlippage}
+                        onChange={(event) =>
+                          onChangeSlippage(event.target.value)
+                        }
                       />
                       <p className="ml-1">%</p>
                     </div>
@@ -515,7 +498,7 @@ const Swap = () => {
               !loadingSwap && !loadingApprove && error === ""
                 ? "btn-veb"
                 : "bg-btn-veb-disabled rounded-lg"
-            }  h-12`}
+            } px-2 h-12`}
           >
             {renderTitleButton()}
           </button>

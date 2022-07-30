@@ -58,7 +58,7 @@ const useRemoveLiquidFacade = () => {
   const [continueAvailable, setContinueAvailable] = useState(false);
   const [primaryButtonLabel, setPrimaryButtonLabel] =
     useState("Enter an amount");
-  const [removeValue, setRemoveValue] = useState(0);
+  const [removeValue, setRemoveValue] = useState("0");
 
   const amountTokenA = useMemo(() => {
     return firstTokenAmount * (removeValue / liquidityPool) || 0;
@@ -76,9 +76,9 @@ const useRemoveLiquidFacade = () => {
   const removeAvailable = useMemo(() => {
     return (
       isLoadingDetail === false &&
-      removeValue > 0 &&
-      approvePoolState >= removeValue &&
-      liquidityPool >= removeValue
+      Number(removeValue) > 0 &&
+      approvePoolState >= Number(removeValue) &&
+      liquidityPool >= Number(removeValue)
     );
   }, [removeValue, approvePoolState, isLoadingDetail, liquidityPool]);
 
@@ -87,7 +87,7 @@ const useRemoveLiquidFacade = () => {
   };
 
   const resetFrm = () => {
-    setRemoveValue(0);
+    setRemoveValue("0");
     setPrimaryButtonLabel("Enter an amount");
   };
 
@@ -121,7 +121,7 @@ const useRemoveLiquidFacade = () => {
     (value) => {
       // Check matching format and set the other token amount with the relative rate.
       if (value.isMatch?.(/^\d*\.?\d*$/)) {
-        if (value > liquidityPool) {
+        if (Number(value) > Number(liquidityPool)) {
           return;
         }
         setRemoveValue(value);

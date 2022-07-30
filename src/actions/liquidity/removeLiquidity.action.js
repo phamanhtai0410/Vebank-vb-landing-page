@@ -38,19 +38,6 @@ export const loadDetailRemoveLiquidity = createAsyncThunk(
       addressTokenA = await contractPair.methods.token0().call();
       addressTokenB = await contractPair.methods.token1().call();
 
-      if (account) {
-        // approvePool = await contractPair.methods
-        //   .allowance(account, ADDRESS_ROUTER)
-        //   .call();
-        //    console.log("approvePool",approvePool)
-        // const poolInfo = selectPoolInfoByAddress(currentState, poolAddress);
-        // approvePool = ethers.utils.formatUnits(
-        //   approvePool,
-        //   poolInfo?.assetsDecimals
-        // );
-        // approvePool = Number(approvePool);
-      }
-
       const {
         amountTokenA: _amountTokenA,
         amountTokenB: _amountTokenB,
@@ -70,6 +57,25 @@ export const loadDetailRemoveLiquidity = createAsyncThunk(
       baExchangeRate = reserve1 / reserve2;
 
       balanceAccount = liquidityPool;
+
+      if (account) {
+        approvePool = await contractPair.methods
+          .allowance(account, ADDRESS_ROUTER)
+          .call();
+           console.log("approvePool",approvePool)
+        const poolInfo = selectPoolInfoByAddress(currentState, poolAddress);
+        approvePool = ethers.utils.formatUnits(
+          approvePool,
+          poolInfo?.assetsDecimals
+        );
+        
+        approvePool = Number(approvePool);
+
+        if(approvePool < Number(liquidityPool) ){
+          approvePool = 0;
+        }
+      }
+
     }
     return {
       addressTokenA,
@@ -100,6 +106,7 @@ export const approvePoolLiquidity = createAsyncThunk(
     const amountMax = removeAmount;
 
     if (account && contractPair && poolAddress) {
+      
       const approveABI = ERC20ABI_PAIR.find(
         ({ name, type }) => name === "approve" && type === "function"
       );

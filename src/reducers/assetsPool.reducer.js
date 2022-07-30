@@ -11,7 +11,7 @@ const listAsset = [
     iconAssets: IcVeUSD,
     assetsPoolName: "VET-VEUSD",
     assetsKey:
-      process.env.REACT_APP_TOKEN_WVET + process.env.REACT_APP_TOKEN_VEUSD,
+    process.env.REACT_APP_TOKEN_WVET + process.env.REACT_APP_TOKEN_VEUSD,
     assetsChainA: "VET",
     addressTokenA: process.env.REACT_APP_TOKEN_WVET,
     assetsChainB: "VEUSD",
@@ -30,7 +30,7 @@ const listAsset = [
     iconAssets: IcVtho,
     assetsPoolName: "VET-VTHO",
     assetsKey:
-      process.env.REACT_APP_TOKEN_WVET + process.env.REACT_APP_TOKEN_VTHO,
+    process.env.REACT_APP_TOKEN_WVET + process.env.REACT_APP_TOKEN_VTHO,
     assetsChainA: "VET",
     addressTokenA: process.env.REACT_APP_TOKEN_WVET,
     assetsChainB: "VTHO",
@@ -68,7 +68,7 @@ const listAsset = [
     iconAssets: IcVtho,
     assetsPoolName: "VB-VTHO",
     assetsKey:
-      process.env.REACT_APP_TOKEN_VEBANK + process.env.REACT_APP_TOKEN_VTHO,
+    process.env.REACT_APP_TOKEN_VEBANK + process.env.REACT_APP_TOKEN_VTHO,
     assetsChainA: "VB",
     addressTokenA: process.env.REACT_APP_TOKEN_VEBANK,
     assetsChainB: "VTHO",
@@ -87,7 +87,7 @@ const listAsset = [
     iconAssets: IcVtho,
     assetsPoolName: "VEUSD-VTHO",
     assetsKey:
-      process.env.REACT_APP_TOKEN_VEUSD + process.env.REACT_APP_TOKEN_VTHO,
+    process.env.REACT_APP_TOKEN_VEUSD + process.env.REACT_APP_TOKEN_VTHO,
     assetsChainA: "VEUSD",
     addressTokenA: process.env.REACT_APP_TOKEN_VEUSD,
     assetsChainB: "VTHO",

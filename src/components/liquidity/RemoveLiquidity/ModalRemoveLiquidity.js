@@ -126,12 +126,12 @@ const ModalRemoveLiquidity = () => {
               {enableBtnLabel}
             </button>
           )}
-          {isEnabled && !isRemoving && <button
+          {isEnabled && <button
             onClick={handlerStepToStep}
             className={`btn-modal-veb w-full h-16.5 text-lg font-poppins_medium ${
-              removeAvailable ? "bg-btn-veb" : ""
+              (removeAvailable && !isRemoving) ? "bg-btn-veb" : ""
             }`}
-            disabled={!removeAvailable}
+            disabled={!removeAvailable || isRemoving}
           >
             {primaryButtonLabel}
           </button>}

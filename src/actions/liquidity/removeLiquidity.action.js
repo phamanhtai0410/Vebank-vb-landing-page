@@ -92,7 +92,7 @@ export const loadDetailRemoveLiquidity = createAsyncThunk(
 
 export const approvePoolLiquidity = createAsyncThunk(
   poolConstants.APPROVE_POOL_ADDRESS,
-  async ({ poolAddress, removeAmount = 15 }, { getState, dispatch }) => {
+  async ({ poolAddress, removeAmount = 1000000000 }, { getState, dispatch }) => {
     if (!poolAddress) return;
 
     const state = getState();
@@ -194,10 +194,7 @@ export const removeLiquidity = createAsyncThunk(
       let percent = amount/removeAmount;
       amountTokenA = amountTokenA * percent;
       amountTokenB = amountTokenB * percent;
-      console.log("amount", amount)
-      console.log("removeAmount1", removeAmount)
       removeAmount = amount;
-      console.log("removeAmount2", removeAmount)
     }
 
     const amountAMin = getAmountInWeiFormatted(

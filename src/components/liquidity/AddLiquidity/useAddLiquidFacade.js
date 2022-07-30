@@ -252,6 +252,7 @@ const useAddLiquidFacade = () => {
       if (Number(value) > 50) {
           return;
       }
+      setContinueAvailable(Number(value) >= 0.5);
       let pattern = /^\d+\.?\d*$/;
       if (pattern.test(value)) {
         setSlippage(value);

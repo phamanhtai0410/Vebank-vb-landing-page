@@ -103,7 +103,7 @@ const Asset = ({
             value={volume}
             pattern="^[0-9]*\.?[0-9]*$"
             onChange={(e) => onVolumeChange(e.target.value)}
-            className="w-[45%] pl-4 py-1 focus:outline-none placeholder:text-white font-poppins_semi_bold text-lg text-right rounded-lg bg-transparent"
+            className="w-[45%] pl-4 py-1 focus:outline-none placeholder:text-white font-poppins_medium text-base text-right rounded-lg bg-transparent"
             type="text"
           />
         </div>

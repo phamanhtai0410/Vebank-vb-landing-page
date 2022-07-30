@@ -89,8 +89,8 @@ const ModalRemoveLiquidity = () => {
             </span>
           </div>
           <div className="flex flex-row items-center justify-between mt-6">
-            <div className="flex flex-row flex-1 items-center">
-              <span className="font-poppins_bold text-base text-white">
+            <div className="flex flex-row w-fit items-center">
+              <span className="font-poppins_bold text-base text-white whitespace-nowrap">
                 {`${firstTokenInfo?.assetsChain || ""}-${secondTokenInfo?.assetsChain || ""}`}
               </span>
               <div className="w-[1px] h-9 bg-[#7694DE] mx-3"></div>
@@ -107,7 +107,7 @@ const ModalRemoveLiquidity = () => {
               value={removeValue}
               pattern="^[0-9]*\.?[0-9]*$"
               onChange={(e) => onChangeRemoveValue(e.target.value)}
-              className="w-[45%] flex-1 px-4 py-1 focus:outline-none placeholder:text-[#4B5C86] font-poppins_semi_bold text-lg text-white text-right bg-transparent"
+              className="w-full pl-4 py-1 focus:outline-none placeholder:text-[#4B5C86] font-poppins_semi_bold text-lg text-white text-right bg-transparent"
               type="text"
             />
           </div>
@@ -126,12 +126,12 @@ const ModalRemoveLiquidity = () => {
               {enableBtnLabel}
             </button>
           )}
-          {isEnabled && !isRemoving && <button
+          {isEnabled && <button
             onClick={handlerStepToStep}
             className={`btn-modal-veb w-full h-16.5 text-lg font-poppins_medium ${
-              removeAvailable ? "bg-btn-veb" : ""
+              (removeAvailable && !isRemoving) ? "bg-btn-veb" : ""
             }`}
-            disabled={!removeAvailable}
+            disabled={!removeAvailable || isRemoving}
           >
             {primaryButtonLabel}
           </button>}

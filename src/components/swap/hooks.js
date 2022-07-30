@@ -505,6 +505,26 @@ const useSwapFacade = () => {
       .catch((rejectedValueOrSerializedError) => {});
   };
 
+  const onChangeSlippage = (value) => {
+    if (value === "") {
+      setInputSlippage("");
+    }
+
+    if (value > 50) {
+      return;
+    }
+
+    let regex = /^((?!0)\d{1,10}|0|\.\d{1,2})($|\.$|\.\d{1,2}$)/gm;
+    if (!regex.test(value)) {
+      return;
+    }
+
+    let pattern = /^\d+\.?\d*$/;
+    if (pattern.test(value)) {
+      setInputSlippage(value);
+    }
+  };
+
   return {
     error,
     priceImpact,
@@ -555,6 +575,7 @@ const useSwapFacade = () => {
     isSwitch,
     pricePaidPerA,
     pricePaidPerB,
+    onChangeSlippage,
   };
 };
 

@@ -121,6 +121,9 @@ const useRemoveLiquidFacade = () => {
     (value) => {
       // Check matching format and set the other token amount with the relative rate.
       if (value.isMatch?.(/^\d*\.?\d*$/)) {
+        if (value > liquidityPool) {
+          return;
+        }
         setRemoveValue(value);
       }
     },

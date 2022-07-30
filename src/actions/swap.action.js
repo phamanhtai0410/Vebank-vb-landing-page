@@ -130,47 +130,9 @@ export const checkExchangeRatePool = createAsyncThunk(
         getDecimalForAsset(tokenAddressB)
       );
 
-      let contractFactory = new web3.eth.Contract(
-        ERC20ABI_ROUTER,
-        ADDRESS_ROUTER
-      );
-
-      const amountInUint = web3.utils.toWei(
-        "1",
-        getDecimalForAsset(tokenAddressA) === PartialConstants.VEUSD_DECIMAL
-          ? "mwei"
-          : "ether"
-      );
-
-      const amountsOut = await contractFactory.methods
-        .getAmountsOut(amountInUint, [tokenAddressA, tokenAddressB])
-        .call();
-      const exchangeRateFormatAB = ethers.utils.formatUnits(
-        amountsOut[1],
-        getDecimalForAsset(tokenAddressB)
-      );
-
-      const amountOutUint = web3.utils.toWei(
-        "1",
-        getDecimalForAsset(tokenAddressB) === PartialConstants.VEUSD_DECIMAL
-          ? "mwei"
-          : "ether"
-      );
-
-      const amountsIn = await contractFactory.methods
-        .getAmountsIn(amountOutUint, [tokenAddressA, tokenAddressB])
-        .call();
-
-      const exchangeRateFormatBA = ethers.utils.formatUnits(
-        amountsIn[0],
-        getDecimalForAsset(tokenAddressA)
-      );
-
       return {
         reserves1,
         reserves2,
-        exchangeRateFormatAB,
-        exchangeRateFormatBA,
       };
     }
   }

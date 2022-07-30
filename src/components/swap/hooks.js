@@ -28,7 +28,6 @@ import {
   checkApproveToken,
   checkAssetExistsPools,
   checkExchangeRatePool,
-  checkTotalSupplyAvailable,
   getAmountsIn,
   getAmountsOut,
   getPairsFee,
@@ -37,7 +36,6 @@ import {
 import { useDebouncedCallback } from "use-debounce";
 import PartialConstants from "../../constants/partial.constants";
 import { formatLocaleString, getDecimalForAsset } from "../../utils/lib";
-import { unwrapResult } from "@reduxjs/toolkit";
 
 const useSwapFacade = () => {
   const dispatch = useDispatch();

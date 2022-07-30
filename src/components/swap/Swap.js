@@ -83,6 +83,42 @@ const Swap = () => {
     }
   };
 
+  const renderPriceImpact = () => {
+    if (Number(priceImpact) < 1) {
+      return (
+        <p className="text-vbLine">
+          {" "}
+          {Number(priceImpact) < 0.1 ? <>&lt;</> : ""}
+          {Number(priceImpact).toFixed(2)}%{" "}
+        </p>
+      );
+    } else if (Number(priceImpact) > 1 && Number(priceImpact) <= 3) {
+      return (
+        <p className="text-white">
+          {" "}
+          {Number(priceImpact) < 0.1 ? <>&lt;</> : ""}
+          {Number(priceImpact).toFixed(2)}%{" "}
+        </p>
+      );
+    } else if (Number(priceImpact) > 3 && Number(priceImpact) <= 5) {
+      return (
+        <p className="text-notiWarning">
+          {" "}
+          {Number(priceImpact) < 0.1 ? <>&lt;</> : ""}
+          {Number(priceImpact).toFixed(2)}%{" "}
+        </p>
+      );
+    } else if (Number(priceImpact) > 5) {
+      return (
+        <p className="text-red-600">
+          {" "}
+          {Number(priceImpact) < 0.1 ? <>&lt;</> : ""}
+          {Number(priceImpact).toFixed(2)}%{" "}
+        </p>
+      );
+    }
+  };
+
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex justify-between w-full">
@@ -314,8 +350,7 @@ const Swap = () => {
         {userInputRef.current !== "" &&
           !emptyAddress &&
           userInputRef.current !== "0" &&
-          userInputRef.current !== "0." &&
-          (
+          userInputRef.current !== "0." && (
             <div className="flex flex-col w-full space-y-2 relative">
               <button
                 onClick={onShowDetailInfo}
@@ -409,11 +444,7 @@ const Swap = () => {
                     {" "}
                     {`-0.01% / -0.1 ${sourceTokenInfo?.assetsChain}`}{" "}
                   </p> */}
-                    <p className="text-vbLine">
-                      {" "}
-                      {priceImpact < 0.1 ? <>&lt;</> : ""}
-                      {priceImpact.toFixed(2)}%{" "}
-                    </p>
+                    {renderPriceImpact()}
                   </div>
                   <div className="flex justify-between flex-row w-full items-center">
                     <div className="flex space-x-2 w-full">

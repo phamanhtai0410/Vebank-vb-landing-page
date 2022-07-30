@@ -119,8 +119,8 @@ const swapAssetSlice = createSlice({
       .addCase(checkExchangeRatePool.fulfilled, (state, action) => {
         state.reserves1 = action.payload.reserves1;
         state.reserves2 = action.payload.reserves2;
-        state.exchangeRateAB = action.payload.exchangeRateFormatAB;
-        state.exchangeRateBA = action.payload.exchangeRateFormatBA;
+        // state.exchangeRateAB = action.payload.exchangeRateFormatAB;
+        // state.exchangeRateBA = action.payload.exchangeRateFormatBA;
       })
       .addCase(checkExchangeRatePool.rejected, (state) => {
         state.reserves1 = "";

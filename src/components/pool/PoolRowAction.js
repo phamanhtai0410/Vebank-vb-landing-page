@@ -35,16 +35,14 @@ const PoolRowAction = ({ assetsPoolAddress = "" }) => {
   return (
     <div className="bg-[#182844] p-6 mt-2 fade-in-box">
       <div className="bg-[#26355A] p-6 rounded flex flex-row justify-between rounded space-x-4">
+        
         <div>
           <label className="font-poppins text-[14px] text-[#678BCA]">
             Your Liquidity
           </label>
           <div className="font-montserrat text-[16px] text-[#3EE8FF]">
-            ${nFormatter(poolInfo.yourLiquidityUSD, 2)}
+            ${nFormatter(poolInfo.yourLiquidityUSD, 7)}
           </div>
-          {/* <div className="font-montserrat text-[16px] text-[#3EE8FF]">
-            {userLiquidity || 0} LP
-          </div> */}
         </div>
 
         <div>

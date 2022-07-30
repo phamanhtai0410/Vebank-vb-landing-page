@@ -498,7 +498,7 @@ const Swap = () => {
               !loadingSwap && !loadingApprove && error === ""
                 ? "btn-veb"
                 : "bg-btn-veb-disabled rounded-lg"
-            }  h-12`}
+            } px-2 h-12`}
           >
             {renderTitleButton()}
           </button>

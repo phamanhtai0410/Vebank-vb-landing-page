@@ -54,6 +54,7 @@ const useSwapFacade = () => {
   const [isSwitch, setIsSwitch] = useState(false);
 
   const defaultErr = "Enter an amount to see more trading details.";
+  const slippageErr = "Slippage no smaller than 0.5% or no greater than 50%";
   const [error, setError] = useState(defaultErr);
   const poolErrRef = useRef("");
 
@@ -243,13 +244,13 @@ const useSwapFacade = () => {
                 if (
                   inputAmountIn === userInputRef.current &&
                   inputAmountIn !== ""
-                  ) {
-                    setInputAmountOut("");
-                    selectLoadingGetAmountOut(false);
-                    const isBalanceInAvailable = checkBalance(
-                      userInputRef.current
-                      );
-                      if (isBalanceInAvailable) {
+                ) {
+                  setInputAmountOut("");
+                  selectLoadingGetAmountOut(false);
+                  const isBalanceInAvailable = checkBalance(
+                    userInputRef.current
+                  );
+                  if (isBalanceInAvailable) {
                     getAmountOutDebounced(userInputRef.current);
                   }
                 }
@@ -550,17 +551,38 @@ const useSwapFacade = () => {
       setInputSlippage("");
     }
 
+    if (value === "00" || value === "0") {
+      setError(slippageErr);
+      setInputSlippage("0");
+      return;
+    }
+    if (
+      value === "0.0" ||
+      value === "0." ||
+      value === "0.1" ||
+      value === "0.2" ||
+      value === "0.3" ||
+      value === "0.4"
+    ) {
+      setError(slippageErr);
+      setInputSlippage("0.");
+      return;
+    }
+
     if (value > 50) {
+      setError(slippageErr);
       return;
     }
 
     let regex = /^((?!0)\d{1,10}|0|\.\d{1,2})($|\.$|\.\d{1,2}$)/gm;
     if (!regex.test(value)) {
+      setError(slippageErr);
       return;
     }
 
     let pattern = /^\d+\.?\d*$/;
     if (pattern.test(value)) {
+      setError("");
       setInputSlippage(value);
     }
   };

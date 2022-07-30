@@ -185,6 +185,7 @@ const useRemoveLiquidFacade = () => {
     console.log("liquidityPool", liquidityPool);
     console.log("amountTokenA", amountTokenA);
     console.log("amountTokenB", amountTokenB);
+    console.log("removeAvailable", removeAvailable);
     if (Number(removeValue) > Number(liquidityPool)) {
       setPrimaryButtonLabel("Amount Too Large");
     }
@@ -212,6 +213,7 @@ const useRemoveLiquidFacade = () => {
     liquidityPool,
     removeValue,
     isRemoving,
+    isLoadingDetail,
     closeModal,
     onEnableClicked,
     removeLiquidity,

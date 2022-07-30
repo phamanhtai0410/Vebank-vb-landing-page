@@ -67,7 +67,7 @@ const Swap = () => {
     loadingApprove,
     onCheckExchangeRatePool,
     onSwitchExchangeRate,
-    onChangeSlippage
+    onChangeSlippage,
   } = useSwapFacade();
 
   const errExistedLiquidity = "Not existed liquidity.";
@@ -372,12 +372,12 @@ const Swap = () => {
                 className="absolute flex flex-row items-center left-4"
                 onClick={onSwitchExchangeRate}
               >
-                {loadingGetAmountOut || loadingGetAmountIn ? (
+                {loadingExchangeRate ? (
                   <div className="loading mr-2" />
                 ) : (
                   <img src={IcSwitch} alt="Switch" className="w-4" />
                 )}
-                {loadingGetAmountOut || loadingGetAmountIn ? (
+                {loadingExchangeRate ? (
                   <p>Fetching price...</p>
                 ) : (
                   <div className="w-full flex flex-row items-center justify-between">
@@ -462,7 +462,9 @@ const Swap = () => {
                         max={50}
                         placeholder="0.5"
                         value={inputSlippage}
-                        onChange={(event) => onChangeSlippage(event.target.value)}
+                        onChange={(event) =>
+                          onChangeSlippage(event.target.value)
+                        }
                       />
                       <p className="ml-1">%</p>
                     </div>

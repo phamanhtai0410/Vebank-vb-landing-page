@@ -68,8 +68,10 @@ const useSwapFacade = () => {
   const exchangeRateBA = useSelector(selectExchangeRateBA);
   const fee = useSelector(selectPairsFee);
   const loadingFee = useSelector(selectLoadingFee);
-  const loadingGetAmountOut = useSelector(selectLoadingGetAmountOut);
-  const loadingGetAmountIn = useSelector(selectLoadingGetAmountIn);
+  const [loadingGetAmountOut, selectLoadingGetAmountOut] = useState(false);
+  const [loadingGetAmountIn, selectLoadingGetAmountIn] = useState(false);
+  // const loadingGetAmountOut = useSelector(selectLoadingGetAmountOut);
+  // const loadingGetAmountIn = useSelector(selectLoadingGetAmountIn);
   const reserveFrom = useSelector(selectReserveFrom);
   const reserveTo = useSelector(selectReserveTo);
 
@@ -215,28 +217,66 @@ const useSwapFacade = () => {
               setError(defaultErr);
             }
             onGetPairsFee();
-            const isCheckExchangeRate = onCheckExchangeRatePool({
-              assetsPoolAddress: assetsPoolAddress,
-            });
-            if (isCheckExchangeRate) {
-              if (
-                inputAmountIn === userInputRef.current &&
-                inputAmountIn !== ""
-              ) {
-                setInputAmountOut("");
-                const isBalanceInAvailable = checkBalance(userInputRef.current);
-                if (isBalanceInAvailable) {
-                  getAmountOutDebounced(userInputRef.current);
-                }
-              }
-              if (
-                inputAmountOut === userInputRef.current &&
-                inputAmountOut !== ""
-              ) {
-                setInputAmountIn("");
-                getAmountsInDebounced(userInputRef.current);
-              }
+            setLoadingExchangeRate(true);
+            if (
+              inputAmountIn === userInputRef.current &&
+              inputAmountIn !== ""
+            ) {
+              selectLoadingGetAmountOut(true);
             }
+            if (
+              inputAmountOut === userInputRef.current &&
+              inputAmountOut !== ""
+            ) {
+              selectLoadingGetAmountIn(true);
+            }
+            dispatch(
+              checkExchangeRatePool({
+                tokenAddressA: sourceTokenAddress,
+                tokenAddressB: desireTokenAddress,
+                assetsPoolAddress: assetsPoolAddress,
+              })
+            )
+              .unwrap()
+              .then((originalPromiseResult) => {
+                setLoadingExchangeRate(false);
+                if (
+                  inputAmountIn === userInputRef.current &&
+                  inputAmountIn !== ""
+                  ) {
+                    setInputAmountOut("");
+                    selectLoadingGetAmountOut(false);
+                    const isBalanceInAvailable = checkBalance(
+                      userInputRef.current
+                      );
+                      if (isBalanceInAvailable) {
+                    getAmountOutDebounced(userInputRef.current);
+                  }
+                }
+                if (
+                  inputAmountOut === userInputRef.current &&
+                  inputAmountOut !== ""
+                ) {
+                  selectLoadingGetAmountIn(false);
+                  setInputAmountIn("");
+                  getAmountsInDebounced(userInputRef.current);
+                }
+              })
+              .catch((rejectedValueOrSerializedError) => {
+                setLoadingExchangeRate(false);
+                if (
+                  inputAmountIn === userInputRef.current &&
+                  inputAmountIn !== ""
+                ) {
+                  selectLoadingGetAmountOut(true);
+                }
+                if (
+                  inputAmountOut === userInputRef.current &&
+                  inputAmountOut !== ""
+                ) {
+                  selectLoadingGetAmountIn(true);
+                }
+              });
           } else {
             setError("Not existed liquidity.");
             userInputRef.current = "";

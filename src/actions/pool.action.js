@@ -179,6 +179,89 @@ export const getPoolAssets = () => async (dispatch, getState) => {
   return dataList;
 };
 
+
+export const listenEventPairs = (pairs) => async (dispatch, getState) => {
+  
+  const state = getState();
+  const { web3, account } = state.web3;
+
+  if (web3 && pairs.length > 0) {
+
+    for await (const item of pairs) {
+
+      const {
+        addressTokenA,
+        addressTokenB,
+        assetsPoolAddress,
+        isSubscribeListener,
+        pairTransferEvent,
+        pairApproveEvent,
+      } = item;
+
+      if (assetsPoolAddress) {
+
+        const contractPair = new web3.eth.Contract(
+          ERC20ABI_PAIR,
+          assetsPoolAddress
+        );
+
+        let _isSubscribed = isSubscribeListener ?? false;
+        let _pairApproveEvent = pairApproveEvent,
+          _pairTransferEvent = pairTransferEvent;
+
+        if (contractPair && !_isSubscribed) {
+    
+          _pairTransferEvent = contractPair.events.Transfer?.();
+          _pairTransferEvent.on("data", async (data) => {
+            // When this pair have a Transfer event from anyone, it will be process in this closure
+            const { from, to, value } = data.returnValues;
+            if (from.equals(account) || to.equals(account)) {
+              // This Transfer event is caused by user. If it's from user,
+              // the user is removing the pool, if it's to, user is adding the pool
+
+              // This call may receive wrong amount of user tokens in pool because when this Transfer event is emitted,
+              // the total supply of the pool may haven't been updated on Blockchain yet. So inside of this function,
+              // we should check for it's current value stored in redux with the fetched one, and add the value
+              // to get the latest value of the total LP.
+              const { amountTokenA, amountTokenB, liquidityPool ,totalSupply } =
+                await getUserTokenAmounts({
+                  contractPair,
+                  account,
+                  addressTokenA,
+                  addressTokenB,
+                });
+
+              const percentYour = liquidityPool/totalSupply;
+              // console.log("percentYour",percentYour);
+      
+              const yourLiquidityUSD = percentYour > 0 ? item.liquidity_usd*percentYour :0;
+              // console.log("yourLiquidityUSD",yourLiquidityUSD);
+
+              // Push this update into userAssetPools.reducer to update data in pool page and liquidity page.
+              dispatch(
+
+                actions.updateUserAssets({
+                  assetsPoolAddress,
+                  balanceAccount: liquidityPool,
+                  liquidity: totalSupply,
+                  yourLiquidityUSD:
+                  amountTokenA,
+                  amountTokenB,
+                })
+              );
+
+            }
+          });
+          _isSubscribed = true;
+        }
+
+      }
+
+    }
+
+  } 
+};
+
 function getPairVolumeAndFees(dataList){
   let fees = 0;
   let volumes = 0;
@@ -263,8 +346,8 @@ export const fetchPairs = (query) => async (dispatch, getState) => {
           total
       });
 
-
-     dispatch(getPoolAssetsByAccount(dataList));
+      dispatch(getPoolAssetsByAccount(dataList));
+      dispatch(listenEventPairs(dataList))
   
     }
     
@@ -315,7 +398,7 @@ export const getPoolAssetsByAccount =
           dataList.push({
             ...item,
             balanceAccount: liquidityPool,
-            liquidity:totalSupply,
+            liquidity: totalSupply,
             yourLiquidityUSD,
             amountTokenA,
             amountTokenB,
@@ -337,6 +420,7 @@ export const getPoolAssetsByAccount =
         type: poolConstants.FETCH_POOL_ASSETS_SUCCESS,
         data: dataList,
       });
+
     }
 
     return dataList;

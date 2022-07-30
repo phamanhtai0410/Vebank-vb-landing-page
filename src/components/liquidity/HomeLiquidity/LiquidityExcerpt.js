@@ -92,14 +92,14 @@ const LiquidityExcerpt = ({ poolAddress, poolSelect, setPoolSelect }) => {
               {/* <img src={poolInfo?.iconOrigin} alt="" className="w-8 h-8" /> */}
               <p className="text-xs text-white">Pool (Base)</p>
               <p className="text-xs font-poppins_medium text-white">
-                {nFormatter(amountTokenA, 5)}
+                {nFormatter(amountTokenA, 5)} {poolInfo?.assetsChainA}
               </p>
             </div>
             <div className="full-row-between-center space-x-4">
               {/* <img src={poolInfo?.iconAssets} alt="" className="w-8 h-8" /> */}
               <p className="text-xs text-white">Pool (Quote)</p>
               <p className="text-xs font-poppins_medium text-white">
-                {nFormatter(amountTokenB, 5)}
+                {nFormatter(amountTokenB, 5)} {poolInfo?.assetsChainB}
               </p>
             </div>
             <div className="full-row-between-center">

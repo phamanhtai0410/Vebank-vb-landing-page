@@ -16,7 +16,7 @@ const BtnSupply = ({ dataToken, amount, pending }) => {
             setIsPending(true);
 
             if (dataToken.assetsChain === "VET") {
-                await dispatch(actions.supplyDepositETHMarket(dataToken, amount)).then(() => {
+                await dispatch(actions.supplyDepositVETMarket(dataToken, amount)).then(() => {
                     setIsPending(false);
                 }).catch((e) => {
                     setIsPending(false);

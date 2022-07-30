@@ -217,8 +217,7 @@ const ModalSupply = () => {
                             </div>
                             <div>
                                 <span className='font-poppins font-thin text-sm'>
-                                    <CurrencyAssetsUSD currencyBalance={amount} assetsAddress={dataToken.assetsAddress} /> 
-                                    <span>$</span>
+                                    <CurrencyAssetsUSD currencyBalance={amount} assetsAddress={dataToken.assetsAddress} />
                                 </span>
                             </div>
                         </div>

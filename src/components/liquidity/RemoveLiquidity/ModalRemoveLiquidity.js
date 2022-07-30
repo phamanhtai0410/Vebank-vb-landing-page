@@ -29,6 +29,7 @@ const ModalRemoveLiquidity = () => {
     liquidityPool,
     removeValue,
     isRemoving,
+    isLoadingDetail,
     onEnableClicked,
     handlerStepToStep,
     onChangeRemoveValue,
@@ -119,9 +120,9 @@ const ModalRemoveLiquidity = () => {
             <button
               onClick={onEnableClicked}
               className={`btn-modal-veb w-full h-16.5 text-lg font-poppins_medium ${
-                !isEnabled ? "bg-btn-veb" : ""
+                (!isEnabled && !isLoadingDetail) ? "bg-btn-veb" : ""
               }`}
-              disabled={isEnabled}
+              disabled={isEnabled || isLoadingDetail}
             >
               {enableBtnLabel}
             </button>

@@ -92,7 +92,7 @@ export const loadDetailRemoveLiquidity = createAsyncThunk(
 
 export const approvePoolLiquidity = createAsyncThunk(
   poolConstants.APPROVE_POOL_ADDRESS,
-  async ({ poolAddress, removeAmount = 1000000000 }, { getState, dispatch }) => {
+  async ({ poolAddress, removeAmount = 15 }, { getState, dispatch }) => {
     if (!poolAddress) return;
 
     const state = getState();
@@ -167,6 +167,38 @@ export const removeLiquidity = createAsyncThunk(
     console.log("amountTokenA",amountTokenA);
     console.log("amountTokenB",amountTokenB);
 
+    let removeAmount = getAmountInWeiFormatted(
+      web3,
+      liquidityPool,
+      PartialConstants.DEFAULT_ASSET_DECIMAL
+    );
+
+    amount = getAmountInWeiFormatted(
+      web3,
+      amount,
+      PartialConstants.DEFAULT_ASSET_DECIMAL
+    );
+
+    console.log("amount ----------------",amount);
+    console.log("removeAmount ----------------",removeAmount);
+    if(Number(amount) < Number(removeAmount)){
+      // Calculate this way to prevent rounding from float type of JS
+      // removeAmount = BigNumber.from(removeAmount)
+      // .mul(BigNumber.from(amount))
+      // .div(BigNumber.from(100))
+      // .toString();
+      // let percent = BigNumber.from(amount)
+      // .div(BigNumber.from(removeAmount))
+      // .mul(100)
+      // .toString();
+      let percent = amount/removeAmount;
+      amountTokenA = amountTokenA * percent;
+      amountTokenB = amountTokenB * percent;
+      console.log("amount", amount)
+      console.log("removeAmount1", removeAmount)
+      removeAmount = amount;
+      console.log("removeAmount2", removeAmount)
+    }
 
     const amountAMin = getAmountInWeiFormatted(
       web3,
@@ -183,23 +215,7 @@ export const removeLiquidity = createAsyncThunk(
     console.log("amountBMin",amountBMin);
 
     const deadline = Math.round(new Date().getTime() / 1000) + 3600;
-    let removeAmount = getAmountInWeiFormatted(
-      web3,
-      liquidityPool,
-      PartialConstants.DEFAULT_ASSET_DECIMAL
-    );
-
-    // console.log("amount ----------------",amount);
-    // console.log("removeAmount ----------------",removeAmount);
-
-    if(amount < removeAmount){
-      // Calculate this way to prevent rounding from float type of JS
-      removeAmount = BigNumber.from(removeAmount)
-      .mul(BigNumber.from(amount))
-      .div(BigNumber.from(100))
-      .toString();
-    }
-
+    
     let transaction;
     if (isPairContainVET) {
       const assetDesired =
@@ -223,7 +239,7 @@ export const removeLiquidity = createAsyncThunk(
       //   ["account", account],
       //   ["deadline", deadline],
       // ]);
-
+      
       transaction = await methodRemoveLiquidity
         .transact(
           assetDesired.address,

@@ -273,7 +273,6 @@ const ModalRepay = () => {
                             <div>
                                 <span className='font-poppins font-thin text-sm'>
                                     <CurrencyAssetsUSD currencyBalance={amount} assetsAddress={dataToken.assetsAddress} /> 
-                                    <span>$</span>
                                 </span>
                             </div>
                         </div>
@@ -297,7 +296,6 @@ const ModalRepay = () => {
                             <div>
                                 <span className='font-poppins font-thin text-sm'>
                                     <CurrencyAssetsUSD currencyBalance={remain} assetsAddress={dataToken.assetsAddress} />
-                                    <span>$</span>
                                 </span>
                             </div>
                         </div>

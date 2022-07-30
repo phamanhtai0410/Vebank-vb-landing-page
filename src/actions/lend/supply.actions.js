@@ -215,7 +215,7 @@ export const supplyMarket = (dataToken, amount) => async (dispatch, getState) =>
  * depositETH(PoolAddress,UserAddress, referralCode) await iWETHGateway.depositETH("0x...","0x.....", 0, {value: "100000000000000000"})
  * 
  */
-export const supplyDepositETHMarket = (addressAsset, amount) => async (dispatch, getState) => {
+export const supplyDepositVETMarket = (addressAsset, amount) => async (dispatch, getState) => {
     
     const state = getState();
 
@@ -234,8 +234,8 @@ export const supplyDepositETHMarket = (addressAsset, amount) => async (dispatch,
             type: marketplaceConstants.MODAL_SUPPLY_MARKET_REQUEST
         });
 
-        const depositETH_ABI = ERC20ABI_WETH_GETAWAY.find(({ name, type }) => name === "depositETH" && type === "function");
-        const methodDepositETH = connex.thor.account(ADDRESS_GATEWAY).method(depositETH_ABI);
+        const depositVET_ABI = ERC20ABI_WETH_GETAWAY.find(({ name, type }) => name === "depositETH" && type === "function");
+        const methodDepositETH = connex.thor.account(ADDRESS_GATEWAY).method(depositVET_ABI);
 
         methodDepositETH.value(web3.utils.toWei(amount.toString()));
 
@@ -262,8 +262,9 @@ export const supplyDepositETHMarket = (addressAsset, amount) => async (dispatch,
             }).catch((e) => {
 
                 console.log("error----", e);
+                
                 dispatch({
-                    type: marketplaceConstants.MODAL_BORROW_MARKET_ERROR
+                    type: marketplaceConstants.MODAL_SUPPLY_MARKET_ERROR
                 });
 
                 dispatch(actions.alertActions.update({

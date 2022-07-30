@@ -381,19 +381,15 @@ export const getPoolAssetsByAccount =
             item.assetsPoolAddress
           );
 
-          const { amountTokenA, amountTokenB, liquidityPool ,totalSupply} =  await getUserTokenAmounts({
+          const { amountTokenA, amountTokenB, liquidityPool ,totalSupply } =  await getUserTokenAmounts({
               contractPair,
               account,
               addressTokenA,
               addressTokenB,
           });
 
-          // console.log("liquidityPool",liquidityPool);
           const percentYour = liquidityPool/totalSupply;
-          // console.log("percentYour",percentYour);
-
-          let yourLiquidityUSD = percentYour > 0 ? item.liquidity_usd*percentYour :0;
-          // console.log("yourLiquidityUSD",yourLiquidityUSD);
+          let yourLiquidityUSD = percentYour > 0 ? item.liquidity_usd * percentYour : 0;
 
           dataList.push({
             ...item,

@@ -316,7 +316,6 @@ const ModalBorrow = () => {
                             <div>
                                 <span className='font-poppins font-thin text-sm'>
                                     <CurrencyAssetsUSD currencyBalance={amount} assetsAddress={dataToken.assetsAddress} /> 
-                                    <span>$</span>
                                 </span>
                             </div>
                         </div>

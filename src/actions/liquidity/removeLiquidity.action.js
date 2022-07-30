@@ -68,7 +68,7 @@ export const loadDetailRemoveLiquidity = createAsyncThunk(
           approvePool,
           poolInfo?.assetsDecimals
         );
-        
+
         approvePool = Number(approvePool);
 
         if(approvePool < Number(liquidityPool) ){
@@ -183,20 +183,22 @@ export const removeLiquidity = createAsyncThunk(
     console.log("amountBMin",amountBMin);
 
     const deadline = Math.round(new Date().getTime() / 1000) + 3600;
-
     let removeAmount = getAmountInWeiFormatted(
       web3,
       liquidityPool,
       PartialConstants.DEFAULT_ASSET_DECIMAL
     );
 
-    // Calculate this way to prevent rounding from float type of JS
-    // removeAmount = BigNumber.from(removeAmount)
-    //   .mul(BigNumber.from(amount))
-    //   .div(BigNumber.from(100))
-    //   .toString();
+    // console.log("amount ----------------",amount);
+    // console.log("removeAmount ----------------",removeAmount);
 
-    console.log("removeAmount", removeAmount)
+    if(amount < removeAmount){
+      // Calculate this way to prevent rounding from float type of JS
+      removeAmount = BigNumber.from(removeAmount)
+      .mul(BigNumber.from(amount))
+      .div(BigNumber.from(100))
+      .toString();
+    }
 
     let transaction;
     if (isPairContainVET) {

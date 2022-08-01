@@ -166,23 +166,23 @@ const FormAddLiquidity = () => {
               <div className="fade-in-box flex flex-col px-3 py-4 border border-vbDisableText rounded-lg mt-6 space-y-3">
                 <div className="flex flex-row item-center justify-between py-1">
                   <span className="text-xs text-white">Base</span>
-                  <span className="font-poppins_medium text-sm text-white">{firstTokenInfo?.assetsChain}</span>
+                  <span className="font-poppins_medium text-xs text-white">{firstTokenInfo?.assetsChain}</span>
                 </div>
                 <div className="flex flex-row item-center justify-between py-1">
                   <span className="text-xs text-white">Max Amount</span>
-                  <span className="font-poppins_medium text-sm text-white">{showMaxAmount()} {secondTokenInfo?.assetsChain}</span>
+                  <span className="font-poppins_medium text-xs text-white">{showMaxAmount()} {secondTokenInfo?.assetsChain}</span>
                 </div>
                 <div className="flex flex-row item-center justify-between py-1">
                   <span className="text-xs text-white">Pool liquidity ({firstTokenInfo?.assetsChain})</span>
-                  <span className="font-poppins_medium text-sm text-white">{`${formatBalanceString(reserveA)} ${firstTokenInfo?.assetsChain}`}</span>
+                  <span className="font-poppins_medium text-xs text-white">{`${formatBalanceString(reserveA)} ${firstTokenInfo?.assetsChain}`}</span>
                 </div>
                 <div className="flex flex-row item-center justify-between py-1">
                   <span className="text-xs text-white">Pool liquidity ({secondTokenInfo?.assetsChain})</span>
-                  <span className="font-poppins_medium text-sm text-white">{`${reserveB} ${secondTokenInfo?.assetsChain}`}</span>
+                  <span className="font-poppins_medium text-xs text-white">{`${reserveB} ${secondTokenInfo?.assetsChain}`}</span>
                 </div>
                 <div className="flex flex-row item-center justify-between py-1">
                   <span className="text-xs text-white">Share of pool</span>
-                  <span className="font-poppins_medium text-sm text-white">{shareAPool < 0.01 ? "<0,01" : nFormatter(shareAPool, 8)}%</span>
+                  <span className="font-poppins_medium text-xs text-white">{shareAPool < 0.01 ? "<0,01" : nFormatter(shareAPool, 8)}%</span>
                 </div>
                 <div className="flex flex-row item-center justify-between py-1">
                   <span className="text-xs text-white">Slippage Tolerance</span>
@@ -190,10 +190,10 @@ const FormAddLiquidity = () => {
                     <input
                       value={slippage}
                       onChange={(e) => onChangeSlippage(e.target.value)}
-                      className="font-poppins_medium text-sm text-white text-right bg-transparent focus:outline-none w-[50px]"
+                      className="font-poppins_medium text-xs text-white text-right bg-transparent focus:outline-none w-[50px]"
                       type="text"
                     />
-                    <span className="font-poppins_medium text-sm text-white ml-[2px]">%</span>
+                    <span className="font-poppins_medium text-xs text-white ml-[2px]">%</span>
                   </div>
                 </div>
               </div>}

@@ -411,7 +411,10 @@ export const getPoolAssetsByAccount =
 
         }
       }
-
+      dispatch({
+        type: poolConstants.FETCH_POOL_ASSETS_SUCCESS,
+        data: dataList,
+      });
     }
 
     return dataList;

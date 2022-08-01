@@ -1,6 +1,35 @@
 apiVersion: skaffold/v2beta28 
 kind: Config	
 profiles:
+  - name: profile-goldnguyen
+    build:
+      tagPolicy:
+        gitCommit: {}
+      artifacts:
+      - image: [CONTAINER_REPO]
+        context: .
+        docker:
+          dockerfile: Dockerfile-dev
+    deploy:
+        # Using Helm as the deployment strategy
+        statusCheckDeadlineSeconds: 300
+        helm:
+          # Pass the parameters according to  
+          releases:
+            - name: [IMAGE_NAME]-goldnguyen
+              chartPath: ./helm-template
+              namespace: vb-website-dev
+              # Location of the chart - here, we use a local chart
+              wait: true
+              # Path to the values file
+              valuesFiles:
+              - ./goldnguyen.yaml
+              artifactOverrides:
+                image.repository: [CONTAINER_REPO]
+             
+          flags:
+            upgrade:
+              - --install
   - name: profile-dev
     build:
       tagPolicy:

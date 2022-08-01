@@ -58,7 +58,7 @@ const MenuLink = ({ menuToggleHandler }) => {
         >
           <NavLink
             to={item.path}
-            className={`px-6 font-bold text-gray-300 hover:brightness-150 ${
+            className={`px-6 font-bold text-base text-gray-300 hover:brightness-150 ${
               item.path === location.pathname ? "text-linear" : ""
             }`}
           >
@@ -66,11 +66,11 @@ const MenuLink = ({ menuToggleHandler }) => {
           </NavLink>
           {item.name === "Trade" && isMenuHover &&  (
             <div
-              className="navbar-sub-menu absolute w-full col justify-center items-start top-19 md:w-[160px] p-4 md:p-0 rounded-lg z-50"
+              className="navbar-sub-menu absolute w-full col text-base justify-center items-start top-19 md:w-[160px] p-4 md:p-0 rounded-lg z-50"
             >
               <NavLink
                 to="/swap"
-                className={`block px-6 py-2 font-bold text-gray-300 hover:brightness-150 ${
+                className={`block px-6 py-2 font-bold text-base text-gray-300 hover:brightness-150 ${
                   isMenuHover ? "text-linear" : ""
                 }`}
               >
@@ -78,7 +78,7 @@ const MenuLink = ({ menuToggleHandler }) => {
               </NavLink>
               <NavLink
                 to="/liquidity"
-                className={`block px-6 py-2 font-bold text-gray-300 hover:brightness-150 ${
+                className={`block px-6 py-2 font-bold text-base text-gray-300 hover:brightness-150 ${
                   isMenuHover ? "text-linear" : ""
                 }`}
               >

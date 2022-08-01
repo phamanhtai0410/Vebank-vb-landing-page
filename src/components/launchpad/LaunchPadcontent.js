@@ -18,7 +18,7 @@ const LaunchPadContent = () => {
     }, [location]);
 
     return (
-        <div className="raise-content pt-20">
+        <div className="lg:container  pt-20">
             <div className="flex justify-between">
                 <div className="launchpad-filter-btn rounded-full">
 

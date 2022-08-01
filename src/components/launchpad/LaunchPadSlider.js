@@ -4,7 +4,7 @@ import LaunchPadraise from "../../assets/images/launchpad/raise-icon.svg";
 
 const LaunchPadSlider = () => {
     const [value, onChange] = useState(1);
-    const [expiryTime, setExpiryTime] = useState("15 aug 2022 15:30:25");
+    const [expiryTime, setExpiryTime] = useState("1 oct 2022 15:30:25");
     const [countdownTime, setCountdownTime] = useState(
         {
             countdownDays: '',

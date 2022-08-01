@@ -9,8 +9,6 @@ import {
   selectExchangeRateBA,
   selectPairsFee,
   selectLoadingFee,
-  selectLoadingGetAmountOut,
-  selectLoadingGetAmountIn,
   selectAccountApprove,
   selectEmptyAddress,
   selectPoolAddress,

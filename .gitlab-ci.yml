@@ -29,11 +29,11 @@ stages:
 .kubectl_config: &kubectl_config
   - |
       if [ "$CI_COMMIT_REF_NAME" == "test" ]; then
-        aws eks --region $AWS_REGION update-kubec onfig --name rinz-staging-cluster
+        aws eks --region $AWS_REGION update-kubeconfig --name rinz-staging-cluster
       fi
   - |
       if [ "$CI_COMMIT_REF_NAME" == "master" ]; then
-        aws eks --region $AWS_REGION update-kubec onfig --name vb-production-cluster
+        aws eks --region $AWS_REGION update-kubeconfig --name vb-production-cluster
       fi
   - |
       if [ "$CI_COMMIT_REF_NAME" == "stag" ]; then

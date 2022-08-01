@@ -12,11 +12,6 @@ header:not(.navigation) {
 }
 
 //raise box
-.raise-box,
-.raise-content {
-    width: 80%;
-}
-
 .count-down {
     display: flex;
     flex-direction: column;
@@ -225,4 +220,7 @@ input[type="range"] {
     order: 1;
     align-self: stretch;
     color: #ffffff;
+}
+.scrollmargin {
+    scroll-margin: 100px;
 }

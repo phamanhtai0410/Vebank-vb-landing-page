@@ -60,7 +60,7 @@ const AssetsPool = () => {
               onClick={(e) => onClickShowRowAssets(item.assetsPoolAddress)}
             >
               <div className="p-4 col-span-3 flex flex-row justify-center items-center space-x-4 w-full text-right cursor-pointer">
-                {/* <div class="flex -space-x-2 overflow-hidden">
+                {/* <div className="flex -space-x-2 overflow-hidden">
                                     <img className="inline-block h-8 w-8 rounded-full " src={item.iconOrigin} />
                                     <img className="inline-block h-8 w-8 rounded-full " src={item.iconAssets} />
                                 </div> */}

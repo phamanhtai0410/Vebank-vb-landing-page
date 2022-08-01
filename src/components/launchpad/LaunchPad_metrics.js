@@ -1,0 +1,18 @@
+import React from 'react';
+import LaunchPad_metrics from "../../assets/images/launchpad/launchpad_metrics.jpg";
+import LaunchPad_metrics1 from "../../assets/images/launchpad/launchpad_metrics1.jpg";
+
+const LaunchPadmetrics = () => {
+
+    return (
+        <div className="w-full pb-40">
+            <div><p className="launchpad-content-title pb-6">$VB Tokenomics</p></div>
+            <img className="pb-10" src={LaunchPad_metrics} />
+            <div><p className="launchpad-content-title pb-10">Our team leaders</p></div>
+            <img className="pb-10" src={LaunchPad_metrics1} />
+
+        </div>
+    );
+};
+
+export default LaunchPadmetrics;

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
-import launchpad_team1 from "../../assets/images/launchpad/launchpad_team1.jpg";
-import launchpad_team2 from "../../assets/images/launchpad/launchpad_team2.jpg";
+import launchpad_team1 from "../../assets/images/launchpad/launchpad_team1.svg";
+import launchpad_team2 from "../../assets/images/launchpad/launchpad_team2.svg";
 const LaunchPadteampartner = () => {
 
 

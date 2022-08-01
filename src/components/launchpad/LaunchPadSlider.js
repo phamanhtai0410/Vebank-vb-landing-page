@@ -4,12 +4,45 @@ import LaunchPadraise from "../../assets/images/launchpad/raise-icon.svg";
 
 const LaunchPadSlider = () => {
     const [value, onChange] = useState(1);
+    const [expiryTime, setExpiryTime] = useState("15 aug 2022 15:30:25");
+    const [countdownTime, setCountdownTime] = useState(
+        {
+            countdownDays: '',
+            countdownHours: '',
+            countdownlMinutes: '',
+            countdownSeconds: ''
+        }
+    );
+    const countdownTimer = () => {
+
+        const timeInterval = setInterval(() => {
+            const countdownDateTime = new Date(expiryTime).getTime();
+            const currentTime = new Date().getTime();
+            const remainingDayTime = countdownDateTime - currentTime;
+            const totalDays = Math.floor(remainingDayTime / (1000 * 60 * 60 * 24));
+            const totalHours = Math.floor((remainingDayTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const totalMinutes = Math.floor((remainingDayTime % (1000 * 60 * 60)) / (1000 * 60));
+            const totalSeconds = Math.floor((remainingDayTime % (1000 * 60)) / 1000);
+
+            const runningCountdownTime = {
+                countdownDays: totalDays,
+                countdownHours: totalHours,
+                countdownMinutes: totalMinutes,
+                countdownSeconds: totalSeconds
+            }
+
+            setCountdownTime(runningCountdownTime);
+
+            if (remainingDayTime < 0) {
+                clearInterval(timeInterval);
+                setExpiryTime(false);
+            }
+
+        }, 1000);
+    }
 
     useEffect(() => {
-        const ele = document.querySelector('.buble');
-        if (ele) {
-            ele.style.left = `${Number(value / 4)}px`;
-        }
+        countdownTimer();
     })
 
     const n = 4;
@@ -33,15 +66,18 @@ const LaunchPadSlider = () => {
                         <div className="text-center absolute bottom-0 right-0">
                             <p>PROJECT STARTS IN</p>
                             <div className="grid-cols-4 gap-4 flex flex-row justify-center">
-                                {
-                                    [...Array(n)].map((e, i) =>
-                                            <div className="count-down" key={i}>
-                                                <p className="text-[24px] leading-5">4<p className="text-[12px]">days</p></p>
-                                                
-                                            </div>
-                                    )
-
-                                }
+                                <div className="count-down">
+                                    <p className="text-[24px] leading-5">{countdownTime.countdownDays}<p className="text-[12px]">DAYS</p></p>
+                                </div>
+                                <div className="count-down">
+                                    <p className="text-[24px] leading-5">{countdownTime.countdownHours}<p className="text-[12px]">HOURS</p></p>
+                                </div>
+                                <div className="count-down">
+                                    <p className="text-[24px] leading-5">{countdownTime.countdownMinutes}<p className="text-[12px]">MINUTES</p></p>
+                                </div>
+                                <div className="count-down">
+                                    <p className="text-[24px] leading-5">{countdownTime.countdownSeconds}<p className="text-[12px]">SECONDS</p></p>
+                                </div>
                             </div>
                         </div>
                     </div>

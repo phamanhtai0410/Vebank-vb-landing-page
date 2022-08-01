@@ -25,14 +25,14 @@ const userAssetPools = createSlice({
       }
 
       if (
-        (state.data[assetsPoolAddress]?.liquidityPool ?? 0) == 0 &&
-        liquidityPool > 0
+        (state.data[assetsPoolAddress]?.liquidityPool ?? 0) === 0 &&
+        liquidityPool > 0 && !state.userAddedPoolsAddresses.includes(assetsPoolAddress)
       ) {
         // User add pool first time.
         state.userAddedPoolsAddresses.push(assetsPoolAddress);
       } else if (
         state.data[assetsPoolAddress]?.liquidityPool > 0 &&
-        liquidityPool == 0
+        liquidityPool === 0
       ) {
         // User remove all asset from this pool
         const indexOfAsset =

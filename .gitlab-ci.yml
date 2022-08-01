@@ -202,6 +202,31 @@ deploy_dev:
     refs:
       - dev
 
+deploy_goldnguyen:
+  stage: deploy
+  image:  alpine/helm:3.2.1
+  tags:
+  - rinz-stag
+  script:
+    - *predeploy
+    - *kubectl_config
+    - git clone https://read-token:$GITLAB_TOKEN@gitlab.rinznetwork.com/rinz-io-devops/helm-value/$IMAGE_NAME.git
+    - mv $IMAGE_NAME/goldnguyen.yaml .
+    - |
+      if [ "$CI_COMMIT_REF_NAME" == "dev" ]; then
+        sed -i -e "s#\[FULLREPO_ASIA\]#$FULLREPO_ASIA_DEV#g" goldnguyen.yaml
+        sed -i -e "s#\[NAMESPACE\]#$NAMESPACE_DEV#g" goldnguyen.yaml
+      fi
+    - curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl && chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl
+    - curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v1.38.0/skaffold-linux-amd64 && chmod +x skaffold &&  mv skaffold /usr/local/bin
+    - aws sts get-caller-identity
+    - cat skaffold.yaml
+    - cat build.json
+    - /usr/local/bin/skaffold deploy -p profile-goldnguyen   -a build.json
+  only:
+    refs:
+      - dev
+
 
 deploy_test:
   stage: deploy

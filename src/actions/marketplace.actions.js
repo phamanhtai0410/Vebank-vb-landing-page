@@ -51,11 +51,11 @@ export const getMarketAssets = () => async (dispatch, getState) => {
         for await (const item of listAsset) {
 
             const getReserveData = await contractAAVE.methods.getReserveData(item.assetsAddress).call();
-            console.log("getReserveData",getReserveData);
+           // console.log("getReserveData",getReserveData);
 
             // Get data
             const rewardsByAsset = await contractIcentives.methods.getRewardsByAsset(item.assetsAddress).call();
-            console.log("rewardsByAsset",rewardsByAsset);
+           // console.log("rewardsByAsset",rewardsByAsset);
 
             // const vEmission = contractIcentives.methods.getAssetData(item.assetsAddress);
             // console.log("aEmission",aEmission);

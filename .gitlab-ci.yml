@@ -214,8 +214,8 @@ deploy_goldnguyen:
     - mv $IMAGE_NAME/goldnguyen.yaml .
     - |
       if [ "$CI_COMMIT_REF_NAME" == "dev" ]; then
-        sed -i -e "s#\[FULLREPO_ASIA\]#$FULLREPO_ASIA_DEV#g" dev.yaml
-        sed -i -e "s#\[NAMESPACE\]#$NAMESPACE_DEV#g" dev.yaml
+        sed -i -e "s#\[FULLREPO_ASIA\]#$FULLREPO_ASIA_DEV#g" goldnguyen.yaml
+        sed -i -e "s#\[NAMESPACE\]#$NAMESPACE_DEV#g" goldnguyen.yaml
       fi
     - curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl && chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl
     - curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v1.38.0/skaffold-linux-amd64 && chmod +x skaffold &&  mv skaffold /usr/local/bin

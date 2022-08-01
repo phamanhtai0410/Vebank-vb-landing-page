@@ -61,6 +61,9 @@ header:not(.navigation) {
 .launchpad-content-1 {
     width: 30%;
 }
+.launchpad-content-1 a{
+    cursor: pointer;
+}
 
 .raise-bg {
     background-color: #001A31;

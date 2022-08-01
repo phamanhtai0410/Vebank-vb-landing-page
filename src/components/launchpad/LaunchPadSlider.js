@@ -1,51 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import LaunchPadvebank from "../../assets/images/launchpad/vebank.svg";
 import LaunchPadraise from "../../assets/images/launchpad/raise-icon.svg";
-
+import CountdownIDO from"../launchpad/countdown"
 const LaunchPadSlider = () => {
-    const [value, onChange] = useState(1);
-    const [expiryTime, setExpiryTime] = useState("1 oct 2022 15:30:25");
-    const [countdownTime, setCountdownTime] = useState(
-        {
-            countdownDays: '',
-            countdownHours: '',
-            countdownlMinutes: '',
-            countdownSeconds: ''
-        }
-    );
-    const countdownTimer = () => {
 
-        const timeInterval = setInterval(() => {
-            const countdownDateTime = new Date(expiryTime).getTime();
-            const currentTime = new Date().getTime();
-            const remainingDayTime = countdownDateTime - currentTime;
-            const totalDays = Math.floor(remainingDayTime / (1000 * 60 * 60 * 24));
-            const totalHours = Math.floor((remainingDayTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const totalMinutes = Math.floor((remainingDayTime % (1000 * 60 * 60)) / (1000 * 60));
-            const totalSeconds = Math.floor((remainingDayTime % (1000 * 60)) / 1000);
-
-            const runningCountdownTime = {
-                countdownDays: totalDays,
-                countdownHours: totalHours,
-                countdownMinutes: totalMinutes,
-                countdownSeconds: totalSeconds
-            }
-
-            setCountdownTime(runningCountdownTime);
-
-            if (remainingDayTime < 0) {
-                clearInterval(timeInterval);
-                setExpiryTime(false);
-            }
-
-        }, 1000);
+    const data = {
+        start_time:1659286800,
+        end_time:1664557200,
     }
-
-    useEffect(() => {
-        countdownTimer();
-    })
-
-    const n = 4;
+      const checkStartTime = () => {
+        if (!data) {
+          return false;
+        }
+    
+        if (!data.start_time) {
+          return false;
+        }
+        const currentDate = new Date();
+        const startDate = new Date(data.start_time * 1000);
+    
+        return currentDate.getTime() > startDate.getTime();
+      };
+    
+      const checkEndTime = () => {
+        if (!data) {
+          return false;
+        }
+    
+        if (!data.end_time) {
+          return false;
+        }
+    
+        const currentDate = new Date();
+        const endDate = new Date(data.end_time * 1000);
+    
+        return currentDate.getTime() < endDate.getTime();
+      };
+    
+      const showCountDown = () => {
+        if (!data) {
+          return;
+        }
+    
+        if (!data.start_time || !data.end_time) {
+          return;
+        }
+    
+        if (checkStartTime() === false) {
+          return <CountdownIDO eventTime={data.start_time} interval={1000} />;
+        }
+    
+        if (checkEndTime() === true) {
+          return <CountdownIDO eventTime={data.end_time} interval={1000} />;
+        }
+    
+        return <CountdownIDO eventTime={null} interval={0} />;
+      };
     return (
         <div className="flex relative mx-auto lg:container ">
             <div className="raise-box-1 relative rounded-xl bg-[url('../../assets/images/launchpad/market3.svg')] bg-no-repeat bg-center bg-cover">
@@ -66,17 +76,8 @@ const LaunchPadSlider = () => {
                         <div className="text-center absolute bottom-0 right-0">
                             <p>PROJECT STARTS IN</p>
                             <div className="grid-cols-4 gap-4 flex flex-row justify-center">
-                                <div className="count-down">
-                                    <p className="text-[24px] leading-5">{countdownTime.countdownDays}<p className="text-[12px]">DAYS</p></p>
-                                </div>
-                                <div className="count-down">
-                                    <p className="text-[24px] leading-5">{countdownTime.countdownHours}<p className="text-[12px]">HOURS</p></p>
-                                </div>
-                                <div className="count-down">
-                                    <p className="text-[24px] leading-5">{countdownTime.countdownMinutes}<p className="text-[12px]">MINUTES</p></p>
-                                </div>
-                                <div className="count-down">
-                                    <p className="text-[24px] leading-5">{countdownTime.countdownSeconds}<p className="text-[12px]">SECONDS</p></p>
+                                <div className="flex flex-col items-center space-y-6 w-full">
+                                    {showCountDown()}
                                 </div>
                             </div>
                         </div>

@@ -104,9 +104,13 @@ const LiquidityExcerpt = ({ poolAddress, poolSelect, setPoolSelect }) => {
             </div>
             <div className="full-row-between-center">
               <p className="text-xs text-white">Your share</p>
-              <p className="text-xs font-poppins_medium text-white">{`${
-                shareAPool < 0.01 ? "<0.01" : nFormatter(shareAPool, 5)
-              }%`}</p>
+              {poolInfo?.liquidity ? (
+                <p className="text-xs font-poppins_medium text-white">{`${
+                  shareAPool < 0.01 ? "<0.01" : nFormatter(shareAPool, 5)
+                }%`}</p>
+              ) : (
+                <div className="loading" />
+              )}
             </div>
           </div>
           <div className="flex flex-row items-center w-full mt-[20px] space-x-4 pb-2">

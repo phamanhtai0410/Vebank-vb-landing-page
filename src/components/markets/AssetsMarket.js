@@ -67,9 +67,9 @@ const AssetsMarket = () => {
                     timeout={500}
                     classNames="item_asset"
                 >
-                    <div>
+                    <div className='bg-[#182233] rounded-lg mt-[10px]'>
 
-                        <div className="grid grid-cols-6 gap-6 mt-6 bg-[#182844] justify-items-center content-around font-poppins text-lg rounded cursor-pointer" onClick={e => onClickShowRowAssets(item.assetsAddress)}>
+                        <div className="grid grid-cols-6 gap-6 justify-items-center content-around font-poppins text-lg cursor-pointer" onClick={e => onClickShowRowAssets(item.assetsAddress)}>
 
                             <div className="p-2 flex flex-row justify-center items-center space-x-4 w-full text-right cursor-pointer">
                                 <img className="w-6 h-6" src={item.icon} />
@@ -123,9 +123,9 @@ const AssetsMarket = () => {
 
     return (
 
-        <div className="w-full min-h-max rounded-lg bg-[#0b1329] mt-16 p-10 fade-in-box">
+        <div className="w-full min-h-max rounded-lg bg-tbl-vb mt-16 p-10 fade-in-box">
 
-            <h4 className="font-montserrat text-[30px] leading-9">Vechain assets</h4>
+            <h4 className="font-montserrat text-[20px] leading-9 text-[#3FDCA5]">Vechain assets</h4>
 
             <div className="tbl-veb mt-8">
 

@@ -35,12 +35,12 @@ const Wallet = () => {
 
     async function fetchAccountInit() {
 
+        await dispatch(actions.instantiateVBContracts());
+
         setTimeout(async () => {
             await dispatch(actions.instantiateVetContracts());
-            await dispatch(actions.instantiateVBContracts());
             await dispatch(actions.instantiateVEUSDContracts());
-            // await dispatch(actions.getOverview());
-        }, 2000);
+        }, 1000);
 
     }
 

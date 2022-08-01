@@ -7,9 +7,9 @@ module.exports = {
       padding: {
         xs: "1rem",
         sm: "1rem",
-        lg: "1rem",
-        xl: "2rem",
-        "2xl": "2rem",
+        lg: "2rem",
+        xl: "4rem",
+        "2xl": "4rem",
       },
     },
     screens: {

@@ -190,7 +190,6 @@ export const getAccountAssets = (dataAssets) => async (dispatch, getState) => {
 
         if (contractAAVE && account) {
 
-
             for await (const item of dataAssets) {
 
                 const accountReserve = await contractAAVE.methods.getUserReserveData(item.assetsAddress, account).call();

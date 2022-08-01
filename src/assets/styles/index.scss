@@ -265,7 +265,6 @@ input[type=number] {
   -o-transition: all 0.3s ease-in;
   -ms-transition: all 0.3s ease-in;
   transition: all 0.3s ease-in;
-
   background: linear-gradient(91.96deg, #0fe3e3 0%, #02a4ff 100%);
 }
 
@@ -432,6 +431,15 @@ footer {
 .bg-overview {
   background: linear-gradient(116.38deg, #0db6ff 16.58%, #2183e0 83.42%);
 }
+
+.bg-layout-vb{
+  background: linear-gradient(109.17deg, #182D52 0%, #172130 100%);
+}
+
+.bg-tbl-vb{
+  background: #0D1522;
+}
+
 
 input:checked ~ .dot {
   transform: translateX(100%);

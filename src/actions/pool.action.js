@@ -102,6 +102,7 @@ export const getPoolAssets = () => async (dispatch, getState) => {
               // the total supply of the pool may haven't been updated on Blockchain yet. So inside of this function,
               // we should check for it's current value stored in redux with the fetched one, and add the value
               // to get the latest value of the total LP.
+              console.log("_pairTransferEvent getUserTokenAmounts");
               const { amountTokenA, amountTokenB, liquidityPool ,totalSupply } =
                 await getUserTokenAmounts({
                   contractPair,
@@ -360,7 +361,6 @@ export const fetchPairs = (query) => async (dispatch, getState) => {
 
 }
 
-
 export const getPoolAssetsByAccount =
   (dataAssetPool) => async (dispatch, getState) => {
     const state = getState();
@@ -412,11 +412,6 @@ export const getPoolAssetsByAccount =
         }
       }
 
-      dispatch({
-        type: poolConstants.FETCH_POOL_ASSETS_SUCCESS,
-        data: dataList,
-      });
-
     }
 
     return dataList;
@@ -451,6 +446,17 @@ export const getUserTokenAmounts = async ({
   try {
     
     const balanceBigN = await contractPair.methods.balanceOf(account).call();
+    if(Number(balanceBigN) === 0){
+      return {
+        amountTokenA,
+        amountTokenB,
+        liquidityPool,
+        totalSupply,
+        reserve1,
+        reserve2,
+      };
+    }
+
     // console.log('🐶🐶  ~ liquidityPool(raw)', balanceBigN)
     liquidityPool = await ethers.utils.formatUnits(
       balanceBigN,
@@ -507,6 +513,7 @@ export const getUserTokenAmounts = async ({
   } catch (error) {
     console.error(error);
   }
+
   return {
     amountTokenA,
     amountTokenB,
@@ -515,6 +522,7 @@ export const getUserTokenAmounts = async ({
     reserve1,
     reserve2,
   };
+  
 };
 
 export const closeAddLiquidity = () => {

@@ -84,7 +84,7 @@ const CountdownIDO = ({ eventTime, interval }) => {
         // </div>
         <div className="grid-cols-4 gap-4 flex flex-row justify-center">
             <div className="count-down">
-                <div className="text-[24px] leading-5"> {eventTime ? pad(duration.days()) : "00"}<p className="text-[12px] pt-2">DAYS</p></div>
+                <div className="text-[24px] leading-5"> {eventTime ? pad(Math.floor(duration.asDays())) : "00"}<p className="text-[12px] pt-2">DAYS</p></div>
             </div>
             <div className="count-down">
                 <div className="text-[24px] leading-5"> {eventTime ? pad(duration.hours()) : "00"}<p className="text-[12px] pt-2">HOURS</p></div>

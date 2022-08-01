@@ -78,6 +78,8 @@ const useSwapFacade = () => {
   const emptyAddress = useSelector(selectEmptyAddress);
   const poolAddress = useSelector(selectPoolAddress);
 
+  const poolAddressRef = useRef("");
+
   const sourceTokenInfo = useSelector((state) =>
     selectAssetByAddress(state, sourceTokenAddress)
   );
@@ -154,137 +156,156 @@ const useSwapFacade = () => {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
   };
 
-  const getExchangeRateLoop = async (milliseconds) => {
-    await onCheckExchangeRatePool();
-    await sleep(milliseconds);
-    getExchangeRateLoop(30000);
+  const getExchangeRateLoop = async (assetsPoolAddress) => {
+    onCheckExchangeRatePool(
+      assetsPoolAddress ? assetsPoolAddress : poolAddressRef.current
+    );
+    await sleep(30000);
+    getExchangeRateLoop(poolAddressRef.current);
   };
 
   useEffect(() => {
-    getExchangeRateLoop(30000);
+    dispatch(
+      checkAssetExistsPools({
+        tokenAInfo: sourceTokenInfo,
+        tokenBInfo: desireTokenInfo,
+      })
+    )
+      .unwrap()
+      .then((originalPromiseResult) => {
+        const { emptyAddress, assetsPoolAddress } = originalPromiseResult;
+        poolAddressRef.current = assetsPoolAddress;
+        if (!emptyAddress) {
+          getExchangeRateLoop(assetsPoolAddress);
+        }
+      })
+      .catch((rejectedValueOrSerializedError) => {});
   }, []);
 
   useEffect(() => {
     onCheckApproveToken();
+    onGetPairsFee();
   }, [sourceTokenInfo, account]);
 
   useEffect(() => {
-    if (pressSwap) {
-      dispatch(switchReserves());
-      amountInRef.current = inputAmountOut;
-      const isBalanceInAvailable = checkBalance(amountInRef.current);
-      if (isBalanceInAvailable) {
-        if (inputAmountIn === "" && inputAmountOut === "") {
-          setError(emptyAddress ? "Not existed liquidity." : defaultErr);
-        } else {
-          if (
-            amountInRef.current === userInputRef.current &&
-            amountInRef.current !== ""
-          ) {
-            setInputAmountOut("");
-            checkBalance(userInputRef.current);
-            setInputAmountIn(userInputRef.current);
-            getAmountOutDebounced(userInputRef.current);
-          }
-          amountOutRef.current = inputAmountIn;
-
-          if (
-            amountOutRef.current === userInputRef.current &&
-            amountOutRef.current !== ""
-          ) {
-            setInputAmountIn("");
-            setInputAmountOut(userInputRef.current);
-            getAmountsInDebounced(userInputRef.current);
-          }
-        }
-      } else {
-        setInputAmountOut("");
-      }
-      setPressSwap(false);
-    } else {
-      dispatch(
-        checkAssetExistsPools({
-          tokenAInfo: sourceTokenInfo,
-          tokenBInfo: desireTokenInfo,
-        })
-      )
-        .unwrap()
-        .then((originalPromiseResult) => {
-          const { emptyAddress, assetsPoolAddress } = originalPromiseResult;
-          if (!emptyAddress) {
-            if (inputAmountIn === "" && inputAmountOut === "") {
-              setError(defaultErr);
-            }
-            onGetPairsFee();
-            setLoadingExchangeRate(true);
-            if (
-              inputAmountIn === userInputRef.current &&
-              inputAmountIn !== ""
-            ) {
-              selectLoadingGetAmountOut(true);
-            }
-            if (
-              inputAmountOut === userInputRef.current &&
-              inputAmountOut !== ""
-            ) {
-              selectLoadingGetAmountIn(true);
-            }
-            dispatch(
-              checkExchangeRatePool({
-                tokenAddressA: sourceTokenAddress,
-                tokenAddressB: desireTokenAddress,
-                assetsPoolAddress: assetsPoolAddress,
-              })
-            )
-              .unwrap()
-              .then((originalPromiseResult) => {
-                setLoadingExchangeRate(false);
-                if (
-                  inputAmountIn === userInputRef.current &&
-                  inputAmountIn !== ""
-                ) {
-                  setInputAmountOut("");
-                  selectLoadingGetAmountOut(false);
-                  const isBalanceInAvailable = checkBalance(
-                    userInputRef.current
-                  );
-                  if (isBalanceInAvailable) {
-                    getAmountOutDebounced(userInputRef.current);
-                  }
-                }
-                if (
-                  inputAmountOut === userInputRef.current &&
-                  inputAmountOut !== ""
-                ) {
-                  selectLoadingGetAmountIn(false);
-                  setInputAmountIn("");
-                  getAmountsInDebounced(userInputRef.current);
-                }
-              })
-              .catch((rejectedValueOrSerializedError) => {
-                setLoadingExchangeRate(false);
-                if (
-                  inputAmountIn === userInputRef.current &&
-                  inputAmountIn !== ""
-                ) {
-                  selectLoadingGetAmountOut(true);
-                }
-                if (
-                  inputAmountOut === userInputRef.current &&
-                  inputAmountOut !== ""
-                ) {
-                  selectLoadingGetAmountIn(true);
-                }
-              });
+    if (userInputRef.current !== "") {
+      if (pressSwap) {
+        dispatch(switchReserves());
+        amountInRef.current = inputAmountOut;
+        const isBalanceInAvailable = checkBalance(amountInRef.current);
+        if (isBalanceInAvailable) {
+          if (inputAmountIn === "" && inputAmountOut === "") {
+            setError(emptyAddress ? "Not existed liquidity." : defaultErr);
           } else {
-            setError("Not existed liquidity.");
-            userInputRef.current = "";
-            setInputAmountIn("");
-            setInputAmountOut("");
-            poolErrRef.current = "Not existed liquidity.";
+            if (
+              amountInRef.current === userInputRef.current &&
+              amountInRef.current !== ""
+            ) {
+              setInputAmountOut("");
+              checkBalance(userInputRef.current);
+              setInputAmountIn(userInputRef.current);
+              getAmountOutDebounced(userInputRef.current);
+            }
+            amountOutRef.current = inputAmountIn;
+
+            if (
+              amountOutRef.current === userInputRef.current &&
+              amountOutRef.current !== ""
+            ) {
+              setInputAmountIn("");
+              setInputAmountOut(userInputRef.current);
+              getAmountsInDebounced(userInputRef.current);
+            }
           }
-        })
-        .catch((rejectedValueOrSerializedError) => {});
+        } else {
+          setInputAmountOut("");
+        }
+        setPressSwap(false);
+      } else {
+        dispatch(
+          checkAssetExistsPools({
+            tokenAInfo: sourceTokenInfo,
+            tokenBInfo: desireTokenInfo,
+          })
+        )
+          .unwrap()
+          .then((originalPromiseResult) => {
+            const { emptyAddress, assetsPoolAddress } = originalPromiseResult;
+            poolAddressRef.current = assetsPoolAddress;
+            if (!emptyAddress) {
+              if (inputAmountIn === "" && inputAmountOut === "") {
+                setError(defaultErr);
+              }
+              setLoadingExchangeRate(true);
+              if (
+                inputAmountIn === userInputRef.current &&
+                inputAmountIn !== ""
+              ) {
+                selectLoadingGetAmountOut(true);
+              }
+              if (
+                inputAmountOut === userInputRef.current &&
+                inputAmountOut !== ""
+              ) {
+                selectLoadingGetAmountIn(true);
+              }
+              dispatch(
+                checkExchangeRatePool({
+                  tokenAddressA: sourceTokenAddress,
+                  tokenAddressB: desireTokenAddress,
+                  assetsPoolAddress: assetsPoolAddress,
+                })
+              )
+                .unwrap()
+                .then((originalPromiseResult) => {
+                  setLoadingExchangeRate(false);
+                  if (
+                    inputAmountIn === userInputRef.current &&
+                    inputAmountIn !== ""
+                  ) {
+                    setInputAmountOut("");
+                    selectLoadingGetAmountOut(false);
+                    const isBalanceInAvailable = checkBalance(
+                      userInputRef.current
+                    );
+                    if (isBalanceInAvailable) {
+                      getAmountOutDebounced(userInputRef.current);
+                    }
+                  }
+                  if (
+                    inputAmountOut === userInputRef.current &&
+                    inputAmountOut !== ""
+                  ) {
+                    selectLoadingGetAmountIn(false);
+                    setInputAmountIn("");
+                    getAmountsInDebounced(userInputRef.current);
+                  }
+                })
+                .catch((rejectedValueOrSerializedError) => {
+                  setLoadingExchangeRate(false);
+                  if (
+                    inputAmountIn === userInputRef.current &&
+                    inputAmountIn !== ""
+                  ) {
+                    selectLoadingGetAmountOut(true);
+                  }
+                  if (
+                    inputAmountOut === userInputRef.current &&
+                    inputAmountOut !== ""
+                  ) {
+                    selectLoadingGetAmountIn(true);
+                  }
+                });
+            } else {
+              setError("Not existed liquidity.");
+              userInputRef.current = "";
+              setInputAmountIn("");
+              setInputAmountOut("");
+              poolErrRef.current = "Not existed liquidity.";
+            }
+          })
+          .catch((rejectedValueOrSerializedError) => {});
+      }
     }
   }, [desireTokenAddress, sourceTokenAddress]);
 
@@ -296,8 +317,12 @@ const useSwapFacade = () => {
     const pricePaidPerTokenTo = Number(amountIn) / tokenToReceived;
     setPricePaidPerA(pricePaidPerTokenFrom);
     setPricePaidPerB(pricePaidPerTokenTo);
+
+    const amountInWithFee = Number(amountIn) * (1 - fee / 100);
     const priceImpact =
-      ((pricePaidPerTokenTo - Number(marketPrice)) / Number(marketPrice)) * 100;
+      (amountInWithFee / (Number(reserveFrom) + amountInWithFee)) * 100;
+    // const priceImpact =
+    //   ((pricePaidPerTokenTo - Number(marketPrice)) / Number(marketPrice)) * 100;
     setPriceImpact(priceImpact);
   };
 
@@ -512,23 +537,23 @@ const useSwapFacade = () => {
       .catch((rejectedValueOrSerializedError) => {});
   };
 
-  const onCheckExchangeRatePool = ({ assetsPoolAddress }) => {
+  const onCheckExchangeRatePool = (assetsPoolAddress) => {
     setLoadingExchangeRate(true);
     dispatch(
       checkExchangeRatePool({
         tokenAddressA: sourceTokenAddress,
         tokenAddressB: desireTokenAddress,
-        assetsPoolAddress: assetsPoolAddress ? assetsPoolAddress : poolAddress,
+        assetsPoolAddress: assetsPoolAddress
+          ? assetsPoolAddress
+          : poolAddressRef.current,
       })
     )
       .unwrap()
       .then((originalPromiseResult) => {
         setLoadingExchangeRate(false);
-        return true;
       })
       .catch((rejectedValueOrSerializedError) => {
         setLoadingExchangeRate(false);
-        return false;
       });
   };
 

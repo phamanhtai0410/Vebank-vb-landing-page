@@ -121,8 +121,14 @@ const Swap = () => {
           {loadingExchangeRate ? (
             <div className="loading__exchange__rate" />
           ) : (
-            <button onClick={onCheckExchangeRatePool}>
-              <img src={IcLoading} alt="Refresh" />
+            <button onClick={() => onCheckExchangeRatePool(null)}>
+              <div className="circle-progress circle-progress--loading">
+                <svg>
+                  <circle className="track" />
+                  <circle className="progress" />
+                </svg>
+              </div>
+              {/* <img src={IcLoading} alt="Refresh" /> */}
             </button>
           )}
           {/* <img className="cursor-pointer" src={IcSetting} alt="" /> */}
@@ -166,7 +172,7 @@ const Swap = () => {
                   onClick={() => onChangeSourceInput(sourceTokenBalance)}
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
-                  } sm:w-[40px] w-[36px] h-[28px] bg-[#203557] rounded flex flex-row items-center justify-center text-xs`}
+                  } sm:w-[40px] w-[36px] h-[28px] bg-[#203557] rounded flex flex-row items-center justify-center text-[12px] leading-4`}
                   disabled={
                     !account ||
                     error === errExistedLiquidity ||
@@ -180,7 +186,7 @@ const Swap = () => {
                   onClick={() => onChangeSourceInput(sourceTokenBalance / 2.0)}
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
-                  } sm:w-[40px] w-[36px] h-[28px] rounded bg-[#203557]" flex flex-row items-center justify-center text-xs`}
+                  } sm:w-[40px] w-[36px] h-[28px] rounded bg-[#203557]" flex flex-row items-center justify-center text-[12px] leading-4`}
                   disabled={
                     !account ||
                     error === errExistedLiquidity ||
@@ -283,7 +289,7 @@ const Swap = () => {
                   onClick={() => onChangeDesireInput(desireTokenBalance)}
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
-                  } sm:w-[40px] w-[36px] h-[28px] bg-[#203557] rounded flex flex-row items-center justify-center text-xs`}
+                  } sm:w-[40px] w-[36px] h-[28px] bg-[#203557] rounded flex flex-row items-center justify-center text-[12px] leading-4`}
                   disabled={
                     !account ||
                     error === errExistedLiquidity ||
@@ -297,7 +303,7 @@ const Swap = () => {
                   onClick={() => onChangeDesireInput(desireTokenBalance / 2.0)}
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
-                  } sm:w-[40px] w-[36px] h-[28px] rounded bg-[#203557]" flex flex-row items-center justify-center text-xs`}
+                  } sm:w-[40px] w-[36px] h-[28px] rounded bg-[#203557]" flex flex-row items-center justify-center text-[12px] leading-4`}
                   disabled={
                     !account ||
                     error === errExistedLiquidity ||

@@ -28,12 +28,15 @@ const Liquidity = () => {
       {/*Header*/}
       <GradientStrokeWrapper borderRadius="1rem" className="-z-10" />
 
-      <div className="flex flex-row flex-1 items-center justify-between">
+      <div className="flex flex-row flex-1">
         {/* <button className="btn-modal-back" onClick={closeModal} /> */}
-        <div className="flex flex-row items-center space-x-6">
-          <span className="text-white text-2xl font-poppins_medium">
+        <div className="flex flex-col items-start">
+          <span className="text-white text-xl font-poppins_bold">
             Your Liquidity
           </span>
+          {!(userPoolAddresses.length > 0) && <span className="text-grey-1 text-sm font-poppins_light mt-[6px]">
+              Remove liquidity to receive tokens back
+          </span>}
           {/* <div className="flex flex-col space-y-4">
             <span className="text-white text-2xl font-poppins_medium">
               Your Liquidity
@@ -72,13 +75,13 @@ const Liquidity = () => {
               {/* </TransitionGroup> */}
             </div>
           ) : (
-            <p className="self-center text-xl font-poppins_light text-[#678BCA]">
+            <p className="self-center text-base text-[#678BCA]">
               No liquidity found.
             </p>
           )}
           {poolAddresses.length > 0 && (
             <>
-              <p className="mt-8 self-center text-xl font-poppins_light text-[#678BCA]">
+              <p className="mt-8 self-center text-base text-[#678BCA]">
                 Don’t see a pool you joined?
               </p>
               <SecondaryButton

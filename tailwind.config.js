@@ -83,6 +83,7 @@ module.exports = {
       "color-modal-wallet": "#182233",
       "color-item-modal-wallet": "#182844",
       "color-item-hover-modal-wallet": "#232E49",
+      "tooltip": "#273958",
     },
     // fontSize: {
     //   'xs'  : ['12px', { lineHeight: '16px' }],

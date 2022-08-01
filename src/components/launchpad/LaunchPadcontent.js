@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import LaunchPadoverview from './LaunchPad_overview';
 import LaunchPadteampartner from './LaunchPad_teamparner';
 import LaunchPadmetrics from './LaunchPad_metrics';
+import LaunchPadguideline from './LaunchPad_guildline';
 
 const LaunchPadContent = () => {
     const location = useLocation();
@@ -59,7 +60,7 @@ const LaunchPadContent = () => {
                 {keyHash === "#overview" && (<LaunchPadoverview />)}
                 {keyHash === "#team&partners" && (<LaunchPadteampartner />)}
                 {keyHash === "#metrics" && (<LaunchPadmetrics />)}
-
+                {keyHash === "#guideline" && (<LaunchPadguideline />)}
             </div>
         </div>
     );

@@ -125,7 +125,7 @@ const AssetsPool = () => {
           <h4 className="font-poppins_semi_bold text-xl text-vbLine">
             Liquidity Pools 
           </h4>
-          <span className="text-base text-[#E8E8E8]">
+          <span className="font-poppins text-base text-[#E8E8E8]">
             Earn both $VB and a share of trading fees by providing liquidity
           </span>
         </div>

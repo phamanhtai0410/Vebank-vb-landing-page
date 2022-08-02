@@ -388,14 +388,7 @@ const Swap = () => {
                         {isSwitch
                           ? desireTokenInfo?.assetsChain
                           : sourceTokenInfo?.assetsChain}{" "}
-                        &asymp;{" "}
-                        {isSwitch
-                          ? pricePaidPerB.toString().length >= 6
-                            ? `${parseFloat(pricePaidPerB).toFixed(6)}`
-                            : pricePaidPerB
-                          : pricePaidPerA.toString().length >= 6
-                          ? `${parseFloat(pricePaidPerA).toFixed(6)}`
-                          : pricePaidPerA}{" "}
+                        &asymp; {isSwitch ? pricePaidPerB : pricePaidPerA}{" "}
                         {isSwitch
                           ? sourceTokenInfo?.assetsChain
                           : desireTokenInfo?.assetsChain}

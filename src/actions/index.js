@@ -12,6 +12,6 @@ export * from "./stake.action";
 export * from "./unstake.action";
 export * from "./farm.action";
 export * from "./unfarm.action";
-export { updateLiquidityPool, updateUserAssets } from "../reducers/userAssetPools.reducer";
+export { updateLiquidityPool, updateUserAssets, updateLoadingLiquidPoolState } from "../reducers/userAssetPools.reducer";
 export * from "./swap.action";
 export { clearRemoveLiquidityData } from "../reducers/removeLiquidity.reducer";

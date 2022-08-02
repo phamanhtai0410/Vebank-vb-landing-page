@@ -224,33 +224,33 @@ export const listenEventPairs = (pairs) => async (dispatch, getState) => {
               // the total supply of the pool may haven't been updated on Blockchain yet. So inside of this function,
               // we should check for it's current value stored in redux with the fetched one, and add the value
               // to get the latest value of the total LP.
-              const { amountTokenA, amountTokenB, liquidityPool ,totalSupply } =
-                await getUserTokenAmounts({
-                  contractPair,
-                  account,
-                  addressTokenA,
-                  addressTokenB,
-                });
+              // const { amountTokenA, amountTokenB, liquidityPool ,totalSupply } =
+              //   await getUserTokenAmounts({
+              //     contractPair,
+              //     account,
+              //     addressTokenA,
+              //     addressTokenB,
+              //   });
 
-              const percentYour = liquidityPool/totalSupply;
-              // console.log("percentYour",percentYour);
+              // const percentYour = liquidityPool/totalSupply;
+              // // console.log("percentYour",percentYour);
       
-              const yourLiquidityUSD = percentYour > 0 ? item.liquidity_usd*percentYour :0;
-              // console.log("yourLiquidityUSD",yourLiquidityUSD);
+              // const yourLiquidityUSD = percentYour > 0 ? item.liquidity_usd*percentYour :0;
+              // // console.log("yourLiquidityUSD",yourLiquidityUSD);
 
-              // Push this update into userAssetPools.reducer to update data in pool page and liquidity page.
-              dispatch(
+              // // Push this update into userAssetPools.reducer to update data in pool page and liquidity page.
+              // dispatch(
 
-                actions.updateUserAssets({
-                  assetsPoolAddress,
-                  balanceAccount: liquidityPool,
-                  liquidity: totalSupply,
-                  yourLiquidityUSD:
-                  amountTokenA,
-                  amountTokenB,
-                })
-              );
-
+              //   actions.updateUserAssets({
+              //     assetsPoolAddress,
+              //     balanceAccount: liquidityPool,
+              //     liquidity: totalSupply,
+              //     yourLiquidityUSD:
+              //     amountTokenA,
+              //     amountTokenB,
+              //   })
+              // );
+              dispatch(getPoolAssetsByAccount(pairs));
             }
           });
           _isSubscribed = true;
@@ -291,7 +291,7 @@ function getPoolAPR(fee,liquidity){
 }
 
 export const fetchPairs = (query) => async (dispatch, getState) => {
-
+console.log("====fetchPairs")
   const state = getState();
   const { assetEntities } = state.assetsMarketReducer;
 
@@ -370,6 +370,11 @@ export const getPoolAssetsByAccount =
     let dataList = [];
 
     if (account && ADDRESS_FACTORY && dataAssetPool.length > 0) {
+      dispatch(
+        actions.updateLoadingLiquidPoolState({
+          isLoading: true,
+        })
+      );
       for await (const item of dataAssetPool) {
 
         const { addressTokenA, addressTokenB, assetsPoolAddress } = item;
@@ -387,7 +392,6 @@ export const getPoolAssetsByAccount =
               addressTokenA,
               addressTokenB,
           });
-
           const percentYour = liquidityPool/totalSupply;
           let yourLiquidityUSD = percentYour > 0 ? item.liquidity_usd * percentYour : 0;
 
@@ -411,6 +415,11 @@ export const getPoolAssetsByAccount =
 
         }
       }
+      dispatch(
+        actions.updateLoadingLiquidPoolState({
+          isLoading: false,
+        })
+      );
       dispatch({
         type: poolConstants.FETCH_POOL_ASSETS_SUCCESS,
         data: dataList,
@@ -445,7 +454,6 @@ export const getUserTokenAmounts = async ({
   let totalSupply = 0;
   let reserve1 = 0;
   let reserve2 = 0;
-
   try {
     
     const balanceBigN = await contractPair.methods.balanceOf(account).call();
@@ -460,12 +468,12 @@ export const getUserTokenAmounts = async ({
       };
     }
 
-    // console.log('🐶🐶  ~ liquidityPool(raw)', balanceBigN)
+    console.log('🐶🐶  ~ liquidityPool(raw)', balanceBigN)
     liquidityPool = await ethers.utils.formatUnits(
       balanceBigN,
       PartialConstants.DEFAULT_ASSET_DECIMAL
     );
-    // console.log('🐶🐶  ~ liquidityPool(formatted)', liquidityPool)
+    console.log('🐶🐶  ~ liquidityPool(formatted)', liquidityPool)
     liquidityPool = FixedNumber.from(liquidityPool);
     totalSupply = await contractPair.methods.totalSupply().call();
 
@@ -516,7 +524,6 @@ export const getUserTokenAmounts = async ({
   } catch (error) {
     console.error(error);
   }
-
   return {
     amountTokenA,
     amountTokenB,

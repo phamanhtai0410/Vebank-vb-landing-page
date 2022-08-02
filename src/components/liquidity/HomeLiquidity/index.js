@@ -3,6 +3,7 @@ import "../styles.scss";
 
 import IcSettingWhite from "../../../assets/images/buttons/ic_setting_white.svg";
 import IcHistoryWhite from "../../../assets/images/buttons/ic_history_white.svg";
+import IcLoading from "../../../assets/images/loading_swap.svg";
 
 import useLiquidityFacade from "./hook";
 import SecondaryButton from "../../partials/SecondaryButton";
@@ -15,6 +16,7 @@ const Liquidity = () => {
   const {
     poolAddresses,
     userPoolAddresses,
+    isLoadingPools,
     addLiquidity,
     onFindOtherLPClicked,
   } = useLiquidityFacade();
@@ -30,10 +32,20 @@ const Liquidity = () => {
 
       <div className="flex flex-row flex-1">
         {/* <button className="btn-modal-back" onClick={closeModal} /> */}
-        <div className="flex flex-col items-start">
-          <span className="text-white text-xl font-poppins_bold">
-            Your Liquidity
-          </span>
+        <div className="flex flex-col items-start w-full">
+          <div className="flex flex-row w-full items-center justify-between">
+            <span className="text-white text-xl font-poppins_bold">
+              Your Liquidity
+            </span>
+            {isLoadingPools ? (
+              <div className="loading__exchange__rate" />
+            ) : (
+              <button>
+                <img src={IcLoading} alt="Refresh" />
+              </button>
+            )}
+          </div>
+          
           {!(userPoolAddresses.length > 0) && <span className="text-grey-1 text-sm font-poppins_light mt-[6px]">
               Remove liquidity to receive tokens back
           </span>}

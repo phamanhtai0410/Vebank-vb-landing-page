@@ -1,30 +1,19 @@
+import { useEffect, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 
-import { useEffect, useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-
-import IcSearch from '../../assets/images/ic_search.png';
+import IcSearch from "../../assets/images/ic_pool_search.svg";
 
 const FrmSearchPool = () => {
-
-    return (
-
-        <div className='flex flex-row-reverse flex-auto items-center flex-initial w-full'>
-
-            <div className="hidden lg:flex flex-row bg-gradient-search rounded-lg ml-8 py-2 px-4 ra justify-between md:hidden lg:w-80 xl:w-96">
-                <input
-                    className="bg-transparent focus:outline-none placeholder-slate-300 font-poppins appearance-none text-sm w-full"
-                    type="text"
-                    placeholder={"Search by token"}
-                />
-                <img
-                    alt="search_icon"
-                    src={IcSearch}
-                    className="ml-1 object-contain"
-                />
-            </div>
-
-        </div>
-    )
-}
+  return (
+    <div className="flex flex-row items-center justify-center p-[12px_16px] w-60 space-x-3 border border-vbDisableText rounded-lg">
+      <img alt="search_icon" src={IcSearch} />
+      <input
+        className="bg-transparent focus:outline-none font-poppins appearance-none text-base w-full ml-1 text-vbDisableText placeholder-vbDisableText"
+        type="text"
+        placeholder={"Search All"}
+      />
+    </div>
+  );
+};
 
 export default FrmSearchPool;

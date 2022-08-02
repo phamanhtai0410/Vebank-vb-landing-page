@@ -90,22 +90,22 @@ const LiquidityExcerpt = ({ poolAddress, poolSelect, setPoolSelect }) => {
           <div className="col mt-[20px] space-y-[14px]">
             <div className="full-row-between-center space-x-4">
               {/* <img src={poolInfo?.iconOrigin} alt="" className="w-8 h-8" /> */}
-              <p className="text-xs text-white">Pool (Base)</p>
-              <p className="text-xs font-poppins_medium text-white">
+              <p className="text-sm text-white">Pool (Base)</p>
+              <p className="text-sm font-poppins_medium text-white">
                 {nFormatter(amountTokenA, 5)} {poolInfo?.assetsChainA}
               </p>
             </div>
             <div className="full-row-between-center space-x-4">
               {/* <img src={poolInfo?.iconAssets} alt="" className="w-8 h-8" /> */}
-              <p className="text-xs text-white">Pool (Quote)</p>
-              <p className="text-xs font-poppins_medium text-white">
+              <p className="text-sm text-white">Pool (Quote)</p>
+              <p className="text-sm font-poppins_medium text-white">
                 {nFormatter(amountTokenB, 5)} {poolInfo?.assetsChainB}
               </p>
             </div>
             <div className="full-row-between-center">
-              <p className="text-xs text-white">Your share</p>
+              <p className="text-sm text-white">Your share</p>
               {poolInfo?.liquidity ? (
-                <p className="text-xs font-poppins_medium text-white">{`${
+                <p className="text-sm font-poppins_medium text-white">{`${
                   shareAPool < 0.01 ? "<0.01" : nFormatter(shareAPool, 5)
                 }%`}</p>
               ) : (

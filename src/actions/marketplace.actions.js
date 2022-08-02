@@ -42,7 +42,6 @@ export const getMarketAssets = () => async (dispatch, getState) => {
         let contractAAVE = new web3.eth.Contract(ERC20ABI_AAVE, TOKEN_AAVE);
 
         let contractIcentives = new web3.eth.Contract(ERCABI_REWARD, ADDRESS_REWARD);
-        console.log("contractIcentives",contractIcentives);
 
         const RAY = 10**27; // 10 to the power 27
         const SECONDS_PER_YEAR = 31536000;
@@ -51,7 +50,7 @@ export const getMarketAssets = () => async (dispatch, getState) => {
         for await (const item of listAsset) {
 
             const getReserveData = await contractAAVE.methods.getReserveData(item.assetsAddress).call();
-           // console.log("getReserveData",getReserveData);
+           console.log("getReserveData",getReserveData);
 
             // Get data
             const rewardsByAsset = await contractIcentives.methods.getRewardsByAsset(item.assetsAddress).call();
@@ -114,8 +113,6 @@ export const getMarketAssets = () => async (dispatch, getState) => {
 
         }
 
-
-    
         dataTotal.totalBorrow = dataTotal.totalBorrow.toFixed(2);
         dataTotal.totalSupply = dataTotal.totalSupply.toFixed(2);
 
@@ -193,7 +190,8 @@ export const getAccountAssets = (dataAssets) => async (dispatch, getState) => {
             for await (const item of dataAssets) {
 
                 const accountReserve = await contractAAVE.methods.getUserReserveData(item.assetsAddress, account).call();
-                
+                console.log("getUserReserveData",accountReserve);
+
                 let balanceSupply = 0;
                 if (accountReserve.currentATokenBalance !== "0") {
 

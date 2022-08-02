@@ -69,7 +69,7 @@ const AssetsMarket = () => {
                 >
                     <div className='bg-[#182233] rounded-lg mt-[10px]'>
 
-                        <div className="grid grid-cols-6 gap-6 justify-items-center content-around font-poppins text-lg cursor-pointer" onClick={e => onClickShowRowAssets(item.assetsAddress)}>
+                        <div className="grid grid-cols-6 gap-6 justify-items-center content-around font-poppins text-base cursor-pointer" onClick={e => onClickShowRowAssets(item.assetsAddress)}>
 
                             <div className="p-2 flex flex-row justify-center items-center space-x-4 w-full text-right cursor-pointer">
                                 <img className="w-6 h-6" src={item.icon} />
@@ -82,8 +82,8 @@ const AssetsMarket = () => {
 
                             <div className="p-2 flex flex-col justify-center items-center content-center">
                                 <div className="text-base font-semibold">{item.supplyAPY} %</div>
-                                <div className="border-2 border-solid border-[#4F92A7] p-1">
-                                    <div className="flex flex-row justify-start items-center space-x-2" >
+                                <div className="border-[1px] border-solid border-[#4F92A7] p-1">
+                                    <div className="flex flex-row justify-start items-center space-x-1" >
                                         <span className="font-light text-sm">{item.interestSupply} %</span>
                                         <img className="w-4 h-4" src={IcVeBank} />
                                     </div>
@@ -96,7 +96,7 @@ const AssetsMarket = () => {
 
                             <div className="p-2 flex flex-col justify-center items-center content-center">
                                 <div className="text-base font-semibold">{item.borrowAPY} %</div>
-                                <div className="border-2 border-solid border-[#4F92A7] p-1">
+                                <div className="border-[1px] border-solid border-[#4F92A7] p-1">
                                     <div className="flex flex-row justify-start items-center space-x-2" >
                                         <span className="font-light text-sm">{item.interestBorrow} %</span>
                                         <img className="w-4 h-4" src={IcVeBank} />

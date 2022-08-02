@@ -46,13 +46,6 @@ const LaunchPadContent = () => {
                     >
                         Metrics
                     </NavLink>
-                    <NavLink
-                        className={({ isActive }) => (keyHash === "#mylaunches" && isActive ? 'active' : 'inactive')}
-                        key={"launchpad-mylaunches"}
-                        to="/launchpad#mylaunches"
-                    >
-                        My launches
-                    </NavLink>
                 </div>
             </div>
 

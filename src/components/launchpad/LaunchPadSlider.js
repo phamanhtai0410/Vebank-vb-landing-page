@@ -66,7 +66,7 @@ const LaunchPadSlider = () => {
     };
 
     return (
-        <div className="flex relative mx-auto raise-box-1 ">
+        <div className="flex relative mx-auto lg:container ">
             <div className="raise-box-1 relative rounded-xl bg-[url('../../assets/images/launchpad/market3.svg')] bg-no-repeat bg-center bg-cover">
                 <div className="flex w-full p-6 absolute bottom-0">
                     <div className="w-1/2 flex">

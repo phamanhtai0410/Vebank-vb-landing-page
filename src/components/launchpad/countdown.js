@@ -31,69 +31,18 @@ const CountdownIDO = ({ eventTime, interval }) => {
     }
 
     return (
-        // <div className="flex flex-row items-center space-x-4">
-
-        //     <div className="date-item flex flex-col items-center">
-        //         <span
-        //             id="day"
-        //             className="font-['Poppins'] text-[#FFFFFF] text-[20px] leading-[28px] font-[700]"
-        //         >
-        //             {eventTime ? pad(duration.days()) : "00"}
-        //         </span>
-        //         <span className="font-['Poppins'] text-[#FFFFFF] text-[12px] leading-[16px] font-[400]">
-        //             DAYS
-        //         </span>
-        //     </div>
-
-        //     <div className="date-item flex flex-col items-center">
-        //         <span
-        //             id="hour"
-        //             className="font-['Poppins'] text-[#FFFFFF] text-[20px] leading-[28px] font-[700]"
-        //         >
-        //             {eventTime ? pad(duration.hours()) : "00"}
-        //         </span>
-        //         <span className="font-['Poppins'] text-[#FFFFFF] text-[12px] leading-[16px] font-[400]">
-        //             HOURS
-        //         </span>
-        //     </div>
-
-        //     <div className="date-item flex flex-col items-center">
-        //         <span
-        //             id="minute"
-        //             className="font-['Poppins'] text-[#FFFFFF] text-[20px] leading-[28px] font-[700]"
-        //         >
-        //             {eventTime ? pad(duration.minutes()) : "00"}
-        //         </span>
-        //         <span className="font-['Poppins'] text-[#FFFFFF] text-[12px] leading-[16px] font-[400]">
-        //             MINUTES
-        //         </span>
-        //     </div>
-
-        //     <div className="date-item flex flex-col items-center">
-        //         <span
-        //             id="second"
-        //             className="font-['Poppins'] text-[#FFFFFF] text-[20px] leading-[28px] font-[700]"
-        //         >
-        //             {eventTime ? pad(duration.seconds()) : "00"}
-        //         </span>
-        //         <span className="font-['Poppins'] text-[#FFFFFF] text-[12px] leading-[16px] font-[400]">
-        //             SECONDS
-        //         </span>
-        //     </div>
-
-        // </div>
         <div className="grid-cols-4 gap-4 flex flex-row justify-center">
             <div className="count-down">
-                <div className="text-[24px] leading-5"> {eventTime ? pad(Math.floor(duration.asDays())) : "00"}<p className="text-[12px] pt-2">DAYS</p></div>
+                <div className="text-[24px] leading-5"><p> {eventTime ? pad(Math.floor(duration.asDays())) : "00"}</p><p className="text-[10px] pt-2 leading-[6px]">DAYS</p></div>
             </div>
             <div className="count-down">
-                <div className="text-[24px] leading-5"> {eventTime ? pad(duration.hours()) : "00"}<p className="text-[12px] pt-2">HOURS</p></div>
+                <div className="text-[24px] leading-5"> {eventTime ? pad(duration.hours()) : "00"}<p className="text-[10px] pt-2 leading-[6px] ">HOURS</p></div>
             </div>
             <div className="count-down">
-                <div className="text-[24px] leading-5"> {eventTime ? pad(duration.minutes()) : "00"}<p className="text-[12px] pt-2">MINUTES</p></div>
+                <div className="text-[24px] leading-5"> {eventTime ? pad(duration.minutes()) : "00"}<p className="text-[10px] pt-2 leading-[6px] ">MINUTES</p></div>
             </div>
             <div className="count-down">
-                <div className="text-[24px] leading-5"> {eventTime ? pad(duration.seconds()) : "00"}<p className="text-[12px] pt-2">SECONDS</p></div>
+                <div className="text-[24px] leading-5"> {eventTime ? pad(duration.seconds()) : "00"}<p className="text-[10px] pt-2 leading-[6px] ">SECONDS</p></div>
             </div>
         </div>
 

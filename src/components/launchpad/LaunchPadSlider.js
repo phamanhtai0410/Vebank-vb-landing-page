@@ -1,63 +1,72 @@
 import React, { useState, useEffect } from 'react';
 import LaunchPadvebank from "../../assets/images/launchpad/vebank.svg";
 import LaunchPadraise from "../../assets/images/launchpad/raise-icon.svg";
-import CountdownIDO from"../launchpad/countdown"
+import CountdownIDO from "../launchpad/countdown"
 const LaunchPadSlider = () => {
+    const [message, setMessage] = useState('');
 
     const data = {
-        start_time:1659286800,
-        end_time:1664557200,
+        start_time: 1659286800,
+        end_time: 1664557200,
     }
-      const checkStartTime = () => {
+    const checkStartTime = () => {
         if (!data) {
-          return false;
+            return false;
         }
-    
+
         if (!data.start_time) {
-          return false;
+            return false;
         }
         const currentDate = new Date();
         const startDate = new Date(data.start_time * 1000);
-    
+
         return currentDate.getTime() > startDate.getTime();
-      };
-    
-      const checkEndTime = () => {
+    };
+
+    const checkEndTime = () => {
         if (!data) {
-          return false;
+            return false;
         }
-    
+
         if (!data.end_time) {
-          return false;
+            return false;
         }
-    
+
         const currentDate = new Date();
         const endDate = new Date(data.end_time * 1000);
-    
+
         return currentDate.getTime() < endDate.getTime();
-      };
-    
-      const showCountDown = () => {
+    };
+
+    const showCountDown = () => {
         if (!data) {
-          return;
+            return;
         }
-    
+
         if (!data.start_time || !data.end_time) {
-          return;
+            return;
         }
-    
+
         if (checkStartTime() === false) {
-          return <CountdownIDO eventTime={data.start_time} interval={1000} />;
+            return <CountdownIDO eventTime={data.start_time} interval={1000} />;
         }
-    
+
         if (checkEndTime() === true) {
-          return <CountdownIDO eventTime={data.end_time} interval={1000} />;
+            return <CountdownIDO eventTime={data.end_time} interval={1000} />;
         }
-    
+
         return <CountdownIDO eventTime={null} interval={0} />;
-      };
+    };
+    const handleClick = event => {
+        event.preventDefault();
+        setMessage('2000');
+    };
+    const handleChange = event => {
+        setMessage(event.target.value.replace(/[^0-9]/g, ""));
+    };
+
     return (
-        <div className="flex relative mx-auto lg:container ">
+        <div className="flex relative mx-auto raise-box-1 ">
             <div className="raise-box-1 relative rounded-xl bg-[url('../../assets/images/launchpad/market3.svg')] bg-no-repeat bg-center bg-cover">
                 <div className="flex w-full p-6 absolute bottom-0">
                     <div className="w-1/2 flex">
@@ -98,21 +107,21 @@ const LaunchPadSlider = () => {
                     <p>Total supply</p>
 
                     <div className="slider-parent">
-                        <input className="input-suplly rounded-xl" type="range" min="1" max="10000000" value={5000000} disabled />
+                        <input className="input-suplly rounded-xl" type="range" min="1" max="10000000" value={0} disabled />
                         <div className="flex pb-4 leading-4">
                             <div className="w-1/2">0</div>
-                            <div className="w-1/2 text-right">10000000</div>
+                            <div className="w-1/2 text-right">10,000,000</div>
                         </div>
                     </div>
                 </div>
                 <div className="pb-8">
                     <p className="pb-2">Amount</p>
                     <div className="raise-input">
-                        <input placeholder='0.0'></input>
-                        <button className="raise-button">MAX</button>
+                        <input type="text" placeholder='0.0' value={message} onChange={handleChange} />
+                        <button className="raise-button" onClick={handleClick}>MAX</button>
                     </div>
                 </div>
-                <button className="raise-submit">Buy</button>
+                <button className="raise-submit" disabled>Buy</button>
             </div>
         </div>
     );

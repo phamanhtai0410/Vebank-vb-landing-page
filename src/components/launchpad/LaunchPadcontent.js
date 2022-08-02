@@ -3,7 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import LaunchPadoverview from './LaunchPad_overview';
 import LaunchPadteampartner from './LaunchPad_teamparner';
 import LaunchPadmetrics from './LaunchPad_metrics';
-import LaunchPadguideline from './LaunchPad_guildline';
+import LaunchPadmylaunches from './LaunchPad_mylaunches';
 
 const LaunchPadContent = () => {
     const location = useLocation();
@@ -11,7 +11,7 @@ const LaunchPadContent = () => {
 
 
     useEffect(() => {
-        if (["#overview", "#team&partners", "#metrics", "#guideline"].includes(location.hash)) {
+        if (["#overview", "#team&partners", "#metrics", "#mylaunches"].includes(location.hash)) {
             setKeyHash(location.hash);
         } else {
             setKeyHash("#overview");
@@ -19,7 +19,7 @@ const LaunchPadContent = () => {
     }, [location]);
 
     return (
-        <div className="lg:container  pt-20">
+        <div className="lg:container py-20">
             <div className="flex justify-between">
                 <div className="launchpad-filter-btn rounded-full">
 
@@ -47,11 +47,11 @@ const LaunchPadContent = () => {
                         Metrics
                     </NavLink>
                     <NavLink
-                        className={({ isActive }) => (keyHash === "#guideline" && isActive ? 'active' : 'inactive')}
-                        key={"launchpad-guideline"}
-                        to="/launchpad#guideline"
+                        className={({ isActive }) => (keyHash === "#mylaunches" && isActive ? 'active' : 'inactive')}
+                        key={"launchpad-mylaunches"}
+                        to="/launchpad#mylaunches"
                     >
-                        Guideline
+                        My launches
                     </NavLink>
                 </div>
             </div>
@@ -60,7 +60,7 @@ const LaunchPadContent = () => {
                 {keyHash === "#overview" && (<LaunchPadoverview />)}
                 {keyHash === "#team&partners" && (<LaunchPadteampartner />)}
                 {keyHash === "#metrics" && (<LaunchPadmetrics />)}
-                {keyHash === "#guideline" && (<LaunchPadguideline />)}
+                {keyHash === "#mylaunches" && (<LaunchPadmylaunches />)}
             </div>
         </div>
     );

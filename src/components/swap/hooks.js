@@ -33,7 +33,12 @@ import {
 } from "../../actions";
 import { useDebouncedCallback } from "use-debounce";
 import PartialConstants from "../../constants/partial.constants";
-import { formatLocaleString, getDecimalForAsset } from "../../utils/lib";
+import {
+  checkCharacterZero,
+  compareString,
+  formatLocaleString,
+  getDecimalForAsset,
+} from "../../utils/lib";
 
 const useSwapFacade = () => {
   const dispatch = useDispatch();
@@ -69,10 +74,19 @@ const useSwapFacade = () => {
   const loadingFee = useSelector(selectLoadingFee);
   const [loadingGetAmountOut, selectLoadingGetAmountOut] = useState(false);
   const [loadingGetAmountIn, selectLoadingGetAmountIn] = useState(false);
+  const [firstLoadFlag, setFirstLoadFlag] = useState(false);
   // const loadingGetAmountOut = useSelector(selectLoadingGetAmountOut);
   // const loadingGetAmountIn = useSelector(selectLoadingGetAmountIn);
   const reserveFrom = useSelector(selectReserveFrom);
   const reserveTo = useSelector(selectReserveTo);
+
+  const reserveFromRef = useRef("");
+  const reserveToRef = useRef("");
+
+  const tokenARef = useRef("");
+  const tokenBRef = useRef("");
+
+  const [priceUpdate, setPriceUpdate] = useState(false);
 
   const accountApprove = useSelector(selectAccountApprove);
   const emptyAddress = useSelector(selectEmptyAddress);
@@ -160,35 +174,40 @@ const useSwapFacade = () => {
     onCheckExchangeRatePool(
       assetsPoolAddress ? assetsPoolAddress : poolAddressRef.current
     );
-    await sleep(30000);
+    await sleep(60000);
     getExchangeRateLoop(poolAddressRef.current);
   };
 
   useEffect(() => {
-    dispatch(
-      checkAssetExistsPools({
-        tokenAInfo: sourceTokenInfo,
-        tokenBInfo: desireTokenInfo,
-      })
-    )
-      .unwrap()
-      .then((originalPromiseResult) => {
-        const { emptyAddress, assetsPoolAddress } = originalPromiseResult;
-        poolAddressRef.current = assetsPoolAddress;
-        if (!emptyAddress) {
-          getExchangeRateLoop(assetsPoolAddress);
-        }
-      })
-      .catch((rejectedValueOrSerializedError) => {});
+    if (!firstLoadFlag) {
+      dispatch(
+        checkAssetExistsPools({
+          tokenAInfo: sourceTokenInfo,
+          tokenBInfo: desireTokenInfo,
+        })
+      )
+        .unwrap()
+        .then((originalPromiseResult) => {
+          const { emptyAddress, assetsPoolAddress } = originalPromiseResult;
+          poolAddressRef.current = assetsPoolAddress;
+          if (!emptyAddress) {
+            getExchangeRateLoop(assetsPoolAddress);
+            onGetPairsFee();
+          }
+        })
+        .catch((rejectedValueOrSerializedError) => {});
+      setFirstLoadFlag(!firstLoadFlag);
+    }
   }, []);
 
   useEffect(() => {
     onCheckApproveToken();
-    onGetPairsFee();
   }, [sourceTokenInfo, account]);
 
   useEffect(() => {
-    if (userInputRef.current !== "") {
+    if (firstLoadFlag) {
+      tokenARef.current = sourceTokenAddress;
+      tokenBRef.current = desireTokenAddress;
       if (pressSwap) {
         dispatch(switchReserves());
         amountInRef.current = inputAmountOut;
@@ -258,28 +277,11 @@ const useSwapFacade = () => {
               )
                 .unwrap()
                 .then((originalPromiseResult) => {
+                  const { reserves1, reserves2 } = originalPromiseResult;
                   setLoadingExchangeRate(false);
-                  if (
-                    inputAmountIn === userInputRef.current &&
-                    inputAmountIn !== ""
-                  ) {
-                    setInputAmountOut("");
-                    selectLoadingGetAmountOut(false);
-                    const isBalanceInAvailable = checkBalance(
-                      userInputRef.current
-                    );
-                    if (isBalanceInAvailable) {
-                      getAmountOutDebounced(userInputRef.current);
-                    }
-                  }
-                  if (
-                    inputAmountOut === userInputRef.current &&
-                    inputAmountOut !== ""
-                  ) {
-                    selectLoadingGetAmountIn(false);
-                    setInputAmountIn("");
-                    getAmountsInDebounced(userInputRef.current);
-                  }
+                  reserveFromRef.current = reserves1;
+                  reserveToRef.current = reserves2;
+                  handleInputAmount();
                 })
                 .catch((rejectedValueOrSerializedError) => {
                   setLoadingExchangeRate(false);
@@ -308,6 +310,22 @@ const useSwapFacade = () => {
       }
     }
   }, [desireTokenAddress, sourceTokenAddress]);
+
+  const handleInputAmount = () => {
+    if (inputAmountIn === userInputRef.current && inputAmountIn !== "") {
+      setInputAmountOut("");
+      selectLoadingGetAmountOut(false);
+      const isBalanceInAvailable = checkBalance(userInputRef.current);
+      if (isBalanceInAvailable) {
+        getAmountOutDebounced(userInputRef.current);
+      }
+    }
+    if (inputAmountOut === userInputRef.current && inputAmountOut !== "") {
+      selectLoadingGetAmountIn(false);
+      setInputAmountIn("");
+      getAmountsInDebounced(userInputRef.current);
+    }
+  };
 
   const onCountPriceImpact = (amountIn) => {
     const newTokenTo =
@@ -464,24 +482,23 @@ const useSwapFacade = () => {
       } else {
         let pattern = /^\d+\.?\d*$/;
         if (pattern.test(value)) {
-          if (
-            value === "0" ||
-            value === "00" ||
-            value === "0." ||
-            value === "0.0"
-          ) {
+          if (value === "0" || value === "00" || value === "0.") {
             if (value === "00") {
               setInputAmountIn("0");
-            } else if (value === "0.0") {
-              setInputAmountIn("0.");
             } else {
               setInputAmountIn(value);
             }
             setInputAmountOut("");
             setError("Enter an amount to see more trading details.");
           } else {
-            checkBalance(value);
-            getAmountOutDebounced(value);
+            const isZeRo = checkCharacterZero(value);
+            if (!isZeRo) {
+              checkBalance(value);
+              getAmountOutDebounced(value);
+            } else {
+              userInputRef.current = "";
+              setInputAmountIn(value);
+            }
           }
         }
       }
@@ -500,21 +517,20 @@ const useSwapFacade = () => {
         let pattern = /^\d+\.?\d*$/;
         if (pattern.test(value)) {
           setInputAmountOut(value);
-          if (
-            value === "0" ||
-            value === "00" ||
-            value === "0." ||
-            value === "0.0"
-          ) {
+          if (value === "0" || value === "00" || value === "0.") {
             if (value === "00") {
               setInputAmountOut("0");
-            } else if (value === "0.0") {
-              setInputAmountOut("0.");
             }
             setInputAmountIn("");
             setError("Enter an amount to see more trading details.");
           } else {
-            getAmountsInDebounced(value);
+            const isZeRo = checkCharacterZero(value);
+            if (!isZeRo) {
+              getAmountsInDebounced(value);
+            } else {
+              userInputRef.current = "";
+              setInputAmountOut(value);
+            }
           }
         }
       }
@@ -551,10 +567,30 @@ const useSwapFacade = () => {
       .unwrap()
       .then((originalPromiseResult) => {
         setLoadingExchangeRate(false);
+        const { reserves1, reserves2 } = originalPromiseResult;
+        if (
+          (compareString(tokenARef.current, sourceTokenAddress) &&
+            reserveFromRef.current !== reserves1) ||
+          (compareString(tokenBRef.current, desireTokenAddress) &&
+            reserveToRef.current !== reserves2)
+        ) {
+          setPriceUpdate(true);
+        }
+        if (!firstLoadFlag) {
+          reserveFromRef.current = reserves1;
+          reserveToRef.current = reserves2;
+          tokenARef.current = sourceTokenAddress;
+          tokenBRef.current = desireTokenAddress;
+        }
       })
       .catch((rejectedValueOrSerializedError) => {
         setLoadingExchangeRate(false);
       });
+  };
+
+  const onUpdatePriceChange = () => {
+    setPriceUpdate(false);
+    handleInputAmount();
   };
 
   const onGetPairsFee = () => {
@@ -563,10 +599,7 @@ const useSwapFacade = () => {
         tokenAInfo: sourceTokenInfo,
         tokenBInfo: desireTokenInfo,
       })
-    )
-      .unwrap()
-      .then((originalPromiseResult) => {})
-      .catch((rejectedValueOrSerializedError) => {});
+    );
   };
 
   const onChangeSlippage = (value) => {
@@ -611,6 +644,7 @@ const useSwapFacade = () => {
   };
 
   return {
+    priceUpdate,
     error,
     priceImpact,
     swapFee,
@@ -661,6 +695,7 @@ const useSwapFacade = () => {
     pricePaidPerA,
     pricePaidPerB,
     onChangeSlippage,
+    onUpdatePriceChange,
   };
 };
 

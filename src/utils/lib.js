@@ -88,7 +88,8 @@ export const isContainVET = (...ags) =>
  * @returns the corresponding decimal value of the asset that
  */
 export const getDecimalForAsset = (assetsAddress) =>
-  assetsAddress.toLocaleUpperCase() === process.env.REACT_APP_TOKEN_VEUSD.toLocaleUpperCase()
+  assetsAddress.toLocaleUpperCase() ===
+  process.env.REACT_APP_TOKEN_VEUSD.toLocaleUpperCase()
     ? PartialConstants.VEUSD_DECIMAL
     : PartialConstants.DEFAULT_ASSET_DECIMAL;
 
@@ -149,4 +150,16 @@ export const addressWalletCompact = (address) => {
 };
 export const compareString = (a, b) => {
   return a?.toString().toLowerCase() === b?.toString().toLowerCase();
+};
+
+export const checkCharacterZero = (string) => {
+  const stringArr = string.split("");
+  for (let i = 0; i < stringArr.length; i++) {
+    if (stringArr[i] !== "0") {
+      if (stringArr[i] !== ".") {
+        return false;
+      }
+    }
+  }
+  return true;
 };

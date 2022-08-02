@@ -35,12 +35,11 @@ export const checkAssetExistsPools = createAsyncThunk(
   swapConstants.checkAssetExistsPools,
   async ({ tokenAInfo, tokenBInfo }, { dispatch, getState }) => {
     const state = getState();
-    // const assetsPoolName = `${tokenAInfo?.assetsChain} - ${tokenBInfo?.assetsChain}`;
 
     const addressTokenA = tokenAInfo?.assetsAddress || "";
     const addressTokenB = tokenBInfo?.assetsAddress || "";
 
-    const { web3, account } = state.web3;
+    const { web3 } = state.web3;
     if (web3 && ADDRESS_FACTORY) {
       let contractFactory = new web3.eth.Contract(
         ERC20ABI_FACTORY,
@@ -61,38 +60,38 @@ export const checkAssetExistsPools = createAsyncThunk(
       //   })
       // );
 
-      if (!emptyAddress && assetsPoolAddress) {
-        const contractPair = new web3.eth.Contract(
-          ERC20ABI_PAIR,
-          assetsPoolAddress
-        );
+      // if (!emptyAddress && assetsPoolAddress) {
+      //   const contractPair = new web3.eth.Contract(
+      //     ERC20ABI_PAIR,
+      //     assetsPoolAddress
+      //   );
 
-        if (account) {
-          contractPair.events.Swap({}).on("data", async (data) => {
-            const { event } = data;
-            if (event === "Swap") {
-              dispatch(
-                checkExchangeRatePool({
-                  tokenAddressA: addressTokenA,
-                  tokenAddressB: addressTokenB,
-                  assetsPoolAddress: assetsPoolAddress,
-                })
-              );
-            }
-          });
-        }
-      } else {
-        // const key = randomKeyUUID();
-        // dispatch(
-        //   actions.alertActions.warning(
-        //     {
-        //       title: "Warning",
-        //       description: `${assetsPoolName} not existing in pools`,
-        //     },
-        //     key
-        //   )
-        // );
-      }
+      //   if (account) {
+      //     contractPair.events.Swap({}).on("data", async (data) => {
+      //       const { event } = data;
+      //       if (event === "Swap") {
+      //         dispatch(
+      //           checkExchangeRatePool({
+      //             tokenAddressA: addressTokenA,
+      //             tokenAddressB: addressTokenB,
+      //             assetsPoolAddress: assetsPoolAddress,
+      //           })
+      //         );
+      //       }
+      //     });
+      //   }
+      // } else {
+      //   const key = randomKeyUUID();
+      //   dispatch(
+      //     actions.alertActions.warning(
+      //       {
+      //         title: "Warning",
+      //         description: `${assetsPoolName} not existing in pools`,
+      //       },
+      //       key
+      //     )
+      //   );
+      // }
       return {
         assetsPoolAddress: assetsPoolAddress,
         emptyAddress: emptyAddress,

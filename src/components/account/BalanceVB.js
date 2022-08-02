@@ -20,8 +20,8 @@ const BalanceVB = () => {
 
   return (
     <div className="flex flex-row justify-start items-center space-x-2">
-      <img className="w-6 h-6" src={IcVB} alt="Coin VeBank" />
-      <span className="font-poppins font-medium text-slate-50 text-sm">
+      <img className="w-4 h-4" src={IcVB} alt="Coin VeBank" />
+      <span className="font-poppins font-medium text-slate-50 text-base">
         {balanceAccount ? formatBalanceString(balanceAccount) : `${0}`}
       </span>
     </div>

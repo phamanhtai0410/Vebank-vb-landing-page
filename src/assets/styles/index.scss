@@ -81,7 +81,7 @@
 }
 
 html {
-  font-size: 0.875rem;
+  font-size:.875rem;
 }
 
 @media (max-width: 1920px) {
@@ -98,7 +98,7 @@ html {
 
 header {
   background: rgba(13, 21, 34, 0.5);
-  // backdrop-filter: blur(100px);
+  backdrop-filter: blur(100px);
 }
 .navbar-sub-menu {
   background: rgba(13, 21, 34, 0.5);
@@ -255,8 +255,6 @@ input[type=number] {
   cursor: pointer;
   font-weight: 500;
   border-radius: 32px;
-  font-size: 1rem;
-  line-height: 24px;
   padding-left: 2.625rem;
   padding-right: 2.625rem;
   font-family: "Poppins";

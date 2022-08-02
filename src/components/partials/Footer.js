@@ -60,6 +60,9 @@ const Footer = () => {
     const ignoreMe = document.getElementById("show-more");
     if (event.target !== ignoreMe && event.target.parentNode !== ignoreMe){
       setShowMore("");
+      if (event.target.href !== undefined && event.target.href !== "null" && event.target.href !== "") {
+        window.open( event.target.href)
+      }
     }
   });
 

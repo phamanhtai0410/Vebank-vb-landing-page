@@ -81,7 +81,7 @@
 }
 
 html {
-  font-size: 0.875rem;
+  font-size:.875rem;
 }
 
 @media (max-width: 1920px) {
@@ -98,7 +98,7 @@ html {
 
 header {
   background: rgba(13, 21, 34, 0.5);
-  // backdrop-filter: blur(100px);
+  backdrop-filter: blur(100px);
 }
 .navbar-sub-menu {
   background: rgba(13, 21, 34, 0.5);
@@ -185,12 +185,16 @@ input[type=number] {
 }
 
 .bg-gradient-search {
-  background: linear-gradient(
-    90deg,
-    rgba(132, 104, 168, 0.108) 0%,
-    rgba(132, 104, 168, 0.108) 54.47%,
-    rgba(132, 104, 168, 0.108) 100%
-  );
+
+  background: #334158;
+  backdrop-filter: blur(30px);
+  // background: linear-gradient(
+  //   90deg,
+  //   rgba(132, 104, 168, 0.108) 0%,
+  //   rgba(132, 104, 168, 0.108) 54.47%,
+  //   rgba(132, 104, 168, 0.108) 100%
+  // );
+
 }
 
 .bg-gradient-lend {
@@ -255,8 +259,6 @@ input[type=number] {
   cursor: pointer;
   font-weight: 500;
   border-radius: 32px;
-  font-size: 1rem;
-  line-height: 24px;
   padding-left: 2.625rem;
   padding-right: 2.625rem;
   font-family: "Poppins";
@@ -265,7 +267,6 @@ input[type=number] {
   -o-transition: all 0.3s ease-in;
   -ms-transition: all 0.3s ease-in;
   transition: all 0.3s ease-in;
-
   background: linear-gradient(91.96deg, #0fe3e3 0%, #02a4ff 100%);
 }
 
@@ -283,9 +284,9 @@ input[type=number] {
 }
 
 .btn-veb {
-  padding: 0.35rem 1.75rem;
+  padding: 0.3rem 1.65rem;
   font-weight: 500;
-  border-radius: 0.5rem;
+  border-radius:4px;
   font-family: "Poppins";
   -webkit-transition: all 0.3s ease-in;
   -moz-transition: all 0.3s ease-in;
@@ -293,7 +294,7 @@ input[type=number] {
   -ms-transition: all 0.3s ease-in;
   transition: all 0.3s ease-in;
   background: linear-gradient(91.96deg, #0fe3e3 0%, #02a4ff 100%);
-  @apply text-base
+  @apply text-sm;
 }
 
 .box-borrows {
@@ -345,19 +346,23 @@ footer {
   height: auto;
   border: 1px solid #d2c0f14d;
   background-color: rgba(255, 255, 255, 0.08);
-  padding: 4px;
+  padding: 3px;
   border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
 }
 
 .tab-market a {
   font-family: "Poppins";
   line-height: 24px;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 14px;
   text-align: center;
   color: #ffffff;
   margin: 1px;
-  padding: 0.45rem 2.5rem;
+  padding: 0.2rem 2rem;
   display: inline-block;
 }
 
@@ -432,6 +437,15 @@ footer {
 .bg-overview {
   background: linear-gradient(116.38deg, #0db6ff 16.58%, #2183e0 83.42%);
 }
+
+.bg-layout-vb{
+  background: linear-gradient(109.17deg, #182D52 0%, #172130 100%);
+}
+
+.bg-tbl-vb{
+  background: #0D1522;
+}
+
 
 input:checked ~ .dot {
   transform: translateX(100%);

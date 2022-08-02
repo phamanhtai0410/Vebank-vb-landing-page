@@ -1,6 +1,6 @@
 import React from 'react';
-import LaunchPad_metrics from "../../assets/images/launchpad/launchpad_metrics.jpg";
-import LaunchPad_metrics1 from "../../assets/images/launchpad/launchpad_metrics1.jpg";
+import LaunchPad_metrics from "../../assets/images/launchpad/launchpad_metrics.svg";
+import LaunchPad_metrics1 from "../../assets/images/launchpad/launchpad_metrics1.svg";
 
 const LaunchPadmetrics = () => {
 

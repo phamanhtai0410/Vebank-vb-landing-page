@@ -10,9 +10,12 @@ import PoolRowAction from "./PoolRowAction";
 import * as actions from "../../actions";
 import LiquidPairIcon from "../partials/LiquidPairIcon";
 import { nFormatter } from "../../utils/lib";
+import FrmSearchPool from "./FrmSearchPool";
+import FrmBaseTime from "./FrmBaseTime";
 
 const AssetsPool = () => {
   const [openRowAssets, setOpenRowAssets] = useState([]);
+  const [timeBasis, setTimeBasis] = useState("24H");
 
   const dispatch = useDispatch();
 
@@ -26,11 +29,10 @@ const AssetsPool = () => {
     if (web3) {
       fetchPoolAssets();
     }
-  }, [web3]);
+  }, [web3, timeBasis]);
 
   async function fetchPoolAssets() {
-     await dispatch(actions.fetchPairs());
-   // await dispatch(actions.getPoolAssets());
+     await dispatch(actions.fetchPairs({time_basis:timeBasis}));
   }
 
   const onClickShowRowAssets = (assetsAddress) => {
@@ -48,6 +50,10 @@ const AssetsPool = () => {
 
   const checkShowDown = (assetsAddress) => {
     return (openRowAssets.indexOf(assetsAddress) === -1);
+  };
+
+  const onTimeBasisChange = (value) => {
+    setTimeBasis(value);
   };
 
   const showListAsset = (dataList) => {
@@ -114,9 +120,25 @@ const AssetsPool = () => {
 
   return (
     <div className="w-full min-h-max rounded-lg bg-[#0b1329] mt-10 p-10 fade-in-box">
-      <h4 className="font-montserrat text-[20px] leading-9 text-[#3FDCA5]">
-        Pools
-      </h4>
+      <div className="flex flex-row w-full items-center justify-between">
+        <div className="flex flex-col space-y-1">
+          <h4 className="font-poppins_semi_bold text-xl text-vbLine">
+            Liquidity Pools 
+          </h4>
+          <span className="font-poppins text-base text-[#E8E8E8]">
+            Earn both $VB and a share of trading fees by providing liquidity
+          </span>
+        </div>
+        <div className="flex flex-row justify-end space-x-12">
+          <div className="relative flex justify-end">
+            <div className="absolute top-0">
+              <FrmBaseTime timeBasis={timeBasis} onTimeBasisChange={onTimeBasisChange} />
+            </div>
+          </div>
+          <FrmSearchPool />
+        </div>
+      </div>
+      
 
       <div className="tbl-veb mt-8">
         <div className="grid grid-cols-12 justify-items-center content-around font-poppins text-[14px]">
@@ -129,15 +151,15 @@ const AssetsPool = () => {
             <img className="ml-1 w-4" src={IcCaretDown} alt={IcCaretDown} />
           </div>
           <div className="px-2 py-2 col-span-2 flex">
-            <span>Volume (24H)</span>
+            <span>Volume {timeBasis}</span>
             <img className="ml-1 w-4" src={IcCaretDown} alt={IcCaretDown} />
           </div>
           <div className="px-2 py-2 col-span-2 flex">
-            <span>Fees (24H)</span>
+            <span>Fees {timeBasis}</span>
             <img className="ml-1 w-4" src={IcCaretDown} alt={IcCaretDown} />
           </div>
           <div className="px-2 py-2 col-span-2 flex">
-            <span>APR</span>
+            <span>APR {timeBasis}</span>
             <img className="ml-1 w-4" src={IcCaretDown} alt={IcCaretDown} />
           </div>
           <div className="col-span-1"></div>

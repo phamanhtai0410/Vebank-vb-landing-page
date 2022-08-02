@@ -48,18 +48,24 @@ const userAssetPools = createSlice({
         amountTokenB,
       };
     },
+    updateLoadingLiquidPoolState: (state, action) => {
+      state.isLoadingLiquidPoolState = action.payload.isLoading;
+    },
   },
 });
 
 export default userAssetPools.reducer;
 
-export const { updateLiquidityPool, updateUserAssets } = userAssetPools.actions;
+export const { updateLiquidityPool, updateUserAssets, updateLoadingLiquidPoolState } = userAssetPools.actions;
 
 export const selectAllAddresses = (state) => state.userAssetPools.addresses;
 export const selectAllPoolBalance = (state) => state.userAssetPools.data;
 
 export const selectUserAddedPoolsAddresses = (state) =>
   state.userAssetPools.userAddedPoolsAddresses;
+
+export const selectIsLoadingPoolAddresses = (state) =>
+  state.userAssetPools.isLoadingLiquidPoolState;
 
 export const selectUserPoolAssetByPoolAddress = (state, poolAddress) =>
   state.userAssetPools.data[poolAddress];

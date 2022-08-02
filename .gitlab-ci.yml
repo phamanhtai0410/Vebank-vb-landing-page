@@ -28,8 +28,12 @@ stages:
 
 .kubectl_config: &kubectl_config
   - |
+      if [ "$CI_COMMIT_REF_NAME" == "test" ]; then
+        aws eks --region $AWS_REGION update-kubeconfig --name rinz-staging-cluster
+      fi
+  - |
       if [ "$CI_COMMIT_REF_NAME" == "master" ]; then
-        aws eks --region $AWS_REGION update-kubec onfig --name vb-production-cluster
+        aws eks --region $AWS_REGION update-kubeconfig --name vb-production-cluster
       fi
   - |
       if [ "$CI_COMMIT_REF_NAME" == "stag" ]; then
@@ -96,7 +100,7 @@ build_test:
   script:
     - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $CONTAINER_REPO_ASIA_TEST
     - |
-      if [ "$CI_COMMIT_REF_NAME" == "stag" ]; then
+      if [ "$CI_COMMIT_REF_NAME" == "test" ]; then
         sed -i -e "s#\[NAMESPACE_TEST\]#$NAMESPACE_TEST#g" skaffold.yaml
         sed -i -e "s#\[CONTAINER_REPO_TEST\]#$CONTAINER_REPO_ASIA_TEST#g" skaffold.yaml
         sed -i -e "s#\[NAMESPACE\]#$NAMESPACE_TEST#g" skaffold.yaml
@@ -107,7 +111,7 @@ build_test:
     - cp skaffold.yaml skaffold-test.yaml
   only:
     refs:
-      - stag
+      - test
   artifacts:
     paths:
     - skaffold-test.yaml
@@ -239,7 +243,7 @@ deploy_test:
     - git clone https://read-token:$GITLAB_TOKEN@gitlab.rinznetwork.com/rinz-io-devops/helm-value/$IMAGE_NAME.git
     - mv $IMAGE_NAME/test.yaml .
     - |
-      if [ "$CI_COMMIT_REF_NAME" == "stag" ]; then
+      if [ "$CI_COMMIT_REF_NAME" == "test" ]; then
         sed -i -e "s#\[FULLREPO_ASIA\]#$FULLREPO_ASIA_TEST#g" test.yaml
         sed -i -e "s#\[NAMESPACE\]#$NAMESPACE_TEST#g" test.yaml
       fi
@@ -250,7 +254,7 @@ deploy_test:
     - /usr/local/bin/skaffold deploy -p profile-test   -a build-test.json
   only:
     refs:
-      - stag
+      - test
 deploy_stag:
   stage: deploy
   image:  alpine/helm:3.2.1

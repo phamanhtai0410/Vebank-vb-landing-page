@@ -14,13 +14,13 @@ const AssetsRowAction = ({ openRowAssets, item }) => {
 
     return (
 
-        <div className='bg-[#182844] p-4 mt-2 flex flex-row justify-between rounded space-x-4 fade-in-box' >
+        <div className='bg-[#293A55] rounded-b-lg p-6 mt-2 flex flex-row justify-between space-x-6 fade-in-box' >
 
-            <div className='bg-[#26355A] p-4 rounded'>
-                <h4>Earn</h4>
+            <div className='bg-[#182233] p-4 rounded-lg font-montserrat'>
+                <h4 className='text-[#778CC0] text-sm'>Supply balance</h4>
                 <div className='flex flex-row mt-3'>
                     <input
-                        className="bg-transparent rounded focus:outline-none placeholder-slate-300 font-poppins appearance-none text-base w-full mr-4"
+                        className="bg-transparent rounded focus:outline-none placeholder-slate-300 appearance-none text-base w-full mr-4"
                         type="text"
                         placeholder={"0"}
                         disabled={true}
@@ -29,11 +29,11 @@ const AssetsRowAction = ({ openRowAssets, item }) => {
                 </div>
             </div>
 
-            <div className='bg-[#26355A] p-4 rounded '>
-                <h4>Balance</h4>
+            <div className='bg-[#182233] p-4 rounded-lg font-montserrat'>
+                <h4 className='text-[#778CC0] text-sm'>Balance</h4>
                 <div className='flex flex-row mt-3'>
                     <input
-                        className="bg-transparent rounded focus:outline-none placeholder-slate-300 font-poppins appearance-none text-base w-full mr-4"
+                        className="bg-transparent rounded focus:outline-none placeholder-slate-300 appearance-none text-base w-full mr-4"
                         type="text"
                         placeholder={"0"}
                         disabled={true}
@@ -42,11 +42,11 @@ const AssetsRowAction = ({ openRowAssets, item }) => {
                 </div>
             </div>
 
-            <div className='bg-[#26355A] p-4 rounded'>
-                <h4>Debt</h4>
+            <div className='bg-[#182233] p-4 rounded-lg font-montserrat'>
+                <h4 className='text-[#778CC0] text-sm'>Borrow balance</h4>
                 <div className='flex flex-row mt-3'>
                     <input
-                        className="bg-transparent rounded focus:outline-none placeholder-slate-300 font-poppins appearance-none text-base w-full mr-4"
+                        className="bg-transparent rounded focus:outline-none placeholder-slate-300 appearance-none text-base w-full mr-4"
                         type="text"
                         placeholder={"0"}
                         disabled={true}
@@ -55,11 +55,11 @@ const AssetsRowAction = ({ openRowAssets, item }) => {
                 </div>
             </div>
 
-            <div className='bg-[#26355A] p-4 rounded'>
-                <h4>Balance</h4>
+            <div className='bg-[#182233] p-4 rounded-lg'>
+                <h4 className='text-[#778CC0] text-sm font-montserrat'>Available</h4>
                 <div className='flex flex-row mt-3'>
                     <input
-                        className="bg-transparent rounded focus:outline-none placeholder-slate-300 font-poppins appearance-none text-base w-full mr-4"
+                        className="bg-transparent rounded focus:outline-none placeholder-slate-300 appearance-none text-base w-full mr-4"
                         type="text"
                         placeholder={"0"}
                         disabled={true}

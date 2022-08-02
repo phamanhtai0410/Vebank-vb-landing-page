@@ -61,6 +61,10 @@ export const loadModalSupply = (dataToken) => async (dispatch, getState) => {
     accountApprove = ethers.utils.formatEther(accountApprove);
     accountApprove = Number(accountApprove);
 
+    if(accountApprove < Number(accountBalance)){
+        accountApprove=0;
+    }
+
     dispatch({
         type: marketplaceConstants.MODAL_OPEN_SUPPLY_MARKET,
         contractSupply,

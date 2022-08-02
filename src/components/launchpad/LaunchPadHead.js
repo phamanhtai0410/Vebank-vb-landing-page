@@ -1,5 +1,5 @@
 import React from 'react';
-import LaunchPadheadimg from "../../assets/images/launchpad/launchpad_head.jpg";
+import LaunchPadheadimg from "../../assets/images/launchpad/launchpad_head.svg";
 
 const LaunchPadHead = () => {
 

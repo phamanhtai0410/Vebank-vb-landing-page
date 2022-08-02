@@ -113,6 +113,9 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
 
     }
 
+    if(Number(accountBalance) < Number(accountApprove)){
+        accountApprove = 0;
+    }
 
     dispatch({
         type: marketplaceConstants.MODAL_OPEN_BORROW_MARKET,

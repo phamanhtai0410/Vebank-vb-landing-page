@@ -8,17 +8,16 @@ module.exports = {
         xs: "1rem",
         sm: "1rem",
         lg: "2rem",
-        xl: "4rem",
+        xl: "3rem",
         "2xl": "4rem",
       },
     },
     screens: {
-      xs: "420px",
       sm: "640px",
-      md: "920px",
-      lg: "1280px",
-      xl: "1440px",
-      "2xl": "1690px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
     },
     extend: {
       spacing: {

@@ -66,7 +66,7 @@ const MenuLink = ({ menuToggleHandler }) => {
           </NavLink>
           {item.name === "Trade" && isMenuHover &&  (
             <div
-              className="navbar-sub-menu absolute w-full col text-base justify-center items-start top-19 md:w-[160px] p-4 md:p-0 rounded-lg z-50"
+              className="navbar-sub-menu absolute w-full col text-base justify-center items-start top-16 md:w-[160px] p-4 md:p-0 rounded-lg z-50"
             >
               <NavLink
                 to="/swap"

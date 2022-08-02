@@ -12,11 +12,6 @@ header:not(.navigation) {
 }
 
 //raise box
-.raise-box,
-.raise-content {
-    width: 80%;
-}
-
 .count-down {
     display: flex;
     flex-direction: column;
@@ -65,6 +60,9 @@ header:not(.navigation) {
 .raise-box-2,
 .launchpad-content-1 {
     width: 30%;
+}
+.launchpad-content-1 a{
+    cursor: pointer;
 }
 
 .raise-bg {
@@ -225,4 +223,7 @@ input[type="range"] {
     order: 1;
     align-self: stretch;
     color: #ffffff;
+}
+.scrollmargin {
+    scroll-margin: 100px;
 }

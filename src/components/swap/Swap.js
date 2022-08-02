@@ -23,6 +23,7 @@ import { swapConstants } from "../../constants";
 import { svgSymbolConfig } from "../../_helpers/param";
 import "./styles.scss";
 import { formatBalanceString } from "../../utils/lib";
+import Tooltip from "./Tooltip";
 
 const Swap = () => {
   const {
@@ -49,7 +50,6 @@ const Swap = () => {
     // sourcePerDesireTokenPrice,
     // desireTokenAmount,
     // setInputAmount,
-    setInputSlippage,
     onSwapAssetToken,
     onSwapDesireToken,
     onShowModalSelectToken,
@@ -94,27 +94,20 @@ const Swap = () => {
         </p>
       );
     } else if (Number(priceImpact) > 1 && Number(priceImpact) <= 3) {
-      return (
-        <p className="text-white">
-          {" "}
-          {Number(priceImpact) < 0.1 ? <>&lt;</> : ""}
-          {Number(priceImpact).toFixed(2)}%{" "}
-        </p>
-      );
+      return <p className="text-white"> {Number(priceImpact).toFixed(2)}% </p>;
     } else if (Number(priceImpact) > 3 && Number(priceImpact) <= 5) {
       return (
-        <p className="text-notiWarning">
-          {" "}
-          {Number(priceImpact) < 0.1 ? <>&lt;</> : ""}
-          {Number(priceImpact).toFixed(2)}%{" "}
-        </p>
+        <p className="text-notiWarning"> {Number(priceImpact).toFixed(2)}% </p>
       );
     } else if (Number(priceImpact) > 5) {
       return (
         <p className="text-red-600">
           {" "}
-          {Number(priceImpact) < 0.1 ? <>&lt;</> : ""}
-          {Number(priceImpact).toFixed(2)}%{" "}
+          {Number(priceImpact).toFixed(2)}%
+          {/* {Number(priceImpact) > 100 ? <>&gt;</> : ""}
+          {Number(priceImpact) > 100
+            ? 100
+            : Number(priceImpact).toFixed(2)}% */}
         </p>
       );
     }
@@ -128,8 +121,14 @@ const Swap = () => {
           {loadingExchangeRate ? (
             <div className="loading__exchange__rate" />
           ) : (
-            <button onClick={onCheckExchangeRatePool}>
-              <img src={IcLoading} alt="Refresh" />
+            <button onClick={() => onCheckExchangeRatePool(null)}>
+              <div className="circle-progress circle-progress--loading">
+                <svg>
+                  <circle className="track" />
+                  <circle className="progress" />
+                </svg>
+              </div>
+              {/* <img src={IcLoading} alt="Refresh" /> */}
             </button>
           )}
           {/* <img className="cursor-pointer" src={IcSetting} alt="" /> */}
@@ -173,7 +172,7 @@ const Swap = () => {
                   onClick={() => onChangeSourceInput(sourceTokenBalance)}
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
-                  } sm:w-[40px] w-[36px] h-[28px] bg-[#203557] rounded flex flex-row items-center justify-center text-xs`}
+                  } sm:w-[40px] w-[36px] h-[28px] bg-[#203557] rounded flex flex-row items-center justify-center text-[12px] leading-4`}
                   disabled={
                     !account ||
                     error === errExistedLiquidity ||
@@ -187,7 +186,7 @@ const Swap = () => {
                   onClick={() => onChangeSourceInput(sourceTokenBalance / 2.0)}
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
-                  } sm:w-[40px] w-[36px] h-[28px] rounded bg-[#203557]" flex flex-row items-center justify-center text-xs`}
+                  } sm:w-[40px] w-[36px] h-[28px] rounded bg-[#203557]" flex flex-row items-center justify-center text-[12px] leading-4`}
                   disabled={
                     !account ||
                     error === errExistedLiquidity ||
@@ -290,7 +289,7 @@ const Swap = () => {
                   onClick={() => onChangeDesireInput(desireTokenBalance)}
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
-                  } sm:w-[40px] w-[36px] h-[28px] bg-[#203557] rounded flex flex-row items-center justify-center text-xs`}
+                  } sm:w-[40px] w-[36px] h-[28px] bg-[#203557] rounded flex flex-row items-center justify-center text-[12px] leading-4`}
                   disabled={
                     !account ||
                     error === errExistedLiquidity ||
@@ -304,7 +303,7 @@ const Swap = () => {
                   onClick={() => onChangeDesireInput(desireTokenBalance / 2.0)}
                   className={`${
                     !account ? "bg-vbDisabled" : "bg-[#203557]"
-                  } sm:w-[40px] w-[36px] h-[28px] rounded bg-[#203557]" flex flex-row items-center justify-center text-xs`}
+                  } sm:w-[40px] w-[36px] h-[28px] rounded bg-[#203557]" flex flex-row items-center justify-center text-[12px] leading-4`}
                   disabled={
                     !account ||
                     error === errExistedLiquidity ||
@@ -421,25 +420,40 @@ const Swap = () => {
               >
                 <div className="px-4 py-5 space-y-4 rounded-lg border border-vbDisableText my-2">
                   <div className="flex justify-between">
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-2 relative group">
                       <p className="text-grey-3">Swapping Through</p>
                       <img src={IcQuestionCircleBlue} alt="" className="w-4" />
+                      <Tooltip
+                        info={
+                          "Swapping through these tokens resulted in the best price for your trade."
+                        }
+                      />
                     </div>
                     <p>VeBank Pool</p>
                   </div>
                   <div className="flex justify-between">
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-2 relative group">
                       <p className="text-grey-3">Minimum receive</p>
                       <img src={IcQuestionCircleBlue} alt="" className="w-4" />
+                      <Tooltip
+                        info={
+                          "The least amount of tokens you will receive on this trade."
+                        }
+                      />
                     </div>
                     <p>
                       {amountOutMin} {desireTokenInfo?.assetsChain}
                     </p>
                   </div>
                   <div className="flex justify-between">
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-2 relative group">
                       <p className="text-grey-3">Price Impact</p>
                       <img src={IcQuestionCircleBlue} alt="" className="w-4" />
+                      <Tooltip
+                        info={
+                          "The difference between the market price and estimated price due to trade size."
+                        }
+                      />
                     </div>
                     {/* <p className="text-vbLine">
                     {" "}
@@ -448,11 +462,17 @@ const Swap = () => {
                     {renderPriceImpact()}
                   </div>
                   <div className="flex justify-between flex-row w-full items-center">
-                    <div className="flex space-x-2 w-full">
+                    <div className="flex space-x-2 relative group">
                       <p className="text-grey-3 min-w-fit">
                         Slippage tolerance
                       </p>
                       <img src={IcQuestionCircleBlue} alt="" className="w-4" />
+                      <Tooltip
+                        info={
+                          "The difference between the market price and estimated price due to trade size."
+                        }
+                        position="top"
+                      />
                     </div>
                     <div className="w-20 flex flex-row justify-evenly items-center bg-itemForm rounded border-vbDisableText border px-2 py-[0.0625rem]">
                       <input
@@ -474,9 +494,16 @@ const Swap = () => {
                 </p> */}
                   </div>
                   <div className="flex justify-between items-center">
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-2 relative group">
                       <p className="text-grey-3">Swap fee</p>
                       <img src={IcQuestionCircleBlue} alt="" className="w-4" />
+                      <Tooltip
+                        info={`For each trade a 0.3% fee is paid.
+                          - 0.25% to liquidity providers.
+                          - 0.05% to VB holders and Treasury.`}
+                        position="top"
+                        width="250px"
+                      />
                     </div>
                     {loadingFee ? (
                       <div className="loading" />

@@ -67,4 +67,24 @@ export const selectAccountBorrowBalance = (state) =>
         : [];
     }
   );
-  export const selectUserAssets = (state) => _selectUserAssets(state);
+
+  const selectDataAssets = state => state.accountAssetsReducer.data;
+//export const selectUserAssets = (state, tokenAddress) => state.accountAssetsReducer.data[tokenAddress]
+
+export const selectUserAssets = (state, tokenAddress) => {
+  const items =state.accountAssetsReducer.data.filter(item => item.assetsAddress?.toLocaleString() === tokenAddress?.toLocaleString())
+  if(items){
+    return items[0];
+  }
+}
+//const selectDataAssets = state => state.accountAssetsReducer.data;
+// export const selectItemsByAssets = createSelector(
+//   [
+//     // Usual first input - extract value from `state`
+//     selectDataAssets,
+//     // Take the second arg, `category`, and forward to the output selector
+//     (state, address) => address
+//   ],
+//   // Output selector gets (`items, category)` as args
+//   (data, address) => data.filter(item => item.assetAddress?.toLocaleString() === address?.toLocaleString())
+// )

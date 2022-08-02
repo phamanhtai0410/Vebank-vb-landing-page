@@ -110,7 +110,8 @@ const AssetsMarket = () => {
 
                         </div>
 
-                        <AssetsRowAction key={item.assetsAddress + '_act'} openRowAssets={openRowAssets} item={item} />
+                        {item ? <AssetsRowAction key={item.assetsAddress + '_act'} openRowAssets={openRowAssets} item={item} />:""}
+                        
 
                     </div>
 

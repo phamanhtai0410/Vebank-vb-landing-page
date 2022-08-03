@@ -12,7 +12,9 @@ const Tooltip = ({ info, position = "bottom", width = "170px" }) => {
         <div className="w-3 h-[13px] -mb-2 ml-4 rotate-45 bg-tooltip"></div>
       )}
       <p
-        className={`relative w-[${width}] flex flex-col justify-center items-center z-10 p-[10px] text-[12px] leading-4 text-white whitespace-pre-line bg-tooltip rounded-lg shadow-lg`}
+        className={`relative ${
+          width === "170px" ? "w-[170px]" : "w-250px]"
+        } flex flex-col justify-center items-center z-10 p-[10px] text-[12px] leading-4 text-white whitespace-pre-line bg-tooltip rounded-lg shadow-lg`}
       >
         {info}
       </p>

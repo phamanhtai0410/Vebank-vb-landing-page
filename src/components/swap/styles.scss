@@ -29,7 +29,7 @@
 .loading__exchange__rate {
   width: 20px;
   height: 20px;
-  border: solid 2px #02a4ff;
+  border: solid 2px #3EE8FF;
   border-radius: 50%;
   border-right-color: transparent;
   border-bottom-color: transparent;
@@ -86,7 +86,7 @@
       stroke: none;
       stroke-dasharray: 280%;
       stroke-dashoffset: 277%;
-      transform: rotate(-89deg);
+      transform: rotate(-90deg);
       transform-origin: center;
     }
 
@@ -99,8 +99,8 @@
     > svg {
       .progress {
         // custom progress color
-        stroke: #02a4ff;
-        animation: circle-loading 30s infinite;
+        stroke: #3EE8FF;
+        animation: circle-loading 60s infinite;
         @keyframes circle-loading {
           0% {
             stroke-dashoffset: 277%;

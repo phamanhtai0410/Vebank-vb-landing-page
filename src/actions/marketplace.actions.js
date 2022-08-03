@@ -50,7 +50,7 @@ export const getMarketAssets = () => async (dispatch, getState) => {
         for await (const item of listAsset) {
 
             const getReserveData = await contractAAVE.methods.getReserveData(item.assetsAddress).call();
-           console.log("getReserveData",getReserveData);
+            //console.log("getReserveData",getReserveData);
 
             // Get data
             const rewardsByAsset = await contractIcentives.methods.getRewardsByAsset(item.assetsAddress).call();
@@ -190,7 +190,7 @@ export const getAccountAssets = (dataAssets) => async (dispatch, getState) => {
             for await (const item of dataAssets) {
 
                 const accountReserve = await contractAAVE.methods.getUserReserveData(item.assetsAddress, account).call();
-                console.log("getUserReserveData",accountReserve);
+                //console.log("getUserReserveData",accountReserve);
 
                 let balanceSupply = 0;
                 if (accountReserve.currentATokenBalance !== "0") {

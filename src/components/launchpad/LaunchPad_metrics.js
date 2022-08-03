@@ -7,9 +7,8 @@ const LaunchPadmetrics = () => {
     return (
         <div className="w-full pb-40">
             <div><p className="launchpad-content-title pb-6">$VB Tokenomics</p></div>
-            <img className="pb-10" src={LaunchPad_metrics} />
-            <div><p className="launchpad-content-title pb-10">Our team leaders</p></div>
-            <img className="pb-10" src={LaunchPad_metrics1} />
+            <img className="w-full pb-10" src={LaunchPad_metrics} />
+            <img className="w-full pb-10" src={LaunchPad_metrics1} />
 
         </div>
     );

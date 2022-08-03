@@ -5,7 +5,6 @@ import IcDown from "../../assets/images/down_fill.svg";
 import IcUp from "../../assets/images/up_fill.svg";
 import IcDropDown from "../../assets/images/ic_dropdown.svg";
 import BtnConnectInPage from "../account/BtnConnectInPage";
-import IcLoading from "../../assets/images/loading_swap.svg";
 import IcSwitch from "../../assets/images/vertical_switch.svg";
 import IcQuestionCircleBlue from "../../assets/images/question_circle_blue.svg";
 // import IcQuestionCircleYellow from "../../assets/images/question_circle_yellow.svg";
@@ -14,6 +13,7 @@ import IcQuestionCircleBlue from "../../assets/images/question_circle_blue.svg";
 // import IcSetting from "../../assets/images/buttons/ic_setting_outline.svg";
 // import IcQuestionCircle from "../../assets/images/ic_question_circle.svg";
 // import IcSwapWhiteNoBackground from "../../assets/images/ic_swap_white_no_background.svg";
+// import IcLoading from "../../assets/images/loading_swap.svg";
 // import IcGas from "../../assets/images/gas.svg";
 // import BtnOpenSwap from "./BtnOpenSwap";
 
@@ -27,6 +27,7 @@ import Tooltip from "./Tooltip";
 
 const Swap = () => {
   const {
+    priceUpdate,
     error,
     isSwitch,
     pricePaidPerA,
@@ -68,6 +69,7 @@ const Swap = () => {
     onCheckExchangeRatePool,
     onSwitchExchangeRate,
     onChangeSlippage,
+    onUpdatePriceChange,
   } = useSwapFacade();
 
   const errExistedLiquidity = "Not existed liquidity.";
@@ -90,7 +92,7 @@ const Swap = () => {
         <p className="text-vbLine">
           {" "}
           {Number(priceImpact) < 0.1 ? <>&lt;</> : ""}
-          {Number(priceImpact).toFixed(2)}%{" "}
+          {Number(priceImpact) < 0.1 ? 0.1 : Number(priceImpact).toFixed(2)}%
         </p>
       );
     } else if (Number(priceImpact) > 1 && Number(priceImpact) <= 3) {
@@ -386,14 +388,7 @@ const Swap = () => {
                         {isSwitch
                           ? desireTokenInfo?.assetsChain
                           : sourceTokenInfo?.assetsChain}{" "}
-                        &asymp;{" "}
-                        {isSwitch
-                          ? pricePaidPerB.toString().length >= 6
-                            ? `${parseFloat(pricePaidPerB).toFixed(6)}`
-                            : pricePaidPerB
-                          : pricePaidPerA.toString().length >= 6
-                          ? `${parseFloat(pricePaidPerA).toFixed(6)}`
-                          : pricePaidPerA}{" "}
+                        &asymp; {isSwitch ? pricePaidPerB : pricePaidPerA}{" "}
                         {isSwitch
                           ? sourceTokenInfo?.assetsChain
                           : desireTokenInfo?.assetsChain}
@@ -517,6 +512,21 @@ const Swap = () => {
               </div>
             </div>
           )}
+        {priceUpdate && (
+          <div className="w-full bg-itemForm rounded-lg px-4 py-3 flex flex-row items-center justify-between">
+            <div className="flex flex-row items-center space-x-2">
+              <p className="text-base">Price updated</p>
+              <img src={IcQuestionCircleBlue} alt="" className="w-4" />
+            </div>
+            <button
+              onClick={onUpdatePriceChange}
+              className="
+                btn-veb"
+            >
+              Accept
+            </button>
+          </div>
+        )}
         {account && (
           <button
             disabled={loadingSwap || loadingApprove || error !== ""}
@@ -531,14 +541,7 @@ const Swap = () => {
           </button>
         )}
         {!account && <BtnConnectInPage className="w-full btn-veb h-12" />}
-        {/* (
-          <button
-            className="btn-veb h-12 text-sm bg-btn-veb-disabled border-[1px] border-[#4B5C86]"
-            disabled={true}
-          >
-            Enter an amount to see more trading details.
-          </button>
-        ) */}
+
         <div className="flex space-x-2">
           <p className="text-balanceVTHO">
             VTHO balance:{" "}

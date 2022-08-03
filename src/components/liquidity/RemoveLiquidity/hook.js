@@ -72,7 +72,7 @@ const useRemoveLiquidFacade = () => {
   );
 
   const isEnabled = useMemo(() => {
-    console.log('🐶🐶  ~ isEnabled ~ approvePoolState', approvePoolState)
+    // console.log('🐶🐶  ~ isEnabled ~ approvePoolState', approvePoolState)
     return !isApproving && approvePoolState > 0 && approvePoolState >= removeAmount;
   }, [isApproving, removeAmount, approvePoolState]);
 

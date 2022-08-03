@@ -60,6 +60,9 @@ const Footer = () => {
     const ignoreMe = document.getElementById("show-more");
     if (event.target !== ignoreMe && event.target.parentNode !== ignoreMe){
       setShowMore("");
+      // if (event.target.href !== undefined && event.target.href !== "null" && event.target.href !== "") {
+      //   window.open( event.target.href)
+      // }
     }
   });
 
@@ -89,6 +92,7 @@ const Footer = () => {
               <div className="flex flex-col space-y-4 mt-6">
                 {products.map((item, index) => (
                   <Link
+                    key={index}
                     to={item.path}
                     className="text-sm text-[#D9D9D9]"
                   >
@@ -133,7 +137,7 @@ const Footer = () => {
               <span className="font-poppins_semi_bold text-lg text-[#39C5F1]">COMMUNITY</span>
               <div className="flex flex-col space-y-4 mt-6">
                 {communities.map((item, index) => (
-                  <div id="show-more" className="relative flex flex-row items-center space-x-3 cursor-pointer" onClick={() => showSocialDetai(item.title)}>
+                  <div key={index} id="show-more" className="relative flex flex-row items-center space-x-3 cursor-pointer" onClick={() => showSocialDetai(item.title)}>
                     <img src={item.icon} alt={item.title} />
                     {item?.link ? 
                     <a

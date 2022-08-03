@@ -43,27 +43,27 @@ function App() {
 
           <Route path="/" element={<HomePage />} />
 
-          <Route path="/markets" element={<MarketPage />} />
+          <Route path="/markets" element={<ComingSoon />} />
 
-          <Route path="/pool" element={<PoolPage />} />
+          <Route path="/pool" element={<ComingSoon />} />
 
-          <Route path="/farm" element={<FarmPage/>} />
+          <Route path="/farm" element={<ComingSoon/>} />
 
           {/* <Route path="/trade" element={<TradePage />} /> */}
 
-          <Route path="/stake" element={<StakingPage />} />
+          <Route path="/stake" element={<ComingSoon />} />
 
-          <Route path="/launchpad" element={<LaunchPadPage />} />
+          <Route path="/launchpad" element={<ComingSoon />} />
 
-          <Route path="/swap" element={<SwapPage />} />
+          <Route path="/swap" element={<ComingSoon />} />
 
           <Route path="/trade" element={<Navigate to="/swap" />} />
 
           <Route path="/liquidity" >
-            <Route path="add/:addressPool" element={<AddLiquidityPage  />} />
-            <Route path="add" element={<AddLiquidityPage  />} />
-            <Route path="remove/:addressPool" element={<RemoveLiquidityPage  />} />
-            <Route path="*" index element={<LiquidityPage  />} />
+            <Route path="add/:addressPool" element={<ComingSoon  />} />
+            <Route path="add" element={<ComingSoon  />} />
+            <Route path="remove/:addressPool" element={<ComingSoon  />} />
+            <Route path="*" index element={<ComingSoon  />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" />} />

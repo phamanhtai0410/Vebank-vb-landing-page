@@ -69,7 +69,7 @@ const useRemoveLiquidFacade = () => {
   }, [secondTokenAmount, removeValue, liquidityPool]);
 
   const isEnabled = useMemo(() => {
-    console.log('🐶🐶  ~ isEnabled ~ approvePoolState',isApproving, approvePoolState)
+    // console.log('🐶🐶  ~ isEnabled ~ approvePoolState',isApproving, approvePoolState)
     return !isApproving && approvePoolState > 0 && approvePoolState >= liquidityPool;
   }, [isApproving, approvePoolState, liquidityPool]);
 
@@ -140,8 +140,6 @@ const useRemoveLiquidFacade = () => {
   }, [isLoadingDetail]);
 
   useEffect(() => {
-    console.log("approvePoolState", approvePoolState)
-    console.log("isApproving", isApproving)
     if (!isApproving) {
       if (approvePoolState <= 0) {
         setEnableBtnLabel("Enable");
@@ -180,12 +178,6 @@ const useRemoveLiquidFacade = () => {
   }, [isRemoving, removePoolSuccessState]);
 
   useEffect(() => {
-    console.log("firstTokenAmount", firstTokenAmount);
-    console.log("secondTokenAmount", secondTokenAmount);
-    console.log("liquidityPool", liquidityPool);
-    console.log("amountTokenA", amountTokenA);
-    console.log("amountTokenB", amountTokenB);
-    console.log("removeAvailable", removeAvailable);
     if (Number(removeValue) > Number(liquidityPool)) {
       setPrimaryButtonLabel("Amount Too Large");
     }

@@ -13,7 +13,6 @@ const HomePage = () => {
     exploreRef.current.scrollIntoView({ behavior: "smooth" });
   }
 
-
   return (
     <div className="box_home w-full min-h-screen">
       <Banner handleClickExplore={handleClickExplore} />

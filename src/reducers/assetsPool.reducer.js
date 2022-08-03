@@ -1,10 +1,9 @@
-import { poolConstants } from "../constants";
+import { poolConstants, web3Constants } from "../constants";
 
 import IcVeUSD from "../assets/images/ic_veusd.svg";
 import IcVeChain from "../assets/images/ic_vechain.svg";
 import IcVeBank from "../assets/images/ic_vebank.svg";
 import IcVtho from "../assets/images/ic_vtho.svg";
-
 
 const listAsset = [
   {
@@ -12,7 +11,7 @@ const listAsset = [
     iconAssets: IcVeUSD,
     assetsPoolName: "VET-VEUSD",
     assetsKey:
-      process.env.REACT_APP_TOKEN_WVET + process.env.REACT_APP_TOKEN_VEUSD,
+    process.env.REACT_APP_TOKEN_WVET + process.env.REACT_APP_TOKEN_VEUSD,
     assetsChainA: "VET",
     addressTokenA: process.env.REACT_APP_TOKEN_WVET,
     assetsChainB: "VEUSD",
@@ -31,7 +30,7 @@ const listAsset = [
     iconAssets: IcVtho,
     assetsPoolName: "VET-VTHO",
     assetsKey:
-      process.env.REACT_APP_TOKEN_WVET + process.env.REACT_APP_TOKEN_VTHO,
+    process.env.REACT_APP_TOKEN_WVET + process.env.REACT_APP_TOKEN_VTHO,
     assetsChainA: "VET",
     addressTokenA: process.env.REACT_APP_TOKEN_WVET,
     assetsChainB: "VTHO",
@@ -69,7 +68,7 @@ const listAsset = [
     iconAssets: IcVtho,
     assetsPoolName: "VB-VTHO",
     assetsKey:
-      process.env.REACT_APP_TOKEN_VEBANK + process.env.REACT_APP_TOKEN_VTHO,
+    process.env.REACT_APP_TOKEN_VEBANK + process.env.REACT_APP_TOKEN_VTHO,
     assetsChainA: "VB",
     addressTokenA: process.env.REACT_APP_TOKEN_VEBANK,
     assetsChainB: "VTHO",
@@ -88,7 +87,7 @@ const listAsset = [
     iconAssets: IcVtho,
     assetsPoolName: "VEUSD-VTHO",
     assetsKey:
-    process.env.REACT_APP_TOKEN_VEUSD+ process.env.REACT_APP_TOKEN_VTHO,
+    process.env.REACT_APP_TOKEN_VEUSD + process.env.REACT_APP_TOKEN_VTHO,
     assetsChainA: "VEUSD",
     addressTokenA: process.env.REACT_APP_TOKEN_VEUSD,
     assetsChainB: "VTHO",
@@ -107,7 +106,7 @@ const listAsset = [
     iconAssets: IcVeBank,
     assetsPoolName: "VEUSD-VB",
     assetsKey:
-    process.env.REACT_APP_TOKEN_VEUSD+ process.env.REACT_APP_TOKEN_VEBANK,
+      process.env.REACT_APP_TOKEN_VEUSD + process.env.REACT_APP_TOKEN_VEBANK,
     assetsChainA: "VEUSD",
     addressTokenA: process.env.REACT_APP_TOKEN_VEUSD,
     assetsChainB: "VB",
@@ -120,7 +119,6 @@ const listAsset = [
     fees: "199,905",
     apr: 32.12,
   },
-
 ];
 
 const initialState = {
@@ -135,7 +133,6 @@ const initialState = {
   data: [],
 };
 
-
 export function assetsPoolReducer(state = initialState, payload) {
   switch (payload.type) {
     case poolConstants.FETCH_POOL_ASSETS_REQUEST:
@@ -145,7 +142,7 @@ export function assetsPoolReducer(state = initialState, payload) {
         query: payload.query ? payload.query : {},
       };
 
-    case poolConstants.FETCH_POOL_ASSETS_SUCCESS:
+    case poolConstants.FETCH_POOL_ASSETS_SUCCESS: {
       const nextState = {
         ...state,
         requesting: false,
@@ -160,7 +157,19 @@ export function assetsPoolReducer(state = initialState, payload) {
         nextState.entities[pool.assetsPoolAddress] = pool;
       }
       return nextState;
-
+    }
+    case web3Constants.WEB3_DISCONNECT: {
+      // When user disconnected account
+      const nextState = {
+        ...state,
+      };
+      for (const poolAddress of state.ids) {
+        nextState.entities[poolAddress].isSubscribeListener = false;
+        nextState.entities[poolAddress].pairApproveEvent?.removeAllListeners();
+        nextState.entities[poolAddress].pairTransferEvent?.removeAllListeners();
+      }
+      return nextState;
+    }
     case poolConstants.FETCH_POOL_ASSETS_ERROR:
       return {
         ...state,
@@ -173,5 +182,6 @@ export function assetsPoolReducer(state = initialState, payload) {
   }
 }
 
+export const selectPoolAddresses = (state) => state.assetsPoolReducer.ids;
 export const selectPoolInfoByAddress = (state, address) =>
   state.assetsPoolReducer.entities[address];

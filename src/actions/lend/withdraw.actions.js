@@ -7,7 +7,7 @@ import ERC20ABI_WETH_GETAWAY from '../../_contracts/lend/WETHGateway.json';
 import ERC20ABI_POOL from '../../_contracts/lend/Pool.json';
 import ABI_ATOKEN from '../../_contracts/lend/AToken.json';
 
-import { randomKeyUUID } from '../../utils/lib';
+import { formatLocaleString, randomKeyUUID } from '../../utils/lib';
 import * as actions from '../.';
 
 const ADDRESS_GATEWAY = process.env.REACT_APP_ADDRESS_GATEWAY; // WETHGateway (chinh là VET Asset)
@@ -27,27 +27,74 @@ export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
 
     const state = getState();
     const { web3, account } = state.web3;
+    const dataPrice = state.assetsPriceReducer.data;
 
     let accountBalance = 0;
     let accountApprove = 0;
+    let totalUserCollateralPool =0;
 
     if (!account) {
         return;
     }
 
+    dispatch({
+        type: marketplaceConstants.MODAL_OPEN_WITHDRAW_MARKET,
+        loading:true,
+        accountApprove,
+        accountBalance: accountBalance,
+        dataToken
+    });
+
     if (dataToken.assetsAddress) {
 
         let contractAAVE = new web3.eth.Contract(ERC20ABI_AAVE, TOKEN_AAVE);
-
         const accountReserve = await contractAAVE.methods.getUserReserveData(dataToken.assetsAddress, account).call();
+        //accountBalance = ethers.utils.formatEther(accountReserve.currentATokenBalance); 
+        //console.log("getUserReserveData",accountReserve);
 
-        console.log("getUserReserveData", accountReserve)
+        const getReserveData = await contractAAVE.methods.getReserveData(dataToken.assetsAddress).call();
 
-        // get balance A Token your account withdrawal is allowed
-        if (accountReserve.currentATokenBalance) {
-            accountBalance = ethers.utils.formatUnits(accountReserve.currentATokenBalance, dataToken.assetsDecimals);
+        if(Number(getReserveData.totalAToken) > 0){
+            totalUserCollateralPool = getReserveData.totalAToken - (getReserveData.totalStableDebt  + getReserveData.totalVariableDebt)
+            totalUserCollateralPool = totalUserCollateralPool.toLocaleString('fullwide', {useGrouping:false});
+            totalUserCollateralPool = ethers.utils.formatUnits(totalUserCollateralPool, dataToken.assetsDecimals);
+            totalUserCollateralPool = Number(totalUserCollateralPool);
         }
 
+        const contractPOOL = new web3.eth.Contract(ERC20ABI_POOL, ADDRESS_POOL);
+        const accountData = await contractPOOL.methods.getUserAccountData(account).call();
+        
+        // get balance A Token your account withdrawal is allowed
+        if (Number(accountReserve.currentATokenBalance && Number(totalUserCollateralPool) > 0)) {
+            accountBalance = ethers.utils.formatUnits(accountReserve.currentATokenBalance, dataToken.assetsDecimals);
+            accountBalance = Number(accountBalance);
+
+            if(accountData && accountData.availableBorrowsBase){
+
+                // totalUserCollateralPool : Tổng số lượng amount mà pool đang có thể withdraw
+                // totalUserWithdraw : Tổng số lượng amount mà user có thể withdraw
+
+                let availableWithdraw = accountData.totalCollateralBase - (accountData.totalDebtBase /(accountData.ltv/10000));
+                availableWithdraw = availableWithdraw.toLocaleString('fullwide', {useGrouping:false});
+                availableWithdraw = ethers.utils.formatEther(availableWithdraw) / dataPrice[dataToken.assetsAddress];
+
+                console.log("currentATokenBalance", accountBalance); 
+                console.log("Available to withdraw", availableWithdraw); 
+                console.log("totalUserCollateralPool", totalUserCollateralPool);
+            
+                // if(accountBalance > totalUserWithdraw  ){ // luong có thể withdraw nhỏ hơn aToken trong pool
+                //     accountBalance = totalUserWithdraw;
+                // }else if(accountBalance > Number(totalUserCollateralPool)){ // Pool ko đủ
+                //     accountBalance = totalUserWithdraw;
+                // }
+
+                accountBalance = Math.min(accountBalance, availableWithdraw, totalUserCollateralPool);
+                
+            }
+
+        }
+
+        // totalCollateralBase - (totalDebtBase/ltv)
         let TOKEN_APPROVE = ADDRESS_POOL;
         if (dataToken.assetsChain === "VET") {
             TOKEN_APPROVE = ADDRESS_GATEWAY;
@@ -63,13 +110,13 @@ export const loadModalWithdraw = (dataToken) => async (dispatch, getState) => {
             accountApprove = 0;
         }
 
-
     }
 
     dispatch({
         type: marketplaceConstants.MODAL_OPEN_WITHDRAW_MARKET,
+        loading:false,
         accountApprove,
-        accountBalance: accountBalance,
+        accountBalance: formatLocaleString(accountBalance, dataToken.assetsDecimals),
         dataToken
     });
 
@@ -107,7 +154,7 @@ export const approveWithdraw = (dataToken, rateMode = 2) => async (dispatch, get
             }, key));
 
             approveMethod.transact(TOKEN_APPROVE, web3.utils.toWei(amountMaxApprove.toString()))
-                .comment(`ATOKEN approve ${TOKEN_APPROVE} on VeBank`)
+                .comment(`approve withdraw ${TOKEN_APPROVE} on VeBank`)
                 .request()
                 .then(result => {
 
@@ -149,6 +196,7 @@ export const approveWithdraw = (dataToken, rateMode = 2) => async (dispatch, get
  * 
  */
 export const withdrawMarket = (dataToken, amount) => async (dispatch, getState) => {
+   
 
     const state = getState();
 
@@ -178,7 +226,7 @@ export const withdrawMarket = (dataToken, amount) => async (dispatch, getState) 
 
         connex.vendor
             .sign('tx', [c2_withdraw])
-            .comment(`transfer ${amount} ${dataToken.assetsChain} to Borrow VeBank`)
+            .comment(`withdraw ${amount} ${dataToken.assetsChain}`)
             .request()
             .then(transaction => {
 
@@ -225,6 +273,7 @@ export const withdrawMarket = (dataToken, amount) => async (dispatch, getState) 
  * "interestRateMode: 0, 1, 2 => 0: None, 1: Stable, 2: Variable"
  */
 export const withdrawETHMarket = (dataToken, amount) => async (dispatch, getState) => {
+    console.log("withdrawETHMarket",dataToken,amount);
 
     const state = getState();
 
@@ -244,19 +293,23 @@ export const withdrawETHMarket = (dataToken, amount) => async (dispatch, getStat
         });
 
         const amountWithdraw = web3.utils.toWei(amount.toString());
+        console.log("amountWithdraw",amountWithdraw);
 
         // approve Atoken 
         let approveABI = ABI_ATOKEN.find(({ name, type }) => name === "approve" && type === "function");
         let approveMethod = connex.thor.account(process.env.REACT_APP_ATOKEN_VET).method(approveABI);
         const c1_approve = approveMethod.asClause(ADDRESS_GATEWAY, web3.utils.toWei(amountMaxApprove.toString()))
+        console.log("c1_approve",c1_approve);
 
         const withdrawETH_ABI = ERC20ABI_WETH_GETAWAY.find(({ name, type }) => name === "withdrawETH" && type === "function");
         const methodWithdraw = connex.thor.account(ADDRESS_GATEWAY).method(withdrawETH_ABI);
         const c2_withdraw = methodWithdraw.asClause(ADDRESS_POOL, amountWithdraw, account)
+        console.log("c2_withdraw",c2_withdraw);
+
 
         connex.vendor
-            .sign('tx', [c1_approve, c2_withdraw])
-            .comment(`transfer ${amount} to withdrawETH`)
+            .sign('tx', [ c2_withdraw])
+            .comment(`withdraw ${amount} ${dataToken.assetsChain}`)
             .request()
             .then(transaction => {
 

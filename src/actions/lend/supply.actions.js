@@ -30,9 +30,11 @@ export const loadModalSupply = (dataToken) => async (dispatch, getState) => {
     let accountApprove = 0;
     let contractSupply;
 
-    if (!account) {
+    if(!account){
+        dispatch(actions.web3Connect(true));
         return;
     }
+    
     contractSupply = new web3.eth.Contract(ERC20ABI_VB, dataToken.assetsAddress);
 
     if (dataToken.assetsChain === "VET") {
@@ -41,7 +43,6 @@ export const loadModalSupply = (dataToken) => async (dispatch, getState) => {
 
         if (accountCoinVET.balance) {
             accountBalance = ethers.utils.formatEther(accountCoinVET.balance);
-
             //accountBalance = Math.round(accountBalance * 100) / 100;
         }
 
@@ -59,6 +60,10 @@ export const loadModalSupply = (dataToken) => async (dispatch, getState) => {
     accountApprove = await contractSupply.methods.allowance(account, ADDRESS_POOL).call();
     accountApprove = ethers.utils.formatEther(accountApprove);
     accountApprove = Number(accountApprove);
+
+    if(accountApprove < Number(accountBalance)){
+        accountApprove=0;
+    }
 
     dispatch({
         type: marketplaceConstants.MODAL_OPEN_SUPPLY_MARKET,
@@ -133,7 +138,6 @@ export const approveSupply = (dataToken) => async (dispatch, getState) => {
 
 };
 
-
 /**
  * 
  * @param {number} id 
@@ -168,39 +172,39 @@ export const supplyMarket = (dataToken, amount) => async (dispatch, getState) =>
 
         // console.log(dataToken.assetsAddress, valueAmount, account, 0);
         methodSupply.transact(dataToken.assetsAddress, valueAmount, account, 0)
-            .comment(`transfer ${amount} ${dataToken.assetsChain} to Supply VeBank`)
-            .request()
-            .then(transaction => {
+        .comment(`transfer ${amount} ${dataToken.assetsChain} to Supply VeBank`)
+        .request()
+        .then(transaction => {
 
-                dispatch({
-                    type: marketplaceConstants.MODAL_SUPPLY_MARKET_SUCCESS,
-                    transaction: 1
-                });
-
-                dispatch(actions.alertActions.update({
-                    status: "success",
-                    title: "Transaction Submitted",
-                    description: `Transfer ${amount} ${dataToken.assetsChain} to Supply VeBank`,
-                  }, key));
-
-                dispatch(actions.reloadAccountAssets());
-
-                return transaction;
-
-            }).catch((e) => {
-
-                console.log("error----", e);
-                dispatch({
-                    type: marketplaceConstants.MODAL_SUPPLY_MARKET_ERROR
-                });
-                dispatch(actions.alertActions.update({
-                    status: "warning",
-                    title: "Transaction Supply Rejected",
-                    description: e.message
-                  }, key));
-                return e;
-
+            dispatch({
+                type: marketplaceConstants.MODAL_SUPPLY_MARKET_SUCCESS,
+                transaction: 1
             });
+
+            dispatch(actions.alertActions.update({
+                status: "success",
+                title: "Transaction Submitted",
+                description: `Transfer ${amount} ${dataToken.assetsChain} to Supply VeBank`,
+                }, key));
+
+            dispatch(actions.reloadAccountAssets());
+
+            return transaction;
+
+        }).catch((e) => {
+
+            console.log("error----", e);
+            dispatch({
+                type: marketplaceConstants.MODAL_SUPPLY_MARKET_ERROR
+            });
+            dispatch(actions.alertActions.update({
+                status: "warning",
+                title: "Transaction Supply Rejected",
+                description: e.message
+                }, key));
+            return e;
+
+        });
 
     }
 
@@ -215,7 +219,7 @@ export const supplyMarket = (dataToken, amount) => async (dispatch, getState) =>
  * depositETH(PoolAddress,UserAddress, referralCode) await iWETHGateway.depositETH("0x...","0x.....", 0, {value: "100000000000000000"})
  * 
  */
-export const supplyDepositETHMarket = (addressAsset, amount) => async (dispatch, getState) => {
+export const supplyDepositVETMarket = (addressAsset, amount) => async (dispatch, getState) => {
     
     const state = getState();
 
@@ -234,13 +238,13 @@ export const supplyDepositETHMarket = (addressAsset, amount) => async (dispatch,
             type: marketplaceConstants.MODAL_SUPPLY_MARKET_REQUEST
         });
 
-        const depositETH_ABI = ERC20ABI_WETH_GETAWAY.find(({ name, type }) => name === "depositETH" && type === "function");
-        const methodDepositETH = connex.thor.account(ADDRESS_GATEWAY).method(depositETH_ABI);
+        const depositVET_ABI = ERC20ABI_WETH_GETAWAY.find(({ name, type }) => name === "depositETH" && type === "function");
+        const methodDepositETH = connex.thor.account(ADDRESS_GATEWAY).method(depositVET_ABI);
 
         methodDepositETH.value(web3.utils.toWei(amount.toString()));
 
         methodDepositETH.transact(ADDRESS_POOL, account, 0)
-            .comment(`transfer ${amount} VET to DepositETH`)
+            .comment(`Transfer ${amount} VET to supply to the market`)
             .request()
             .then(transaction => {
 
@@ -254,7 +258,7 @@ export const supplyDepositETHMarket = (addressAsset, amount) => async (dispatch,
                 dispatch(actions.alertActions.update({
                     status: "success",
                     title: "Transaction Submitted",
-                    description: `Transfer ${amount} VET to DepositETH`,
+                    description: `Transfer ${amount} VET into the market successfully`,
                   }, key));
 
                 return transaction;
@@ -262,8 +266,9 @@ export const supplyDepositETHMarket = (addressAsset, amount) => async (dispatch,
             }).catch((e) => {
 
                 console.log("error----", e);
+                
                 dispatch({
-                    type: marketplaceConstants.MODAL_BORROW_MARKET_ERROR
+                    type: marketplaceConstants.MODAL_SUPPLY_MARKET_ERROR
                 });
 
                 dispatch(actions.alertActions.update({

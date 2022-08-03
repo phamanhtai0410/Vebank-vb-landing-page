@@ -28,6 +28,10 @@ stages:
 
 .kubectl_config: &kubectl_config
   - |
+      if [ "$CI_COMMIT_REF_NAME" == "test" ]; then
+        aws eks --region $AWS_REGION update-kubeconfig --name rinz-staging-cluster
+      fi
+  - |
       if [ "$CI_COMMIT_REF_NAME" == "master" ]; then
         aws eks --region $AWS_REGION update-kubeconfig --name vb-production-cluster
       fi
@@ -66,6 +70,8 @@ build_dev:
     - |
       if [ "$CI_COMMIT_REF_NAME" == "dev" ]; then
         sed -i -e "s#\[NAMESPACE\]#$NAMESPACE_DEV#g" skaffold.yaml
+        sed -i -e "s#\[NAMESPACE_TEST\]#$NAMESPACE_TEST#g" skaffold.yaml
+        sed -i -e "s#\[CONTAINER_REPO_TEST\]#$CONTAINER_REPO_ASIA_TEST#g" skaffold.yaml
         sed -i -e "s#\[IMAGE_NAME\]#$IMAGE_NAME#g" skaffold.yaml
         sed -i -e "s#\[CONTAINER_REPO\]#$CONTAINER_REPO_ASIA_DEV#g" skaffold.yaml
       fi
@@ -94,18 +100,21 @@ build_test:
   script:
     - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $CONTAINER_REPO_ASIA_TEST
     - |
-      if [ "$CI_COMMIT_REF_NAME" == "stag" ]; then
+      if [ "$CI_COMMIT_REF_NAME" == "test" ]; then
+        sed -i -e "s#\[NAMESPACE_TEST\]#$NAMESPACE_TEST#g" skaffold.yaml
+        sed -i -e "s#\[CONTAINER_REPO_TEST\]#$CONTAINER_REPO_ASIA_TEST#g" skaffold.yaml
         sed -i -e "s#\[NAMESPACE\]#$NAMESPACE_TEST#g" skaffold.yaml
         sed -i -e "s#\[IMAGE_NAME\]#$IMAGE_NAME#g" skaffold.yaml
         sed -i -e "s#\[CONTAINER_REPO\]#$CONTAINER_REPO_ASIA_TEST#g" skaffold.yaml
       fi
     - /usr/local/bin/skaffold build -p profile-test --file-output=build-test.json
+    - cp skaffold.yaml skaffold-test.yaml
   only:
     refs:
-      - stag
+      - test
   artifacts:
     paths:
-    - skaffold.yaml
+    - skaffold-test.yaml
     - build-test.json
 build_stag:
   image: docker:19.03.1
@@ -126,6 +135,8 @@ build_stag:
     - |
       if [ "$CI_COMMIT_REF_NAME" == "stag" ]; then
         sed -i -e "s#\[NAMESPACE\]#$NAMESPACE_STAG#g" skaffold.yaml
+        sed -i -e "s#\[NAMESPACE_TEST\]#$NAMESPACE_TEST#g" skaffold.yaml
+        sed -i -e "s#\[CONTAINER_REPO_TEST\]#$CONTAINER_REPO_ASIA_TEST#g" skaffold.yaml
         sed -i -e "s#\[IMAGE_NAME\]#$IMAGE_NAME#g" skaffold.yaml
         sed -i -e "s#\[CONTAINER_REPO\]#$CONTAINER_REPO_ASIA_STAG#g" skaffold.yaml
       fi
@@ -155,6 +166,8 @@ build_prod:
     - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $CONTAINER_REPO_ASIA_PROD
     - |
       if [ "$CI_COMMIT_REF_NAME" == "master" ]; then
+        sed -i -e "s#\[NAMESPACE_TEST\]#$NAMESPACE_TEST#g" skaffold.yaml
+        sed -i -e "s#\[CONTAINER_REPO_TEST\]#$CONTAINER_REPO_ASIA_TEST#g" skaffold.yaml
         sed -i -e "s#\[NAMESPACE\]#$NAMESPACE_PROD#g" skaffold.yaml
         sed -i -e "s#\[IMAGE_NAME\]#$IMAGE_NAME#g" skaffold.yaml
         sed -i -e "s#\[CONTAINER_REPO\]#$CONTAINER_REPO_ASIA_PROD#g" skaffold.yaml
@@ -193,6 +206,31 @@ deploy_dev:
     refs:
       - dev
 
+deploy_goldnguyen:
+  stage: deploy
+  image:  alpine/helm:3.2.1
+  tags:
+  - rinz-stag
+  script:
+    - *predeploy
+    - *kubectl_config
+    - git clone https://read-token:$GITLAB_TOKEN@gitlab.rinznetwork.com/rinz-io-devops/helm-value/$IMAGE_NAME.git
+    - mv $IMAGE_NAME/goldnguyen.yaml .
+    - |
+      if [ "$CI_COMMIT_REF_NAME" == "dev" ]; then
+        sed -i -e "s#\[FULLREPO_ASIA\]#$FULLREPO_ASIA_DEV#g" goldnguyen.yaml
+        sed -i -e "s#\[NAMESPACE\]#$NAMESPACE_DEV#g" goldnguyen.yaml
+      fi
+    - curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl && chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl
+    - curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v1.38.0/skaffold-linux-amd64 && chmod +x skaffold &&  mv skaffold /usr/local/bin
+    - aws sts get-caller-identity
+    - cat skaffold.yaml
+    - cat build.json
+    - /usr/local/bin/skaffold deploy -p profile-goldnguyen   -a build.json
+  only:
+    refs:
+      - dev
+
 
 deploy_test:
   stage: deploy
@@ -205,19 +243,18 @@ deploy_test:
     - git clone https://read-token:$GITLAB_TOKEN@gitlab.rinznetwork.com/rinz-io-devops/helm-value/$IMAGE_NAME.git
     - mv $IMAGE_NAME/test.yaml .
     - |
-      if [ "$CI_COMMIT_REF_NAME" == "stag" ]; then
+      if [ "$CI_COMMIT_REF_NAME" == "test" ]; then
         sed -i -e "s#\[FULLREPO_ASIA\]#$FULLREPO_ASIA_TEST#g" test.yaml
         sed -i -e "s#\[NAMESPACE\]#$NAMESPACE_TEST#g" test.yaml
       fi
     - curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl && chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl
     - curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v1.38.0/skaffold-linux-amd64 && chmod +x skaffold &&  mv skaffold /usr/local/bin
     - aws sts get-caller-identity
-    - cat skaffold.yaml
-    - cat build-test.json
+
     - /usr/local/bin/skaffold deploy -p profile-test   -a build-test.json
   only:
     refs:
-      - stag
+      - test
 deploy_stag:
   stage: deploy
   image:  alpine/helm:3.2.1

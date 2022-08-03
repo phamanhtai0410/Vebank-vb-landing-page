@@ -6,6 +6,7 @@ const PartialConstants = {
   VEUSD_DECIMAL: 6,
   DEFAULT_ASSET_DECIMAL: 18,
   LIQUIDITY_PAIR_CONTAIN_VET_DECIMAL: 12,
+  DEFAULT_FORMAT_FLOATING_NUMBER: 6,
 };
 
 export default PartialConstants;

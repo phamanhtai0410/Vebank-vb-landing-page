@@ -1,18 +1,19 @@
-import { BigNumber, ethers, FixedNumber } from "ethers";
+import { ethers, FixedNumber } from "ethers";
+import queryString from 'query-string';
 
 import { poolConstants } from "../constants";
 
-import ERC20ABI_PAIR from "../_contracts/pair.json";
-import ERC20ABI_FACTORY from "../_contracts/factory.json";
-import {
-  getDecimalForAsset,
-  getDecimalForAssetPair,
-  nFormatter,
-} from "../utils/lib";
+import ERC20ABI_PAIR from "../_contracts/pool/VeBankV1Pair.json";
+import ERC20ABI_FACTORY from "../_contracts/pool/VeBankV1Factory.json";
+
+import { compareString, getDecimalForAsset } from "../utils/lib";
 import PartialConstants from "../constants/partial.constants";
 import * as actions from "./index";
 
+import { formatUriSecure } from '../utils/lib';
+
 const ADDRESS_FACTORY = process.env.REACT_APP_ADDRESS_FACTORY;
+const pageSize = 10;
 
 // ------------------------ POOL ------------------------ //
 
@@ -26,43 +27,50 @@ export const getPoolAssets = () => async (dispatch, getState) => {
   let dataAssets = data.length === 0 ? listAsset : data;
 
   if (web3 && ADDRESS_FACTORY && dataAssets.length > 0) {
+
     let contractFactory = new web3.eth.Contract(
       ERC20ABI_FACTORY,
       ADDRESS_FACTORY
     );
 
     for await (const item of dataAssets) {
-      //"getPair(address tokenA, address tokenB),
+
+      const {
+        addressTokenA,
+        addressTokenB,
+        isSubscribeListener,
+        pairTransferEvent,
+        pairApproveEvent,
+      } = item;
+
       const assetsPoolAddress = await contractFactory.methods
-        .getPair(item.addressTokenA, item.addressTokenB)
+        .getPair(addressTokenA, addressTokenB)
         .call();
       const emptyAddress = /^0x0+$/.test(assetsPoolAddress); // true chưa có
 
       if (!emptyAddress && assetsPoolAddress) {
-        let assetsDecimals = 18;
-        if (
-          item.addressTokenA === process.env.REACT_APP_TOKEN_VEUSD ||
-          item.addressTokenB === process.env.REACT_APP_TOKEN_VEUSD
-        ) {
-          assetsDecimals = 12;
-        }
-
         const contractPair = new web3.eth.Contract(
           ERC20ABI_PAIR,
           assetsPoolAddress
         );
 
-        if (contractPair) {
-          contractPair.events.Approval?.().removeAllListeners?.();
-          contractPair.events.Approval?.().on("data", async (data) => {
-            console.log("🐶🐶  ~ contractPair.events.Approval?. ~ data", data);
-            if (data.returnValues?.owner.toLowerCase?.() === account) {
+        let _isSubscribed = isSubscribeListener ?? false;
+        let _pairApproveEvent = pairApproveEvent,
+          _pairTransferEvent = pairTransferEvent;
+
+        if (contractPair && !_isSubscribed) {
+          _pairApproveEvent = contractPair.events.Approval?.();
+          _pairApproveEvent.on("data", async (data) => {
+            console.log('🐶🐶  ~ _pairApproveEvent.on ~ data', data)
+            // When this pair have a Approve event from anyone, it will be process in this closure
+            if (compareString(data.returnValues?.owner, account)) {
+              // If this event is triggered by the user
               const balanceBigN = await contractPair.methods
                 .balanceOf(account)
                 .call();
               let liquidityPool = await ethers.utils.formatUnits(
                 balanceBigN,
-                getDecimalForAssetPair(item.addressTokenA, item.addressTokenB)
+                PartialConstants.DEFAULT_ASSET_DECIMAL
               );
               const approveAmount = Number(
                 ethers.utils.formatEther(
@@ -70,75 +78,88 @@ export const getPoolAssets = () => async (dispatch, getState) => {
                   PartialConstants.DEFAULT_ASSET_DECIMAL
                 )
               );
+              // This dispatch is used to update user approval in removeLiquidity.reducer
               dispatch(liquidityPoolApproved(assetsPoolAddress, approveAmount));
+              // This is used to update if user's liquidity pool has changed.
               dispatch(
                 actions.updateLiquidityPool({
                   poolAddress: assetsPoolAddress,
-                  liquidityPool,
+                  balanceAccount: liquidityPool,
                 })
               );
             }
           });
 
-          contractPair.events.Transfer().removeAllListeners?.();
-          contractPair.events.Transfer().on("data", async (data) => {
-            console.log("Pair Transfer event emitted");
-            console.log(
-              "🐶🐶  ~ contractPair.events.allEvents().TransFer() ~ event",
-              data
-            );
-            const { from, to } = data.returnValues;
-            if (
-              from.toLowerCase() === account ||
-              to.toLowerCase() === account
-            ) {
-              const balanceBigN = await contractPair.methods
-                .balanceOf(account)
-                .call();
-              let liquidityPool = await ethers.utils.formatUnits(
-                balanceBigN,
-                getDecimalForAssetPair(item.addressTokenA, item.addressTokenB)
-              );
+          _pairTransferEvent = contractPair.events.Transfer?.();
+          _pairTransferEvent.on("data", async (data) => {
+            // When this pair have a Transfer event from anyone, it will be process in this closure
+            const { from, to, value } = data.returnValues;
+            if (from.equals(account) || to.equals(account)) {
+              // This Transfer event is caused by user. If it's from user,
+              // the user is removing the pool, if it's to, user is adding the pool
+
+              // This call may receive wrong amount of user tokens in pool because when this Transfer event is emitted,
+              // the total supply of the pool may haven't been updated on Blockchain yet. So inside of this function,
+              // we should check for it's current value stored in redux with the fetched one, and add the value
+              // to get the latest value of the total LP.
+              console.log("_pairTransferEvent getUserTokenAmounts");
+              const { amountTokenA, amountTokenB, liquidityPool ,totalSupply } =
+                await getUserTokenAmounts({
+                  contractPair,
+                  account,
+                  addressTokenA,
+                  addressTokenB,
+                });
+
+              // Push this update into userAssetPools.reducer to update data in pool page and liquidity page.
               dispatch(
-                actions.updateLiquidityPool({
-                  poolAddress: assetsPoolAddress,
+                actions.updateUserAssets({
+                  assetsPoolAddress,
                   liquidityPool,
+                  liquidity: totalSupply,
+                  amountTokenA,
+                  amountTokenB,
                 })
               );
-              const isUserReceiving = to?.toLowerCase() === account;
-              dispatch(
-                actions.alertActions.success({
-                  title: isUserReceiving
-                    ? "Add liquidity Confirmed"
-                    : "Remove liquidity Transaction Sent",
-                  description: "View on Chain",
-                })
-              );
+
+              // This is attempt to display if the LP have moved into or out of user's wallet notification.
+              // const isUserReceiving = to?.equals(account);
+              // dispatch(
+              //   actions.alertActions.success({
+              //     title: isUserReceiving
+              //       ? "Add liquidity Confirmed"
+              //       : "Remove liquidity Transaction Sent",
+              //     details: {
+              //       txid: data.meta?.txID ?? "",
+              //       message: "View on Chain",
+              //      }
+              //   })
+              // );
             }
           });
-          console.log(
-            "🐶🐶  ~ contractPair.events.Transfer ~ contractPair.events.Transfer().countListener",
-            contractPair.events.Transfer().listenerCount?.()
-          );
+          _isSubscribed = true;
         }
 
         //Lấy tổng liquidity
         let totalSupply = await contractPair.methods.totalSupply().call();
-        const rawTotalSupply = totalSupply;
         if (totalSupply) {
-          totalSupply = ethers.utils.formatUnits(totalSupply, assetsDecimals);
-          if (totalSupply < PartialConstants.MIN_AMOUNT_TO_FORMAT) {
-            totalSupply = nFormatter(totalSupply);
-          }
+          totalSupply = ethers.utils.formatUnits(
+            totalSupply,
+            PartialConstants.DEFAULT_ASSET_DECIMAL
+          );
         }
 
         dataList.push({
           ...item,
+          isSubscribeListener: _isSubscribed,
           liquidity: totalSupply,
-          rawTotalSupply,
           assetsPoolAddress,
+          pairApproveEvent: _pairApproveEvent,
+          pairTransferEvent: _pairTransferEvent,
         });
+
       }
+
     }
 
     dispatch({
@@ -148,6 +169,7 @@ export const getPoolAssets = () => async (dispatch, getState) => {
     });
 
     dispatch(getPoolAssetsByAccount(dataList));
+
   } else {
     dispatch({
       type: poolConstants.FETCH_POOL_ASSETS_SUCCESS,
@@ -158,6 +180,187 @@ export const getPoolAssets = () => async (dispatch, getState) => {
   return dataList;
 };
 
+
+export const listenEventPairs = (pairs) => async (dispatch, getState) => {
+  
+  const state = getState();
+  const { web3, account } = state.web3;
+
+  if (web3 && pairs.length > 0) {
+
+    for await (const item of pairs) {
+
+      const {
+        addressTokenA,
+        addressTokenB,
+        assetsPoolAddress,
+        isSubscribeListener,
+        pairTransferEvent,
+        pairApproveEvent,
+      } = item;
+
+      if (assetsPoolAddress) {
+
+        const contractPair = new web3.eth.Contract(
+          ERC20ABI_PAIR,
+          assetsPoolAddress
+        );
+
+        let _isSubscribed = isSubscribeListener ?? false;
+        let _pairApproveEvent = pairApproveEvent,
+          _pairTransferEvent = pairTransferEvent;
+
+        if (contractPair && !_isSubscribed) {
+    
+          _pairTransferEvent = contractPair.events.Transfer?.();
+          _pairTransferEvent.on("data", async (data) => {
+            // When this pair have a Transfer event from anyone, it will be process in this closure
+            const { from, to, value } = data.returnValues;
+            if (from.equals(account) || to.equals(account)) {
+              // This Transfer event is caused by user. If it's from user,
+              // the user is removing the pool, if it's to, user is adding the pool
+
+              // This call may receive wrong amount of user tokens in pool because when this Transfer event is emitted,
+              // the total supply of the pool may haven't been updated on Blockchain yet. So inside of this function,
+              // we should check for it's current value stored in redux with the fetched one, and add the value
+              // to get the latest value of the total LP.
+              // const { amountTokenA, amountTokenB, liquidityPool ,totalSupply } =
+              //   await getUserTokenAmounts({
+              //     contractPair,
+              //     account,
+              //     addressTokenA,
+              //     addressTokenB,
+              //   });
+
+              // const percentYour = liquidityPool/totalSupply;
+              // // console.log("percentYour",percentYour);
+      
+              // const yourLiquidityUSD = percentYour > 0 ? item.liquidity_usd*percentYour :0;
+              // // console.log("yourLiquidityUSD",yourLiquidityUSD);
+
+              // // Push this update into userAssetPools.reducer to update data in pool page and liquidity page.
+              // dispatch(
+
+              //   actions.updateUserAssets({
+              //     assetsPoolAddress,
+              //     balanceAccount: liquidityPool,
+              //     liquidity: totalSupply,
+              //     yourLiquidityUSD:
+              //     amountTokenA,
+              //     amountTokenB,
+              //   })
+              // );
+              dispatch(getPoolAssetsByAccount(pairs));
+            }
+          });
+          _isSubscribed = true;
+        }
+
+      }
+
+    }
+
+  } 
+};
+
+function getPairVolumeAndFees(dataList){
+  let fees = 0;
+  let volumes = 0;
+  dataList.map((item) => {
+
+    // FixedNumber.from(fees)
+    // .addUnsafe(FixedNumber.from(secondPerFirstTokenExchangeRate.toString()))
+    // .toString(),
+
+    //fees = FixedNumber.from(fees).addUnsafe(FixedNumber.from(item.fee_usd)).toString();
+
+    //console.log(fees);
+
+    fees= fees + Number(item.fee_usd);
+    volumes= volumes +Number(item.volume_usd) ;
+
+    // fees = FixedNumber.from(fees).addUnsafe( FixedNumber.from(item.fee_usd) );
+    // volumes =  FixedNumber.from(volumes).addUnsafe( FixedNumber.from(item.volume_usd)  ); 
+
+  })
+  return{fees, volumes};
+}
+
+function getPoolAPR(fee,liquidity){
+  return( ((fee/(24*3600))/liquidity)*365*24*3600)
+}
+
+export const fetchPairs = (query) => async (dispatch, getState) => {
+console.log("====fetchPairs")
+  const state = getState();
+  const { assetEntities } = state.assetsMarketReducer;
+
+  let querySearch = {
+    page: 1,
+    page_size: pageSize,
+  }
+
+  if (query) {
+    querySearch = { ...querySearch, ...query };
+  }
+
+  const linkQuery = queryString.stringify(querySearch);
+  const url = `${process.env.REACT_APP_API_ENDPOINT}${formatUriSecure('/v1/pool/exchange')}&${linkQuery}`;
+
+  try {
+
+    const response = await fetch(url);
+    const responseBody = await response.json();
+  
+    if(responseBody && responseBody.data){
+  
+      const { pairs, total } = responseBody.data;
+  
+      const dataList = pairs.map(e => {
+
+        const { fees, volumes} = getPairVolumeAndFees(e.hour_data);
+
+        return {
+            ...e,
+            iconOrigin: assetEntities[e.token0.address?.toLowerCase()]?.icon,
+            iconAssets: assetEntities[e.token1.address?.toLowerCase()]?.icon,
+            assetsPoolName: e.token0.symbol + ' - ' + e.token1.symbol,
+            assetsChainA: e.token0.symbol,
+            addressTokenA: e.token0.address,
+            assetsChainB: e.token1.symbol,
+            addressTokenB: e.token1.address,
+            assetsPoolAddress: e.pair_address,
+            assetsDecimals: e.token0.decimals,
+            balanceAccount: 0,
+            liquidity:0 ,
+            liquidity_usd: e.reserve_usd,
+            yourLiquidityUSD:0,
+            volume: volumes,
+            fees: fees,
+            apr: getPoolAPR(fees,e.reserve_usd),
+          }
+      })
+
+      dispatch({
+          type: poolConstants.FETCH_POOL_ASSETS_SUCCESS,
+          data: dataList || [],
+          total
+      });
+
+      dispatch(getPoolAssetsByAccount(dataList));
+      dispatch(listenEventPairs(dataList))
+  
+    }
+    
+  } catch (error) {
+    dispatch({
+      type: poolConstants.FETCH_POOL_ASSETS_ERROR,
+      message: error
+    });
+  }
+
+}
+
 export const getPoolAssetsByAccount =
   (dataAssetPool) => async (dispatch, getState) => {
     const state = getState();
@@ -167,89 +370,56 @@ export const getPoolAssetsByAccount =
     let dataList = [];
 
     if (account && ADDRESS_FACTORY && dataAssetPool.length > 0) {
+      dispatch(
+        actions.updateLoadingLiquidPoolState({
+          isLoading: true,
+        })
+      );
       for await (const item of dataAssetPool) {
-        let assetsDecimals = 18;
-        if (
-          item.addressTokenA === process.env.REACT_APP_TOKEN_VEUSD ||
-          item.addressTokenB === process.env.REACT_APP_TOKEN_VEUSD
-        ) {
-          assetsDecimals = 12;
-        }
 
-        let balanceAccount = 0;
-        let amountTokenA = 0;
-        let amountTokenB = 0;
+        const { addressTokenA, addressTokenB, assetsPoolAddress } = item;
 
         if (item.assetsPoolAddress && account) {
+
           const contractPair = new web3.eth.Contract(
             ERC20ABI_PAIR,
             item.assetsPoolAddress
           );
 
-          //Lấy số lượng LP đang nắm giữ của account
-          const balanceBigN = await contractPair.methods
-            .balanceOf(account)
-            .call();
-          if (balanceBigN) {
-            balanceAccount = ethers.utils.formatUnits(balanceBigN, 18);
-          }
-
-          const totalSupply = item.liquidity;
-          if (balanceAccount >= 0 && totalSupply) {
-            console.log("🐶🐶  ~ forawait ~ balanceAccount", balanceAccount);
-            let { 0: reserve0, 1: reserve1 } = await contractPair.methods
-              ?.getReserves()
-              .call();
-            reserve0 = ethers.utils.formatUnits(
-              reserve0,
-              getDecimalForAsset(item.addressTokenA)
-            );
-            reserve1 = ethers.utils.formatUnits(
-              reserve1,
-              getDecimalForAsset(item.addressTokenB)
-            );
-            amountTokenA = (balanceAccount * reserve0 || 0) / totalSupply;
-            console.log("🐶🐶  ~ forawait ~ reserves?.[0]", reserve0);
-            amountTokenB = (balanceAccount * reserve1 || 0) / totalSupply;
-            console.log("🐶🐶  ~ forawait ~ reserves?.[1]", reserve1);
-            if (totalSupply < PartialConstants.MIN_AMOUNT_TO_FORMAT) {
-              totalSupply = nFormatter(totalSupply);
-            }
-          }
-
-          // balanceAccount = ethers.utils.formatUnits(balanceAccount,assetsDecimals);
-
-          //Lấy tokenA nắm giữ của account
-          // amountTokenA = await contractPair.methods
-          //   .providerAssets(account, item.addressTokenA)
-          //   .call();
-          if (amountTokenA) {
-            console.log("🐶🐶  ~ forawait ~ amountTokenA", amountTokenA);
-            if (amountTokenA < PartialConstants.MIN_AMOUNT_TO_FORMAT) {
-              amountTokenA = nFormatter(amountTokenA);
-              console.log("🐶🐶  ~ forawait ~ amountTokenA", amountTokenA);
-            }
-          }
-
-          //Lấy tokenA nắm giữ của account
-          // amountTokenB = await contractPair.methods
-          //   .providerAssets(account, item.addressTokenB)
-          //   .call();
-          if (amountTokenB) {
-            if (amountTokenB < PartialConstants.MIN_AMOUNT_TO_FORMAT) {
-              amountTokenB = nFormatter(amountTokenB);
-            }
-          }
+          const { amountTokenA, amountTokenB, liquidityPool ,totalSupply } =  await getUserTokenAmounts({
+              contractPair,
+              account,
+              addressTokenA,
+              addressTokenB,
+          });
+          const percentYour = liquidityPool/totalSupply;
+          let yourLiquidityUSD = percentYour > 0 ? item.liquidity_usd * percentYour : 0;
 
           dataList.push({
             ...item,
-            balanceAccount,
+            balanceAccount: liquidityPool,
+            liquidity: totalSupply,
+            yourLiquidityUSD,
             amountTokenA,
             amountTokenB,
           });
+
+          dispatch(
+            actions.updateUserAssets({
+              assetsPoolAddress,
+              liquidityPool,
+              amountTokenA,
+              amountTokenB,
+            })
+          );
+
         }
       }
-
+      dispatch(
+        actions.updateLoadingLiquidPoolState({
+          isLoading: false,
+        })
+      );
       dispatch({
         type: poolConstants.FETCH_POOL_ASSETS_SUCCESS,
         data: dataList,
@@ -259,52 +429,110 @@ export const getPoolAssetsByAccount =
     return dataList;
   };
 
-export const getUserTokenAmounts = ({
-  usersLP,
-  totalLP,
-  formattedReserve0,
-  formattedReserve1,
+/**
+ * This function will mainly calculate the amount of user tokens in pool
+ * @param contractPair the Contract of the pair which is need to be calculated
+ * @param account the account address of the user.
+ * @param addressTokenA the address of the first token of the pair.
+ * @param addressTokenB the address of the second token of the pair.
+ * @returns the value of all data that needs for liquidity operation
+ */
+export const getUserTokenAmounts = async ({
+  contractPair,
+  account,
+  addressTokenA,
+  addressTokenB
 }) => {
-  console.log('🐶🐶  ~ formattedReserve1', formattedReserve1)
-  console.log('🐶🐶  ~ formattedReserve0', formattedReserve0)
-  console.log("🐶🐶  ~ totalLP", totalLP);
-  console.log("🐶🐶  ~ usersLP", usersLP);
-  // console.table([
-  //   ["usersLP", usersLP],
-  //   ["totalLP", totalLP],
-  //   ["formattedReserve0", formattedReserve0],
-  //   ["formattedReserve1", formattedReserve1],
-  // ]);
-  let amountTokenA = 0,
-    amountTokenB = 0;
+  if (!contractPair) throw new Error("contractPair is missing");
+  else if (!account) throw new Error("account is missing");
+  else if (!addressTokenA) throw new Error("addressTokenA is missing");
+  else if (!addressTokenB) throw new Error("addressTokenB is missing");
 
+  let amountTokenA = 0;
+  let amountTokenB = 0;
+  let liquidityPool = 0;
+  let totalSupply = 0;
+  let reserve1 = 0;
+  let reserve2 = 0;
   try {
-    if (usersLP >= 0 && totalLP > 0) {
-      // amountTokenA = (BigNumber.from(usersLP)
-      //   .mul(BigNumber.from(formattedReserve0))
-      //   .div(BigNumber.from(totalLP))).toString();
-      amountTokenA = (usersLP * formattedReserve0) / totalLP;
-      // amountTokenB = (BigNumber.from(usersLP)
-      //   .mul(BigNumber.from(formattedReserve1))
-      //   .div(BigNumber.from(totalLP))).toString();
-      amountTokenB = (usersLP * formattedReserve1) / totalLP;
+    
+    const balanceBigN = await contractPair.methods.balanceOf(account).call();
+    if(Number(balanceBigN) === 0){
+      return {
+        amountTokenA,
+        amountTokenB,
+        liquidityPool,
+        totalSupply,
+        reserve1,
+        reserve2,
+      };
     }
+
+    console.log('🐶🐶  ~ liquidityPool(raw)', balanceBigN)
+    liquidityPool = await ethers.utils.formatUnits(
+      balanceBigN,
+      PartialConstants.DEFAULT_ASSET_DECIMAL
+    );
+    console.log('🐶🐶  ~ liquidityPool(formatted)', liquidityPool)
+    liquidityPool = FixedNumber.from(liquidityPool);
+    totalSupply = await contractPair.methods.totalSupply().call();
+
+
+    if (totalSupply) {
+      totalSupply = ethers.utils.formatUnits(
+        totalSupply,
+        PartialConstants.DEFAULT_ASSET_DECIMAL
+      );
+      totalSupply = FixedNumber.from(totalSupply);
+    }
+
+    let { 0: _reserve0, 1: _reserve1 } = await contractPair.methods
+      ?.getReserves()
+      .call();
+
+    // Check if token position is match or not, swap reserve position if it's not match.
+    const firstTokenAddress = await contractPair.methods.token0().call();
+    if (firstTokenAddress.toLocaleUpperCase() !== addressTokenA.toLocaleUpperCase()) {
+      [_reserve0, _reserve1] = [_reserve1, _reserve0];
+    }
+
+    _reserve0 = ethers.utils.formatUnits(
+      _reserve0,
+      getDecimalForAsset(addressTokenA)
+    );
+    _reserve0 = FixedNumber.from(_reserve0);
+
+    _reserve1 = ethers.utils.formatUnits(
+      _reserve1,
+      getDecimalForAsset(addressTokenB)
+    );
+    _reserve1 = FixedNumber.from(_reserve1);
+  
+
+    // Using calculation like this to avoid auto rounding numbers of JS
+    if (liquidityPool >= 0 && totalSupply > 0) {
+      amountTokenA = liquidityPool.mulUnsafe(_reserve0).divUnsafe(totalSupply);
+      amountTokenB = liquidityPool.mulUnsafe(_reserve1).divUnsafe(totalSupply);
+    }
+    [reserve1, reserve2] = [_reserve0, _reserve1];
+    amountTokenA = amountTokenA.toString();
+    amountTokenB = amountTokenB.toString();
+    liquidityPool = liquidityPool.toString();
+    totalSupply = totalSupply.toString();
+    reserve1 = reserve1.toString();
+    reserve2 = reserve2.toString();
   } catch (error) {
     console.error(error);
   }
-
-  // if (amountTokenA) {
-  //   if (amountTokenA < PartialConstants.MIN_AMOUNT_TO_FORMAT) {
-  //     amountTokenA = nFormatter(amountTokenA);
-  //   }
-  // }
-  // if (amountTokenB) {
-  //   if (amountTokenB < PartialConstants.MIN_AMOUNT_TO_FORMAT) {
-  //     amountTokenB = nFormatter(amountTokenB);
-  //   }
-  // }
-
-  return { amountTokenA, amountTokenB };
+  return {
+    amountTokenA,
+    amountTokenB,
+    liquidityPool,
+    totalSupply,
+    reserve1,
+    reserve2,
+  };
+  
 };
 
 export const closeAddLiquidity = () => {

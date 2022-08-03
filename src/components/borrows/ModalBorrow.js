@@ -5,7 +5,7 @@ import { Range } from "react-range";
 import { TailSpin } from 'react-loading-icons';
 
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
-import { numberWithCommas } from '../../utils/lib';
+import {  numberWithCommas } from '../../utils/lib';
 
 import { marketplaceConstants } from '../../constants';
 
@@ -17,6 +17,7 @@ import BtnBorrowApprove from './BtnBorrowApprove';
 
 import * as actions from '../../actions';
 import useAutoFocus from '../common/hooks/useAutoFocus';
+import CurrencyAssetsUSD from '../markets/CurrencyAssetsUSD';
 
 const customStyles = {
     content: {
@@ -40,7 +41,7 @@ const ModalBorrow = () => {
     const [step, setStep] = useState(1);
     const [rate, setRate] = useState(2);
 
-    const { dataToken, accountBalance, accountApprove, accountStableDebtApprove, accountVariableDebtApprove, errorCode, message, transaction, pending, isOpen } = useSelector(state => state.borrowReducer, shallowEqual);
+    const { dataToken, accountBalance, accountApprove, loading, accountVariableDebtApprove, errorCode, message, transaction, pending, isOpen } = useSelector(state => state.borrowReducer, shallowEqual);
 
     const dispatch = useDispatch();
     const amountInputRef = useAutoFocus();
@@ -87,9 +88,13 @@ const ModalBorrow = () => {
 
         const { value } = e.target;
 
+        if(loading){
+            return;
+        }
+
          // Giá trị rỗng
          if(e.target.value === ""){
-            setAmount(value)
+            setAmount(value);
             setValues([0]);
         }
 
@@ -99,9 +104,9 @@ const ModalBorrow = () => {
         }
 
         // kiêm tra input number
-        let pattern = /^\d+$/;
+        let pattern = /^\d+\.?\d*$/;
         if (pattern.test(value)) {
-            setAmount(value)
+            setAmount(value);
             setValues([value]);
         }
 
@@ -146,7 +151,6 @@ const ModalBorrow = () => {
     const showBtnView = () => {
 
         let btn = "";
-
         if (dataToken) {
 
             if (accountApprove === 0) {
@@ -156,9 +160,12 @@ const ModalBorrow = () => {
             }
 
         }
-
         return btn;
 
+    }
+
+    if(!dataToken){
+        return<></>;
     }
 
     return (
@@ -191,7 +198,9 @@ const ModalBorrow = () => {
                             Available to borrow
                         </div>
                         <div>
-                            <span className='font-poppins font-bold'>{accountBalance}</span>
+                            <span className='font-poppins font-bold inline-block'> 
+                            {loading === false? accountBalance : <TailSpin className='w-4 h-4 mr-2' />}
+                            </span>
                             <span className='text-[#BFBFBF] pl-2'>{dataToken ? dataToken.assetsChain : ""}</span>
                         </div>
                     </div>
@@ -222,7 +231,7 @@ const ModalBorrow = () => {
                     </div>
 
                     <div className='px-8'>
-                        <Range
+                        {loading === false  && Number(accountBalance) > 0? <Range
                             step={1}
                             min={0}
                             max={accountBalance}
@@ -244,7 +253,8 @@ const ModalBorrow = () => {
                                     className="w-3 h-3 transform translate-x-10 bg-slate-50 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 />
                             )}
-                        />
+                        />:""}
+                      
                     </div>
                 </div>
 
@@ -304,7 +314,9 @@ const ModalBorrow = () => {
                             <div className='text-[#FAFAFA]'>
                             </div>
                             <div>
-                                <span className='font-poppins font-thin text-sm'>{numberWithCommas(amount)} $</span>
+                                <span className='font-poppins font-thin text-sm'>
+                                    <CurrencyAssetsUSD currencyBalance={amount} assetsAddress={dataToken.assetsAddress} /> 
+                                </span>
                             </div>
                         </div>
 

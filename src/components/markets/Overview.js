@@ -15,7 +15,7 @@ const Overview = () => {
 
     const dispatch = useDispatch();
 
-    const { accountTotalSupplied, accountTotalBorrowed , healthFactor } = useSelector(state => state.accountOverviewReducer, shallowEqual);
+    const { accountTotalSupplied, accountTotalBorrowed , healthFactor ,netAPY } = useSelector(state => state.accountOverviewReducer, shallowEqual);
     const dataPrice = useSelector(state => state.assetsPriceReducer.data, shallowEqual);
     const dataAssets = useSelector(state => state.accountAssetsReducer.data, shallowEqual);
 
@@ -43,7 +43,7 @@ const Overview = () => {
                 {accountTotalSupplied && accountTotalBorrowed ? <>
                     <div className='flex-1'>
                         <p className='text-xs font-normal text-slate-50'>Net APY</p>
-                        <span className='text-xl font-bold'>4.57K %</span>
+                        <span className='text-xl font-bold'>{netAPY ? netAPY.toFixed(2) :0} %</span>
                     </div>|
                 </> : ""}
 
@@ -60,13 +60,13 @@ const Overview = () => {
                 {accountTotalSupplied && accountTotalBorrowed ? <>|<div className='flex-1'>
                     <p className='text-xs font-normal text-slate-50'>Health factor</p>
                     <span className='text-xl font-bold'>
-                        {healthFactor ? parseInt(healthFactor) : 0}
+                        {healthFactor ? nFormatter(healthFactor,2) : 0}
                     </span>
                 </div> </> : ""}
 
                 {accountTotalSupplied && accountTotalBorrowed ? <>|<div className='flex-1'>
                     <p className='text-xs font-normal text-slate-50'>Available rewards</p>
-                    <span className='text-xl font-bold'>0 %</span>
+                    <span className='text-xl font-bold'>0 VB</span>
                 </div></> : ""}
 
             </div>

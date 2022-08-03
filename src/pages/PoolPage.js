@@ -6,11 +6,33 @@ import FrmSearchPool from "../components/pool/FrmSearchPool";
 const PoolPage = () => {
   return (
     <section className="box-borrows mx-auto bg-cover bg-center">
-      <div className="lg:px-4 lg:container xl:px-12 mx-auto px-4 min-h-screen pt-16 pb-24">
-        <div className="flex flex-row mt-4">
-          <div className="flex  flex-row justify-start items-center space-x-4 w-full text-right cursor-pointer">
-            <span className="font-poppins text-base font-montserrat">
-              Stake only
+      <div className="lg:px-4 lg:container xl:px-12 mx-auto px-4 min-h-screen pt-10 pb-24">
+        <div className="flex flex-row w-full justify-between items-center mt-4">
+          <div className="flex flex-row w-full items-center">
+            <span className="font-poppins_bold text-2xl text-vbLine">
+              Pools
+            </span>
+            <div className="flex flex-row ml-12 space-x-1">
+              <span className="text-base text-[#678BCA]">
+                TVL: 
+              </span>
+              <span className="font-poppins_semi_bold text-base text-hint">
+                $200,333,444.55
+              </span>
+            </div>
+            <div className="flex flex-row ml-6 space-x-1">
+              <span className="text-base text-[#678BCA]">
+                Volume24H:
+              </span>
+              <span className="font-poppins_semi_bold text-base text-hint">
+                $50,666,777.88
+              </span>
+            </div>
+          </div>
+          
+          <div className="flex flex-row items-center justify-end space-x-4 w-full text-right cursor-pointer">
+            <span className="font-poppins text-base">
+              Show staked
             </span>
             <div className="flex items-center justify-center">
               <label htmlFor="toggleB" className="flex items-center cursor-pointer">
@@ -22,7 +44,7 @@ const PoolPage = () => {
               </label>
             </div>
           </div>
-          <FrmSearchPool />
+          {/* <FrmSearchPool /> */}
         </div>
 
         <AssetsPool />

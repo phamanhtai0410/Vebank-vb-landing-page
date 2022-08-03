@@ -6,13 +6,16 @@ import { marketplaceConstants } from '../../constants';
 import ERC20ABI_VB from '../../_contracts/assets/VB.json';
 import ERC20ABI_WETH_GETAWAY from '../../_contracts/lend/WETHGateway.json';
 import ERC20ABI_POOL from '../../_contracts/lend/Pool.json';
+import ERC20ABI_AAVE from '../../_contracts/lend/AaveProtocolDataProvider.json';
 
 import ERC20ABI_STABLE_DEBT_TOKEN from '../../_contracts/lend/StableDebtToken.json';
 import ERC20ABI_VARIBLE_DEBT_TOKEN from '../../_contracts/lend/VariableDebtToken.json';
 
-import { randomKeyUUID } from '../../utils/lib';
+import { formatLocaleString, numberWithCommas, randomKeyUUID } from '../../utils/lib';
 import * as actions from '../.';
 
+
+const TOKEN_AAVE = process.env.REACT_APP_ADDRESS_PROTOCOL;
 const ADDRESS_GATEWAY = process.env.REACT_APP_ADDRESS_GATEWAY; // WETHGateway (chinh là VET Asset)
 const ADDRESS_POOL = process.env.REACT_APP_ADDRESS_POOL;
 
@@ -38,32 +41,49 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
     let accountStableDebtApprove = 0;
     let accountVariableDebtApprove = 0;
 
-    if (!account) {
+    if(!account){
+        dispatch(actions.web3Connect(true));
         return;
     }
 
+    const contractAAVE = new web3.eth.Contract(ERC20ABI_AAVE, TOKEN_AAVE);
     const contractPOOL = new web3.eth.Contract(ERC20ABI_POOL, ADDRESS_POOL);
-    //  let contractAAVE = new web3.eth.Contract(ERC20ABI_AAVE, TOKEN_AAVE);
 
-    // const getReserveData = await contractAAVE.methods.getReserveData(dataToken.assetsAddress).call();
-    // let balanceTotalSupply = ethers.utils.formatUnits(getReserveData.totalAToken, dataToken.assetsDecimals);
-    // accountBalance = Math.round(balanceTotalSupply * 100) / 100;
+    dispatch({
+        type: marketplaceConstants.MODAL_OPEN_BORROW_MARKET,
+        dataToken,
+        accountBalance,
+        loading:true,
+    });
 
-    // const accountReserve = await contractAAVE.methods.getUserReserveData(dataToken.assetsAddress, account).call();
-    // console.log(`getUserReserveData`, accountReserve);
+    if(contractPOOL){
 
-    const accountData = await contractPOOL.methods.getUserAccountData(account).call();
-    console.log("getUserAccountData", accountData);
+        const accountData = await contractPOOL.methods.getUserAccountData(account).call();
+        console.log("accountData",accountData);
 
+        if (accountData.availableBorrowsBase) {
+            accountBalance = ethers.utils.formatUnits(accountData.availableBorrowsBase, 18);
+            accountBalance = accountBalance / dataPrice[dataToken.assetsAddress];
+        }
 
-    if (accountData.availableBorrowsBase) {
-        accountBalance = ethers.utils.formatUnits(accountData.availableBorrowsBase, 18);
-        accountBalance = accountBalance / dataPrice[dataToken.assetsAddress];
+        if(contractAAVE ){
+
+            const getReserveData = await contractAAVE.methods.getReserveData(dataToken.assetsAddress).call();
+            console.log("getReserveData", getReserveData);
+
+            let totalUserCollateralPool = getReserveData.totalAToken - (getReserveData.totalStableDebt  + getReserveData.totalVariableDebt)
+            totalUserCollateralPool = totalUserCollateralPool.toLocaleString('fullwide', {useGrouping:false});
+            totalUserCollateralPool = ethers.utils.formatUnits(totalUserCollateralPool, dataToken.assetsDecimals);
+
+            // Tổng pool có chép borrow nhỏ hơn giá trị user có thể variableBorrowRate
+            if(Number(totalUserCollateralPool) < Number(accountBalance)){
+                accountBalance = totalUserCollateralPool;
+            }
+            
+        }
+        
     }
-
-
-    
-
+  
     if (dataToken.assetsChain === "VET") {
 
         // check approveDelegation
@@ -93,12 +113,17 @@ export const loadModalBorrow = (dataToken) => async (dispatch, getState) => {
 
     }
 
+    if(Number(accountBalance) < Number(accountApprove)){
+        accountApprove = 0;
+    }
+
     dispatch({
         type: marketplaceConstants.MODAL_OPEN_BORROW_MARKET,
+        loading:false,
         accountApprove,
         accountStableDebtApprove,
         accountVariableDebtApprove,
-        accountBalance: accountBalance,
+        accountBalance: formatLocaleString(accountBalance,dataToken.assetsDecimals),
         dataToken
     });
 
@@ -199,6 +224,8 @@ export const borrowMarket = (dataToken, amount, rateMode) => async (dispatch, ge
 
     const { account, connex } = state.web3;
 
+    console.log("borrowMarket",amount,dataToken);
+
     if (connex && account && dataToken.assetsAddress) {
 
         const key = randomKeyUUID();
@@ -213,9 +240,13 @@ export const borrowMarket = (dataToken, amount, rateMode) => async (dispatch, ge
         });
 
         const borrowABI = ERC20ABI_POOL.find(({ name, type }) => (name === "borrow" && type === "function"));
-
+console.log("borrowABI",borrowABI);
         const methodBorrow = connex.thor.account(ADDRESS_POOL).method(borrowABI);
+
+        console.log("methodBorrow",methodBorrow);
         const amountBorrow = ethers.utils.parseUnits(amount.toString(), dataToken.assetsDecimals);
+
+        console.log("amountBorrow",amountBorrow);
 
         methodBorrow.transact(dataToken.assetsAddress, amountBorrow, rateMode, 0, account)
             .comment(`transfer ${amount} ${dataToken.assetsChain} to Borrow VeBank`)

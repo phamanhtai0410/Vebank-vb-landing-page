@@ -17,6 +17,7 @@ import IcVeChain from '../../assets/images/ic_vechain.svg';
 
 import useAutoFocus from '../common/hooks/useAutoFocus';
 import BtnSupplyApprove from './BtnSupplyApprove';
+import CurrencyAssetsUSD from '../markets/CurrencyAssetsUSD';
 
 const customStyles = {
     content: {
@@ -98,7 +99,7 @@ const ModalSupply = () => {
         }
 
         // kiêm tra input number
-        let pattern = /^\d+$/;
+        let pattern = /^\d+\.?\d*$/;
         if (pattern.test(value)) {
             setAmount(value)
         }
@@ -120,13 +121,17 @@ const ModalSupply = () => {
     const showBtnView = () => {
         let btn = "";
         if (dataToken) {
-            if (accountApprove === 0) {
+            if (accountApprove === 0 || accountApprove < Number(accountBalance)) {
                 btn = <BtnSupplyApprove dataToken={dataToken} pending={pending} />
             } else {
                 btn = <BtnSupply dataToken={dataToken} pending={pending} amount={amount} />
             }
         }
         return btn;
+    }
+
+    if(!dataToken){
+        return<></>;
     }
 
     return (
@@ -202,7 +207,7 @@ const ModalSupply = () => {
                             </div>
                             <div className='flex items-center'>
                                 <img className='w-6 h-6' src={dataToken ? dataToken.icon : ""} alt="Token VEBank" />
-                                <span className='font-poppins font-bold pl-2'>{numberWithCommas(amount)}</span>
+                                <span className='font-poppins font-bold pl-2'>{amount}</span>
                                 <span className='text-[#BFBFBF] pl-2'>{dataToken ? dataToken.assetsChain : ""}</span>
                             </div>
                         </div>
@@ -211,7 +216,9 @@ const ModalSupply = () => {
                             <div className='text-[#FAFAFA]'>
                             </div>
                             <div>
-                                <span className='font-poppins font-thin text-sm'>{numberWithCommas(amount)} $</span>
+                                <span className='font-poppins font-thin text-sm'>
+                                    <CurrencyAssetsUSD currencyBalance={amount} assetsAddress={dataToken.assetsAddress} />
+                                </span>
                             </div>
                         </div>
 

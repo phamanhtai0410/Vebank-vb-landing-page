@@ -43,7 +43,7 @@ const TabMarket = () => {
 
             </div>
 
-            <div className="hidden lg:flex flex-row bg-gradient-search rounded-lg ml-8 py-2 px-4 ra justify-between md:hidden lg:w-80 xl:w-96">
+            <div className="hidden lg:flex flex-row bg-gradient-search rounded-lg ml-8 py-1 px-4 ra justify-between md:hidden lg:w-80 xl:w-96">
                 <input
                     className="bg-transparent focus:outline-none placeholder-slate-300 font-poppins appearance-none text-sm w-full"
                     type="text"

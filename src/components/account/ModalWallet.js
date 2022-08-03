@@ -11,7 +11,7 @@ const ModalWallet = ({ isOpen, onCopy, disConnectWallet, account }) => {
     <div
       className={`${
         isOpen ? "flex" : "hidden"
-      } absolute right-0 top-16 fade-in-box`}
+      } absolute right-0 top-16 fade-in-box z-50`}
     >
       <div className="relative">
         <GradientStrokeWrapper

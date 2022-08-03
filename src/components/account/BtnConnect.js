@@ -10,8 +10,6 @@ import GradientStrokeWrapper from "../partials/GradientStrokeWrapper";
 import { addressWalletCompact, copyTextToClipboard } from "../../utils/lib";
 import ModalWallet from "./ModalWallet";
 
-
-
 const BtnConnect = () => {
   
   const [isConnecting, setIsConnecting] = useState(false);
@@ -24,13 +22,15 @@ const BtnConnect = () => {
 
   const connectWalletHandler = async () => {
     if (!isConnecting) {
-      setIsConnecting(true);
+    //  setIsConnecting(true);
       await dispatch(actions.web3Connect(true))
-        .then(() => {
-          setIsConnecting(false);
+        .then((res) => {
+          console.log("connectWalletHandler res",res);
+         // setIsConnecting(false);
         })
         .catch((e) => {
-          setIsConnecting(false);
+          console.log("connectWalletHandler err",e);
+        //  setIsConnecting(false);
         });
     }
   };
@@ -51,7 +51,11 @@ const BtnConnect = () => {
     copyTextToClipboard(account)
       .then(() => {
         // If successful, update the isCopied state value
-        dispatch(actions.alertActions.success("Copied"));
+        dispatch(
+          actions.alertActions.success({
+            title: "Copied"
+          })
+        );
       })
       .catch((err) => {
         console.log(err);
@@ -63,7 +67,7 @@ const BtnConnect = () => {
       {account ? (
         <>
           <button
-            className="flex flex-row items-center justify-center rounded-full bg-transparent px-4 py-[10px] font-poppins text-sm leading-5 relative"
+            className="flex flex-row items-center justify-center rounded-full bg-transparent px-4 py-[10px] font-poppins text-base leading-5 relative"
             type="submit"
             onClick={() => setShowModalWallet(!showModalWallet)}
           >
@@ -110,7 +114,7 @@ const BtnConnect = () => {
       ) : (
         <button
           onClick={connectWalletHandler}
-          className="btn-connect-wallet h-12"
+          className="btn-connect-wallet py-[8px] text-base"
           type="submit"
         >
           {isConnecting ? "Connecting..." : "Connect wallet"}

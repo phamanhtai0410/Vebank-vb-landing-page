@@ -61,8 +61,8 @@ const NetMarket = () => {
                         alt="icon Net work"
                     />
                     <div className="xs:ml-2 lg:ml-3 font-normal">
-                        <div className="font-poppins leading-4 text-[#BFBFBF] text-[16px]">Total supply</div>
-                        <div className="font-poppins leading-4 text-[#BFBFBF] text-[20px] pt-3">$ <span className="text-slate-100">{totalSupply}</span></div>
+                        <div className="font-poppins leading-4 text-[#BFBFBF] text-base">Total supply</div>
+                        <div className="font-poppins leading-4 text-[#FFFFFF] text-xl pt-3">$ <span className="text-slate-100">{totalSupply}</span></div>
                     </div>
                 </div>
 
@@ -73,8 +73,8 @@ const NetMarket = () => {
                         alt="icon Net APY"
                     />
                     <div className="xs:ml-2 lg:ml-3 font-normal">
-                        <div className="font-poppins leading-4 text-[#BFBFBF] text-[16px]">Total borrow</div>
-                        <div className="font-poppins leading-4 text-[#BFBFBF] text-[20px] pt-3">$ <span className="text-slate-100">{totalBorrow}</span></div>
+                        <div className="font-poppins leading-4 text-[#BFBFBF] text-base">Total borrow</div>
+                        <div className="font-poppins leading-4 text-[#FFFFFF] text-xl pt-3">$ <span className="text-slate-100">{totalBorrow}</span></div>
                     </div>
                 </div>
 

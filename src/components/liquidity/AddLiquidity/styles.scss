@@ -50,15 +50,15 @@
 }
 
 .price-pool-share-row p {
-  @apply text-xl
+  @apply text-base
 }
 
 .overlay {
   position: fixed;
-  top: 8%;
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background: linear-gradient(135deg, #182d52 0%, #172130 100%);
-  z-index: 999;
+  z-index: 99999;
 }

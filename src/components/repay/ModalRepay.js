@@ -5,7 +5,7 @@ import { Range } from "react-range";
 import { TailSpin } from 'react-loading-icons';
 
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
-import { numberWithCommas } from '../../utils/lib';
+import { nFormatter, numberWithCommas } from '../../utils/lib';
 
 import { marketplaceConstants } from '../../constants';
 import * as actions from '../../actions';
@@ -15,6 +15,7 @@ import IcNext1 from '../../assets/images/ic_factory.svg';
 
 import BtnRepay from './BtnRepay';
 import BtnRepayApprove from './BtnRepayApprove';
+import CurrencyAssetsUSD from '../markets/CurrencyAssetsUSD';
 
 const customStyles = {
     content: {
@@ -38,7 +39,7 @@ const ModalRepay = () => {
     const [values, setValues] = useState([0]);
     const [step, setStep] = useState(1);
 
-    const { dataToken, accountBalance, accountApprove, accountStableDebtApprove, errorCode, message, transaction, pending, isOpen } = useSelector(state => state.repayReducer, shallowEqual);
+    const { dataToken, accountBalance, accountApprove, loading, errorCode, message, transaction, pending, isOpen } = useSelector(state => state.repayReducer, shallowEqual);
 
     const dispatch = useDispatch();
 
@@ -75,17 +76,34 @@ const ModalRepay = () => {
     }
 
     const onChangeAmount = (e) => {
+
         const { value } = e.target;
-        if (value <= accountBalance) {
-            setAmount(value);
+    
+        // Giá trị rỗng
+        if(e.target.value === ""){
+            setAmount(value)
+            setValues([0]);
+            onChangeRemainAmount(0);
+        }
+
+        // Lớn hơn giá trị cho phép
+        if (Number(value) > Number(accountBalance)) {
+            return;
+        }
+
+        // kiêm tra input number
+        let pattern = /^\d+\.?\d*$/;
+        if (pattern.test(value)) {
+            setAmount(value)
             setValues([value]);
             onChangeRemainAmount(value);
         }
+
     }
     const onChangeRemainAmount = (values) => {
 
         if (values) {
-            setRemain(accountBalance - Number(values));
+            setRemain(Number(accountBalance) - Number(values));
         } else {
             setRemain(accountBalance);
         }
@@ -115,20 +133,19 @@ const ModalRepay = () => {
     const showBtnView = () => {
         let btn = "";
         if (dataToken) {
-
             btn = <BtnRepay dataToken={dataToken} pending={pending} amount={amount} />
-
-            // if (dataToken.assetsChain === "VET") {
-            //     btn = <BtnRepay dataToken={dataToken} pending={pending} amount={amount} />
-            // } else if (accountApprove === 0) {
-            //     btn = <BtnRepayApprove dataToken={dataToken} pending={pending} />
-            // } else {
-            //     btn = <BtnRepay dataToken={dataToken} pending={pending} amount={amount} />
-            // }
-
+            if (Number(accountApprove) <= Number(accountBalance)) {
+                btn = <BtnRepayApprove dataToken={dataToken} pending={pending} />
+            } else {
+                btn = <BtnRepay dataToken={dataToken} pending={pending} amount={amount} />
+            }
         }
         return btn;
 
+    }
+
+    if(!dataToken){
+        return<></>;
     }
 
     return (
@@ -162,7 +179,9 @@ const ModalRepay = () => {
                             Available to repay
                         </div>
                         <div>
-                            <span className='font-poppins font-bold'>{accountBalance}</span>
+                            <span className='font-poppins font-bold inline-block'>
+                                {accountBalance ? accountBalance : <TailSpin className='w-4 h-4 mr-2' />}
+                            </span>
                             <span className='text-[#BFBFBF] pl-2'>{dataToken ? dataToken.assetsChain : ""}</span>
                         </div>
                     </div>
@@ -198,7 +217,7 @@ const ModalRepay = () => {
                     </div>
 
                     <div className='px-8'>
-                        <Range
+                        {loading === false  && Number(accountBalance) > 0 ? <Range
                             step={1}
                             min={0}
                             max={accountBalance > 0 ? accountBalance : null}
@@ -220,7 +239,8 @@ const ModalRepay = () => {
                                     className="w-3 h-3 transform translate-x-10 bg-slate-50 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 />
                             )}
-                        />
+                        />:"" }
+                       
                     </div>
                 </div>
 
@@ -251,7 +271,9 @@ const ModalRepay = () => {
                             <div className='text-[#FAFAFA]'>
                             </div>
                             <div>
-                                <span className='font-poppins font-thin text-sm'>{amount} $</span>
+                                <span className='font-poppins font-thin text-sm'>
+                                    <CurrencyAssetsUSD currencyBalance={amount} assetsAddress={dataToken.assetsAddress} /> 
+                                </span>
                             </div>
                         </div>
 
@@ -261,7 +283,9 @@ const ModalRepay = () => {
                             </div>
                             <div className='flex items-center'>
                                 <img className='w-6 h-6' src={dataToken ? dataToken.icon : ""} alt="Token VEBank" />
-                                <span className='font-poppins font-bold pl-2'>{remain} $</span>
+                                <span className='font-poppins font-bold pl-2'>
+                                    { nFormatter(remain) }     
+                                </span>
                                 <span className='text-[#BFBFBF] pl-2'>{dataToken ? dataToken.assetsChain : ""}</span>
                             </div>
                         </div>
@@ -270,7 +294,9 @@ const ModalRepay = () => {
                             <div className='text-[#FAFAFA]'>
                             </div>
                             <div>
-                                <span className='font-poppins font-thin text-sm'>{remain}</span>
+                                <span className='font-poppins font-thin text-sm'>
+                                    <CurrencyAssetsUSD currencyBalance={remain} assetsAddress={dataToken.assetsAddress} />
+                                </span>
                             </div>
                         </div>
 

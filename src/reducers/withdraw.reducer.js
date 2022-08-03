@@ -4,6 +4,7 @@ const initialState = {
 
   isOpen: false,
   pending: false,
+  loading:false,
 
   transaction: null,
   errorCode: null,

@@ -12,8 +12,12 @@ import { selectOpenChooseTokenState } from "../../../../reducers/liquid.reducer"
 import SearchBar from "../../../partials/SearchBar";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import GradientStrokeWrapper from "../../../partials/GradientStrokeWrapper";
-import { selectBalancesIds, selectUserAssetsBalance } from "../../../../reducers/accountBalance.reducer";
+import {
+  selectBalancesIds,
+  selectUserAssetsBalance,
+} from "../../../../reducers/accountBalance.reducer";
 import AssetExcerpt from "./AssetExcerpt";
+import PopularTokens from "./PopularTokens";
 
 const customStyles = {
   content: {
@@ -35,12 +39,19 @@ const customStyles = {
 const ModalSelectToken = () => {
   const isSelectTokenModalOpen = useSelector(selectOpenChooseTokenState);
 
-  const assetAddressList = useSelector(selectBalancesIds);
+  const assetAddressList = useSelector(selectUserAssetsBalance);
+  const assetAddressPopular = [
+    {id: "0xe88c871CEA576DdD59FA91a744Eb6C6d5b93AB40"},
+    {id: "0xA00fe119Efa9d8F7Ef00aD16b4D702e6a5F6CB6A"},
+    {id: "0x0000000000000000000000000000456E65726779"},
+    {id: "0x033BBC923A9378600C6b52Fa9aADA608c4cC7ECE"}
+  ];
   // const assetPriceList = useSelector(selectAssetPrice, shallowEqual);
 
   const dispatch = useDispatch();
 
   useEffect(() => fetchUserAssets(), []);
+  useEffect(() => console.log("assetAddressList",assetAddressList), [assetAddressList]);
 
   const fetchUserAssets = async () => {
     // await dispatch(actions.getCurrentAssets());
@@ -58,6 +69,20 @@ const ModalSelectToken = () => {
     [dispatch]
   );
 
+  const [searchValue, setSearchValue] = useState("");
+  const [assetAddressFilter, setAssetAddressFilter] = useState(assetAddressList);
+  const onSearchValueChange = (value) => {
+    setSearchValue(value);
+    const temp = [];
+    assetAddressList.map((item) => () => {
+      if (item.assetsChain.includes(value.toUpperCase())) {
+        temp.push(item);
+      }
+    })
+    console.log("temp", temp)
+    setAssetAddressFilter(temp);
+  };
+
   return (
     <Modal
       isOpen={isSelectTokenModalOpen}
@@ -66,12 +91,11 @@ const ModalSelectToken = () => {
       portalClassName="modal-veb"
       overlayClassName="overlay"
     >
-      <GradientStrokeWrapper
-        className="-z-50"
-        borderRadius="1rem"
-      />
+      <GradientStrokeWrapper className="-z-50" borderRadius="1rem" />
       <div className="header">
-        <span className="font-poppins_bold text-xl text-white">Select a token</span>
+        <span className="font-poppins_bold text-xl text-white">
+          Select a token
+        </span>
         <img
           alt=""
           src={IcCloseWhite}
@@ -82,21 +106,36 @@ const ModalSelectToken = () => {
 
       <div className="content-modal mt-6">
         {/* STEP 1 */}
-        <SearchBar />
+        <SearchBar searchValue={searchValue} onSearchValueChange={onSearchValueChange}  />
         <div className="flex flex-row space-x-2 items-center mt-8">
-          <p className="font-poppins_light text-xl">Select a currency</p>
-          <img src={IcQuestionOutline} alt="" className="w-4 h-4" />
+          <p className="font-poppins_semi_bold text-base">Popular tokens</p>
+          {/* <img src={IcQuestionOutline} alt="" className="w-4 h-4" /> */}
+        </div>
+
+        <div className="flex flex-row items-center justify-between space-x-3 mt-[20px]">
+          {assetAddressPopular.map((item) => (
+            <PopularTokens
+              key={item.id}
+              id={item.id}
+              onTokenSelected={onTokenSelected}
+            />
+          ))}
         </div>
 
         <TransitionGroup>
-          {assetAddressList &&
-            assetAddressList.length > 0 &&
-            assetAddressList.map((assetAddress) => (
+          {assetAddressFilter &&
+            assetAddressFilter.length > 0 &&
+            assetAddressFilter.map((assetAddress) => (
               <AssetExcerpt
-                key={assetAddress}
-                id={assetAddress}
+                key={assetAddress.assetsAddress}
+                id={assetAddress.assetsAddress}
                 onTokenSelected={onTokenSelected}
               />
+              // <AssetExcerpt
+              //   searchValue={searchValue}
+              //   assetAddressList={assetAddressList}
+              //   onTokenSelected={onTokenSelected}
+              // />
             ))}
         </TransitionGroup>
       </div>

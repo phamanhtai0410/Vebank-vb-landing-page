@@ -30,15 +30,15 @@ const Wallet = () => {
 
     async function fetchWeb3Init(loadDefault) {
         await dispatch(actions.web3Connect(loadDefault));// true is account conected reload contract
-        // await dispatch(actions.getCurrentAssets())
+        await dispatch(actions.getCurrentAssets())
     }
 
     async function fetchAccountInit() {
 
         setTimeout(async () => {
             await dispatch(actions.instantiateVBContracts());
-            // await dispatch(actions.instantiateVetContracts());
-            // await dispatch(actions.instantiateVEUSDContracts());
+            await dispatch(actions.instantiateVetContracts());
+            await dispatch(actions.instantiateVEUSDContracts());
         }, 1000);
 
     }

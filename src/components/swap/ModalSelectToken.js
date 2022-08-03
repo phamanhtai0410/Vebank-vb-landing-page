@@ -3,7 +3,7 @@ import Modal from "react-modal";
 
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
 
-import * as actions from "../../actions";
+// import * as actions from "../../actions";
 import { TransitionGroup } from "react-transition-group";
 
 import {
@@ -25,7 +25,7 @@ import { swapConstants } from "../../constants";
 
 const customStyles = {
   content: {
-    top: "30%",
+    top: "40%",
     left: "50%",
     right: "auto",
     bottom: "auto",

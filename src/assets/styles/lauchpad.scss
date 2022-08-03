@@ -1,0 +1,231 @@
+.launchpad {
+    background: linear-gradient(109.17deg, #182D52 0%, #172130 100%);
+}
+
+header:not(.navigation) {
+    z-index: 1;
+    position: relative;
+}
+
+.head-img {
+    margin-top: -65px;
+}
+
+//raise box
+.count-down {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 26.5px;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(30px);
+    /* Note: backdrop-filter has minimal browser support */
+
+    border-radius: 8px;
+
+    /* Inside auto layout */
+    width: 84px;
+    height: 68px;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+}
+
+.raise-allocation {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 4px 12px;
+    gap: 16px;
+
+    width: 200px;
+    height: 28px;
+
+    /* Rinz/item menu */
+
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    /* Note: backdrop-filter has minimal browser support */
+
+    border-radius: 6px;
+}
+
+.raise-box-1,
+.launchpad-content-2,
+.mylaunch {
+    width: 70%;
+}
+
+.raise-box-2,
+.launchpad-content-1 {
+    width: 30%;
+}
+.launchpad-content-1 a{
+    cursor: pointer;
+}
+
+.raise-bg {
+    background-color: #001A31;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+   background-color: transparent;
+//    opacity: 0.5;
+   height: 6px;
+}
+input[type='range']::-webkit-slider-runnable-track {
+    // -webkit-appearance: none;
+    color: #13bba4;
+    margin-top: -1px;
+  }
+  input[type='range']::-webkit-slider-thumb {
+    width: 10px;
+    -webkit-appearance: none;
+    cursor: default;
+    // background: transparent;
+    box-shadow: -80px 0 0 80px #43e5f7;
+  }
+input[type='range'] {
+    overflow: hidden;
+    -webkit-appearance: none;
+  }
+.raise-input {
+    border: 2px solid #182844;
+    border-radius: 8px;    
+    padding: 5px 15px;
+    display: flex;
+}
+
+.raise-input input {
+    border: none;
+    background-color: transparent;
+    width: 80%;
+    font-weight: 400;
+    font-size: 16px;
+}
+
+.raise-input input:focus {
+    outline: none;
+}
+
+.raise-button {
+    width: 20%;
+    font-size: 16px;
+    color: #3EE8FF;
+    font-weight: 700;
+    text-align: right;
+}
+
+.raise-icon {
+    height: 34px;
+    width: 34px;
+}
+
+.raise-submit {
+    cursor: pointer;
+    width: 100%;
+    font-weight: 500;
+    border-radius: 8px;
+    font-size: 1rem;
+    line-height: 24px;
+    padding: 12px;
+    font-family: "Poppins";
+    transition: all 0.3s ease-in;
+    background: linear-gradient(91.96deg, #0fe3e3 0%, #02a4ff 100%);
+}
+
+//range-wrap
+.slider-parent,
+.slider-parent input {
+    width: 100%;
+}
+
+input[type="range"] {
+    background: rgb(25, 49, 70) !important;
+}
+//content
+.launchpad-filter-btn {
+    width: fit-content;
+    height: auto;
+
+    padding: 4px;
+}
+
+.launchpad-filter-btn a {
+    font-family: "Poppins";
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+    color: #ffffff;
+    padding: 0.45rem 1.5rem;
+    margin-right: 32px;
+    display: inline-block;
+    background: #0E1B31;
+    border-radius: 8px;
+    border: 1px solid #3EE8FF;
+}
+
+.launchpad-filter-btn .active {
+    background: linear-gradient(91.96deg, #0fe3e3 0%, #02a4ff 100%);
+    border-radius: 8px;
+    border:unset;
+}
+
+.launchpad-content-2 {
+    border-left: 1px solid #4B5C86;
+}
+
+.launchpad-contend-menu {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 300px;
+    height: 56px;
+    background: #223453;
+    border-radius: 8px;
+    align-self: stretch;
+    color: #3EE8FF;
+
+}
+
+.launchpad-content-1 a {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 300px;
+    height: 56px;
+    padding: 16px;
+}
+
+.launchpad-content-title {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 36px;
+    display: flex;
+    align-items: center;
+    color: #3EE8FF;
+}
+
+.launchpad-content-text.blue-text {
+    color: #3EE8FF;
+}
+
+.launchpad-content-text {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    align-items: center;
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    color: #ffffff;
+}
+.scrollmargin {
+    scroll-margin: 100px;
+}

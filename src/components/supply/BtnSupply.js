@@ -16,7 +16,7 @@ const BtnSupply = ({ dataToken, amount, pending }) => {
             setIsPending(true);
 
             if (dataToken.assetsChain === "VET") {
-                await dispatch(actions.supplyDepositETHMarket(dataToken, amount)).then(() => {
+                await dispatch(actions.supplyDepositVETMarket(dataToken, amount)).then(() => {
                     setIsPending(false);
                 }).catch((e) => {
                     setIsPending(false);
@@ -37,7 +37,7 @@ const BtnSupply = ({ dataToken, amount, pending }) => {
     return (<>
 
         {/* {isPending ? <Beforeunload onBeforeunload={(event) => event.preventDefault()} /> : ""} */}
-        <button onClick={e => { handlerSubmit(e) }} disabled={pending} className={`btn-modal-veb ${pending ? "bg-btn-veb-disabled hidden" : "bg-btn-veb"}`} type="submit">
+        <button onClick={e => { handlerSubmit(e) }} disabled={pending} className={`btn-modal-veb fade-in-box ${pending ? "bg-btn-veb-disabled hidden" : "bg-btn-veb"}`} type="submit">
             {isPending ? "Pending..." : "Supply"}
         </button>
 

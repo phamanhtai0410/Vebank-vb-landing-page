@@ -1,22 +1,44 @@
-import { ethers } from "ethers";
+/* eslint-disable no-extend-native */
 import PartialConstants from "../constants/partial.constants";
 import { v4 as uuidv4 } from "uuid";
-import { address } from "thor-devkit";
 
 var CryptoJS = require("crypto-js");
 
-export function numberWithCommas(x) {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+export function formatLocaleString(x, digits, isFixed) {
+  if (isFixed) {
+    x = x.toFixed(digits);
+  }
+  return x.toLocaleString("en-IN", {
+    currency: "USD",
+    maximumSignificantDigits: digits || 10,
+  });
 }
+export function formatBalanceString(x) {
+  return x.toLocaleString();
+}
+
+export function numberWithCommas(num) {
+  num = num.toLocaleString("en-IN", { maximumSignificantDigits: 10 });
+  let x = num.toString().split(".");
+  x[0] = x[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return x.join(".");
+}
+
+String.prototype.isMatch = function (pattern) {
+  return pattern.test(this);
+};
+/**
+ * This function is used to compare ignore cases of string.
+ * @param {otherString} otherString is the string that need to be compared with this string
+ * @returns true if the string is equal, false if it's not.
+ */
+String.prototype.equals = function (otherString) {
+  return this.toLowerCase() === otherString?.toString().toLowerCase();
+};
 
 export const getDeadline = () => Math.round(new Date().getTime() / 1000) + 3600;
 
 export const getTimeStamp = () => new Date().getTime().toString();
-
-export function formatNumberEther(amount) {
-  const amountN = Number(ethers.utils.formatEther(amount, { commify: true }));
-  return numberWithCommas(Math.round(amountN * 100) / 100);
-}
 
 export function formatUriSecure(url) {
   const currentDate = new Date();
@@ -37,7 +59,7 @@ export function formatUriSecure(url) {
   return url + `?st=${secure_link}&e=${expireTime}`;
 }
 
-export function nFormatter(num, digits) {
+export function nFormatter(num, digits = 8) {
   var si = [
     { value: 1, symbol: "" },
     { value: 1e3, symbol: "k" },
@@ -60,8 +82,14 @@ export function nFormatter(num, digits) {
 export const isContainVET = (...ags) =>
   [...ags].includes(process.env.REACT_APP_TOKEN_WVET);
 
+/**
+ * Get the decimal number of the given asset tokens
+ * @param {assetsAddress} assetsAddress is the address of the asset that we need to get the decimal value from
+ * @returns the corresponding decimal value of the asset that
+ */
 export const getDecimalForAsset = (assetsAddress) =>
-  assetsAddress === process.env.REACT_APP_TOKEN_VEUSD
+  assetsAddress.toLocaleUpperCase() ===
+  process.env.REACT_APP_TOKEN_VEUSD.toLocaleUpperCase()
     ? PartialConstants.VEUSD_DECIMAL
     : PartialConstants.DEFAULT_ASSET_DECIMAL;
 
@@ -82,7 +110,8 @@ export const getWeiUnitByDecimal = (decimal) => {
 
 export const getAmountInWeiFormatted = (web3, amount, decimalNumber) => {
   if (!web3) throw new Error("Web3 is required");
-  else if (!amount || amount === 0 || amount === 0.0) throw new Error("Amount is required");
+  else if (!amount || amount === 0 || amount === 0.0)
+    throw new Error("Amount is required");
   else if (!decimalNumber) throw new Error("DecimalNumber is required");
 
   if (decimalNumber < PartialConstants.DEFAULT_ASSET_DECIMAL)
@@ -118,4 +147,19 @@ export const addressWalletCompact = (address) => {
     address.length - 4,
     address.length
   )}`;
+};
+export const compareString = (a, b) => {
+  return a?.toString().toLowerCase() === b?.toString().toLowerCase();
+};
+
+export const checkCharacterZero = (string) => {
+  const stringArr = string.split("");
+  for (let i = 0; i < stringArr.length; i++) {
+    if (stringArr[i] !== "0") {
+      if (stringArr[i] !== ".") {
+        return false;
+      }
+    }
+  }
+  return true;
 };

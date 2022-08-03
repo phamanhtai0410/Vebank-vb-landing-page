@@ -1,16 +1,16 @@
 import React from "react";
+import { useSelector } from "react-redux";
+import Swap from "../components/swap/Swap";
+import ModalSelectToken from "../components/swap/ModalSelectToken";
+import { selectOpenChooseTokenState } from "../reducers/swap.reducer";
 // import TradeChart from "../components/trade/TradeChart";
 // import IcVeBank from "../assets/images/ic_vebank.svg";
 // import IcVThor from "../assets/images/ic_vtho.svg";
 // import IcVeUSD from "../assets/images/ic_veusd.svg";
 // import IcVeChain from "../assets/images/ic_vechain.svg";
 // import Wallet from "../components/swap/Wallet";
-import Swap from "../components/swap/Swap";
-import TrendingPairs from "../components/swap/TrendingPairs";
-import PoolChart from "../components/swap/PoolChart";
-import ModalSelectToken from "../components/swap/ModalSelectToken";
-import { useSelector } from "react-redux";
-import { selectOpenChooseTokenState } from "../reducers/swap.reducer";
+// import TrendingPairs from "../components/swap/TrendingPairs";
+// import PoolChart from "../components/swap/PoolChart";
 
 // const COIN_TYPES = [
 //   {
@@ -52,11 +52,11 @@ const SwapPage = () => {
 
   return (
     <section className="box-borrows mx-auto bg-cover bg-center">
-      <div className="w-full h-full pb-9 min-h-screen flex items-center justify-center bg-content -z-50">
+      <div className="w-full h-full pb-9 min-h-screen overflow-hidden flex flex-col items-center bg-content -z-50 xl:pt-[10vh] 2xl:pt-[15vh] pt-[3vh]">
         <div
           className={`${
             isSelectTokenModalOpen ? "hidden" : "flex"
-          } flex flex-row p-2 space-x-6`}
+          } flex flex-row p-4 space-x-6 sm:mx-0 mx-1`}
         >
           {/* <div className="flex flex-col">
             <div className="rounded-2xl border border-vbLine bg-popupVb p-8 w-full md:w-[308px] h-[172px]">
@@ -67,7 +67,7 @@ const SwapPage = () => {
             </div>
           </div> */}
 
-          <div className="rounded-2xl border border-vbLine bg-newForm h-full p-8 w-full md:w-[568px]">
+          <div className="rounded-2xl border border-vbLine bg-newForm h-full p-8 w-full md:w-[490px] xl:w-[530px]">
             <Swap />
           </div>
           {/* <div className="rounded-2xl border border-vbLine bg-popupVb p-8 w-full md:w-[370px] h-[266px]">

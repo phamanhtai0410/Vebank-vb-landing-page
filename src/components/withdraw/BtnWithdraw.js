@@ -15,7 +15,9 @@ const BtnWithdraw = ({ dataToken, amount, pending }) => {
     const handlerSubmit = async () => {
 
         if (isPending === false && dataToken && amount) {
+
             setIsPending(true);
+            console.log("BtnWithdraw dataToken",dataToken,amount);
 
             if (dataToken.assetsChain === "VET") {
                 await dispatch(actions.withdrawETHMarket(dataToken, amount)).then(() => {
@@ -40,7 +42,7 @@ const BtnWithdraw = ({ dataToken, amount, pending }) => {
     return (<>
 
         {/* {isPending ? <Beforeunload onBeforeunload={(event) => event.preventDefault()} /> : ""} */}
-        <button onClick={e => { handlerSubmit(e) }} disabled={pending} className={`btn-modal-veb ${pending ? "bg-btn-veb-disabled hidden" : "bg-btn-veb"}`} type="submit">
+        <button onClick={e => { handlerSubmit(e) }} disabled={pending} className={`btn-modal-veb fade-in-box ${pending ? "bg-btn-veb-disabled hidden" : "bg-btn-veb"}`} type="submit">
             {isPending ? "Pending..." : "Withdraw"}
         </button>
 

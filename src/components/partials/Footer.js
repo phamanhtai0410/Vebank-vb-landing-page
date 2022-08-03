@@ -46,7 +46,26 @@ const Footer = () => {
     }
   ]
 
-  const [showMore, setShowMore] = useState(false);
+  const [showMoreValue, setShowMore] = useState("");
+  const showSocialDetai = (title) => {
+    if (title === showMoreValue) {
+      setShowMore("");
+    }
+    else {
+      setShowMore(title);
+    }
+  }
+  
+  window.addEventListener('mouseup', function(event){
+    const ignoreMe = document.getElementById("show-more");
+    if (event.target !== ignoreMe && event.target.parentNode !== ignoreMe){
+      setShowMore("");
+      // if (event.target.href !== undefined && event.target.href !== "null" && event.target.href !== "") {
+      //   window.open( event.target.href)
+      // }
+    }
+  });
+
   return (
 
     <footer>
@@ -73,6 +92,7 @@ const Footer = () => {
               <div className="flex flex-col space-y-4 mt-6">
                 {products.map((item, index) => (
                   <Link
+                    key={index}
                     to={item.path}
                     className="text-sm text-[#D9D9D9]"
                   >
@@ -117,7 +137,7 @@ const Footer = () => {
               <span className="font-poppins_semi_bold text-lg text-[#39C5F1]">COMMUNITY</span>
               <div className="flex flex-col space-y-4 mt-6">
                 {communities.map((item, index) => (
-                  <div className="relative flex flex-row items-center space-x-3 cursor-pointer" onClick={() => setShowMore(!showMore)}>
+                  <div key={index} id="show-more" className="relative flex flex-row items-center space-x-3 cursor-pointer" onClick={() => showSocialDetai(item.title)}>
                     <img src={item.icon} alt={item.title} />
                     {item?.link ? 
                     <a
@@ -134,7 +154,7 @@ const Footer = () => {
                     {item?.details &&
                     <div>
                       <img src={footer.IcArrowBot} alt={item.title} />
-                      {showMore && <div className="absolute flex flex-col divide-y-[1px] divide-[#000324] bg-[#0E1B31] rounded-lg px-4 py-2 top-10 lg:top-8 right-0 z-10">
+                      {showMoreValue === item.title && <div className="absolute flex flex-col divide-y-[1px] divide-[#000324] bg-[#0E1B31] rounded-lg px-4 py-2 top-10 lg:top-8 right-0 z-10">
                         {item.details.map((item, index) => (
                           <div className="py-2 pr-4 flex flex-row">
                             <img src={footer.IcTelegram} alt={item.title} className="w-4 h-4" />
@@ -161,7 +181,7 @@ const Footer = () => {
           <div className="relative flex md:hidden flex-col mt-12 w-1/2">
               <div className="flex flex-row w-full justify-between">
                 {communities.map((item, index) => (
-                  <div className="relative flex flex-row items-center space-x-3 cursor-pointer" onClick={() => setShowMore(!showMore)}>
+                  <div className="relative flex flex-row items-center space-x-3 cursor-pointer" onClick={() => showSocialDetai(item.title)}>
                    <a
                       key={index}
                       href={item.link}
@@ -172,7 +192,7 @@ const Footer = () => {
                       <img src={item.icon} alt={item.title} />
                     </a>
                     
-                    {item?.details && showMore &&
+                    {item?.details && showMoreValue === item.title &&
                       <div className="absolute flex flex-col divide-y-[1px] divide-[#000324] bg-[#0E1B31] rounded-lg px-4 py-2 bottom-[-1px] left-8 z-10">
                         {item.details.map((item, index) => (
                           <div key={index} className="py-2 pr-4 flex flex-row w-full items-center">

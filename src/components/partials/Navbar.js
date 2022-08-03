@@ -21,7 +21,7 @@ const Navbar = () => {
 
             <div className="flex flex-row items-center justify-center space-x-8">
 
-                <div className="py-4">
+                <div className="py-4 lg:w-[120px] xl:w-[136px]">
                     <NavLink to="/home">
                         <img src={IcLogo} alt="logo VEBank" />
                     </NavLink>

@@ -9,8 +9,11 @@ import {
 import { poolConstants } from "../constants";
 import { selectAssetByAddress } from "./assetsMarket.reducer";
 
+import {compareString} from '../utils/lib';
+
 const initialState = {
   isSelectTokenModalOpen: false,
+  isRemoveLiquidModalOpen: false,
   pending: false,
 
   transaction: null,
@@ -138,6 +141,32 @@ export function liquidReducer(state = initialState, action) {
       return newState;
     }
 
+    case poolConstants.MODAL_DEFAULT_FIRST_TOKEN: {
+      const newState = {
+        ...state,
+        isSelectTokenModalOpen: false,
+        tokenSelecting: "",
+        errorCode: null,
+        message: null,
+      };
+      const newToken = action.payload;
+      newState.firstToken = newToken;
+      return newState;
+    }
+
+    case poolConstants.MODAL_DEFAULT_SECOND_TOKEN: {
+      const newState = {
+        ...state,
+        isSelectTokenModalOpen: false,
+        tokenSelecting: "",
+        errorCode: null,
+        message: null,
+      };
+      const newToken = action.payload;
+      newState.secondToken = newToken;
+      return newState;
+    }
+
     case poolConstants.MODAL_CLOSE_SELECT_TOKEN:
       return {
         ...state,
@@ -148,6 +177,19 @@ export function liquidReducer(state = initialState, action) {
         data: {},
         message: null,
       };
+
+      case poolConstants.MODAL_OPEN_REMOVE_LIQUIDITY:
+        return {
+          ...state,
+          isRemoveLiquidModalOpen: true,
+          poolAddress: action.poolAddress
+        };
+
+      case poolConstants.MODAL_CLOSE_REMOVE_LIQUIDITY:
+        return {
+          ...state,
+          isRemoveLiquidModalOpen: false
+        };
 
     case loadDetailAddLiquidity.pending.type: {
       return {
@@ -170,22 +212,15 @@ export function liquidReducer(state = initialState, action) {
       };
     }
 
-    case approveFirstTokenAddLiquidity.pending.type: {
-      return {
-        ...state,
-        isApproving: true,
-      };
-    }
-
     case poolConstants.APPROVE_TOKEN: {
       const data = action.payload;
-      if (state.firstToken === data?.assetAddress) {
+      if (  compareString(state.firstToken,data?.assetAddress )) {
         return {
           ...state,
           approveTokenA: state.approveTokenA + data?.approveAmount || 0,
           isApproving: false,
         };
-      } else if (state.secondToken === data?.assetAddress) {
+      } else if (compareString(state.secondToken ,data?.assetAddress)) {
         return {
           ...state,
           approveTokenB: state.approveTokenB + data?.approveAmount || 0,
@@ -194,19 +229,28 @@ export function liquidReducer(state = initialState, action) {
       }
       return state;
     }
-    // case approveFirstTokenAddLiquidity.fulfilled.type: {
-    //   return {
-    //     ...state,
-    //     // isApproving: false,
-    //     approveTokenA: action.payload.approveTokenA,
-    //   };
-    // }
+
+    // APPROVE_TOKEN 1
+    case approveFirstTokenAddLiquidity.pending.type: {
+      return {
+        ...state,
+        isApproving: true,
+      };
+    }
+    case approveFirstTokenAddLiquidity.fulfilled.type: {
+      return {
+        ...state,
+        isApproving: false,
+        approveTokenA: action.payload.approveTokenA,
+      };
+    }
     case approveFirstTokenAddLiquidity.rejected.type: {
       return {
         ...state,
         isApproving: false,
       };
     }
+
     case approveSecondTokenAddLiquidity.pending.type: {
       return {
         ...state,
@@ -288,6 +332,8 @@ export const selectOpenAddLiquidState = (state) =>
   state.liquidReducer.isAddLiquidModalOpen;
 export const selectOpenRemoveLiquidState = (state) =>
   state.liquidReducer.isRemoveLiquidModalOpen;
+export const selectPoolAddressToRemove = (state) =>
+  state.liquidReducer.poolAddress;
 export const selectFirstTokenExchangeRate = (state) =>
   state.liquidReducer.abExchangeRate;
 export const selectSecondTokenExchangeRate = (state) =>

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { useSelector, shallowEqual } from "react-redux";
+import { useSelector } from "react-redux";
 
 import IcVB from "../../assets/images/ic_vebank.svg";
 import { selectBalanceById } from "../../reducers/accountBalance.reducer";
+import { formatBalanceString } from "../../utils/lib";
 
 // import { numberWithCommas } from "../../utils/lib";
 
@@ -19,9 +20,9 @@ const BalanceVB = () => {
 
   return (
     <div className="flex flex-row justify-start items-center space-x-2">
-      <img className="w-6 h-6" src={IcVB} alt="Coin VeBank" />
+      <img className="w-4 h-4" src={IcVB} alt="Coin VeBank" />
       <span className="font-poppins font-medium text-slate-50 text-base">
-        {balanceAccount ? balanceAccount : `${0}`}
+        {balanceAccount ? formatBalanceString(balanceAccount) : `${0}`}
       </span>
     </div>
   );

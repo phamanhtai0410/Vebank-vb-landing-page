@@ -7,7 +7,7 @@ import * as actions from '../../actions';
 import { marketplaceConstants } from '../../constants';
 import { useNavigate } from 'react-router-dom';
 
-const BtnOpenAddLiquidity = ({ item }) => {
+const BtnOpenAddLiquidity = ({ assetsPoolAddress }) => {
 
 
     const btnLabel = "Add Liquidity";
@@ -28,7 +28,7 @@ const BtnOpenAddLiquidity = ({ item }) => {
 
     const handlerOpenModal = async () => {
         // if (item && item.assetsAddress && disabledRule === false) {
-            navigate(`/liquidity/add/${item?.assetsPoolAddress}`);
+            navigate(`/liquidity/add/${assetsPoolAddress}`);
         // }
     }
 

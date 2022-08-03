@@ -13,7 +13,6 @@ const BtnOpenSupply = ({ item }) => {
     const dispatch = useDispatch();
 
     const handlerOpenModal = async () => {
-
         if (item && item.assetsAddress) {
             dispatch(actions.loadModalSupply(item))
         }

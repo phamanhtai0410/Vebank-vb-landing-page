@@ -8,7 +8,7 @@ import IcVtho from "../assets/images/ic_vtho.svg";
 function getListKeyAssets(dataList){
   let keys = [];
   for (const i of dataList) {
-    keys[i.assetsAddress] = i;
+    keys[i.assetsAddress.toLowerCase()] = i;
   }
   return keys;
 }
@@ -82,8 +82,9 @@ const initialState = {
     process.env.REACT_APP_TOKEN_VTHO,
     process.env.REACT_APP_TOKEN_VEBANK,
   ],
+  listAsset:listAsset,
   assetEntities: getListKeyAssets(listAsset),
-  data: listAsset || [],
+  data: [],
 };
 
 export function assetsMarketReducer(state = initialState, payload) {
@@ -118,10 +119,10 @@ export function assetsMarketReducer(state = initialState, payload) {
   }
 }
 
-export const selectListAssets = (state) => state.assetsMarketReducer.data;
+export const selectListAssets = (state) => state.assetsMarketReducer.listAsset;
 export const selectAssetByAddress = (state, address) => {
   if (address) {
-    return state.assetsMarketReducer.assetEntities[address];
+    return state.assetsMarketReducer.assetEntities[address.toLowerCase()];
   }
   return null;
 };

@@ -13,7 +13,7 @@ import IcQuestionCircle from "../../../assets/images/buttons/ic_question_outline
 import Asset from "./Asset";
 import useAddLiquidFacade from "./hook";
 import GradientStrokeWrapper from "../../partials/GradientStrokeWrapper";
-import { PartialConstants } from "../../../constants/partial.constants";
+import PartialConstants from "../../../constants/partial.constants";
 
 import BtnLiquidityApproveA from "./BtnLiquidityApproveA";
 import BtnLiquidityApproveB from "./BtnLiquidityApproveB";
@@ -87,12 +87,12 @@ const FrmAddLiquidity = () => {
   // }, [firstTokenVolume?.current?.value, secondTokenVolume?.current?.value])
 
   return (
-    <div className="w-[500px] rounded-2xl p-10 bg-[#182233] mx-auto relative z-50">
+    <div className="w-[500px] rounded-2xl p-10 bg-[#182233] mx-auto relative z-0">
       {/*Header*/}
       <GradientStrokeWrapper borderRadius="1rem" className="-z-10" />
       {step !== 1 && step !== 4 ? (
         <div className="flex flex-row flex-1 items-center justify-between">
-          <p className="font-poppins_medium text-white text-3xl">
+          <p className="font-poppins_bold text-white text-lg">
             You will receive
           </p>
           <img
@@ -138,13 +138,13 @@ const FrmAddLiquidity = () => {
             <img
               src={IcSettingWhite}
               alt="Setting"
-              className="w-8 h-8 cursor-pointer"
+              className="w-7 h-7 cursor-pointer"
               // onClick={closeModal}
             />
             <img
               src={IcHistoryWhite}
               alt="History"
-              className="w-8 h-8 cursor-pointer"
+              className="w-7 h-7 cursor-pointer"
               // onClick={closeModal}
             />
           </div>
@@ -167,7 +167,7 @@ const FrmAddLiquidity = () => {
           <img
             src={IcPlusGradient}
             alt="Add"
-            className="w-8 h-8 mt-4 self-center"
+            className="w-7 h-7 mt-4 self-center"
           />
           <Asset
             assetAddress={secondToken}
@@ -188,13 +188,19 @@ const FrmAddLiquidity = () => {
               <div className="flex flex-1 flex-row justify-between items-center mt-4 px-2 py-5 liquid-wrapper">
                 <div className="price-pool-item">
                   <p className="value">
-                    {nFormatter(firstPerSecondTokenExchangeRate, 6)}
+                    {nFormatter(
+                      firstPerSecondTokenExchangeRate,
+                      PartialConstants.DEFAULT_FORMAT_FLOATING_NUMBER
+                    )}
                   </p>
                   <p className="label">{`${secondTokenInfo?.assetsChain} per ${firstTokenInfo?.assetsChain}`}</p>
                 </div>
                 <div className="price-pool-item">
                   <p className="value">
-                    {nFormatter(secondPerFirstTokenExchangeRate, 6)}
+                    {nFormatter(
+                      secondPerFirstTokenExchangeRate,
+                      PartialConstants.DEFAULT_FORMAT_FLOATING_NUMBER
+                    )}
                   </p>
                   <p className="label">{`${firstTokenInfo?.assetsChain} per ${secondTokenInfo?.assetsChain}`}</p>
                 </div>
@@ -213,52 +219,94 @@ const FrmAddLiquidity = () => {
 
         {/* STEP 2 */}
         <div className={`${step === 2 ? "" : "hidden"} flex flex-col`}>
-          <div className="flex flex-col space-y-6">
+          <div className="flex flex-col space-y-4">
             <div className="flex flex-row items-center">
-              <p className=" text-4xl font-poppins_medium mr-8">
-                {liquidityEstimated}
+              <p className=" text-2xl font-poppins_medium mr-8">
+                {/*Minh said only PartialConstants.DEFAULT_FORMAT_FLOATING_NUMBER fractional digit*/}
+                {nFormatter(
+                  liquidityEstimated,
+                  15
+                )}
               </p>
               <div className="flex flex-row space-x-3">
-                <img src={firstTokenInfo?.icon} alt="" className="w-8 h-8" />
-                <img src={secondTokenInfo?.icon} alt="" className="w-8 h-8" />
+                <img src={firstTokenInfo?.icon} alt="" className="w-6 h-6" />
+                <img src={secondTokenInfo?.icon} alt="" className="w-6 h-6" />
               </div>
             </div>
-            <p className="text-xl">{`${firstTokenInfo?.assetsChain}/${secondTokenInfo?.assetsChain} Pool Tokens`}</p>
-            <p className="text-base text-justify font-poppins_light">
+            <p className="font-poppins_medium text-base">{`${firstTokenInfo?.assetsChain}/${secondTokenInfo?.assetsChain} Pool Tokens`}</p>
+            <p className="text-sm text-justify font-poppins_light text-[#7694DE]">
               Output is estimated. If the price changes by more than 0.5%, your
               transaction will be reverted.
             </p>
           </div>
-          <p className="mt-8 font-poppins text-xl">Price and pool share</p>
-          <div className="flex flex-col mt-4 px-4 py-6 space-y-[1.75rem] liquid-wrapper">
+          <p className="mt-8 font-poppins_bold text-base">Price and pool share</p>
+          <div className="flex flex-col mt-4 px-4 py-6 space-y-4 liquid-wrapper">
             <div className="price-pool-share-row">
               <p className="font-poppins_light">{`${firstTokenInfo?.assetsChain} Deposited`}</p>
               <div className="flex flex-row items-center space-x-4">
-                <img src={firstTokenInfo?.icon} alt="" className="w-8 h-8" />
-                <span className="font-poppins_semi_bold text-2xl">
-                  {firstTokenVolume > 1 ? numberWithCommas(firstTokenVolume) : firstTokenVolume}
+                <img src={firstTokenInfo?.icon} alt="" className="w-6 h-6" />
+                <span className="font-poppins_semi_bold text-base">
+                  {firstTokenVolume > 1
+                    ? numberWithCommas(
+                        nFormatter(
+                          firstTokenVolume,
+                          PartialConstants.DEFAULT_FORMAT_FLOATING_NUMBER
+                        )
+                      )
+                    : nFormatter(
+                        firstTokenVolume,
+                        PartialConstants.DEFAULT_FORMAT_FLOATING_NUMBER
+                      )}
                 </span>
               </div>
             </div>
             <div className="price-pool-share-row">
               <p className="font-poppins_light">{`${secondTokenInfo?.assetsChain} Deposited`}</p>
               <div className="flex flex-row items-center space-x-4">
-                <img src={secondTokenInfo?.icon} alt="" className="w-8 h-8" />
-                <span className="font-poppins_semi_bold text-2xl">
-                  {secondTokenVolume > 1 ? numberWithCommas(secondTokenVolume) : secondTokenVolume}
+                <img src={secondTokenInfo?.icon} alt="" className="w-6 h-6" />
+                <span className="font-poppins_semi_bold text-base">
+                  {secondTokenVolume > 1
+                    ? numberWithCommas(
+                        nFormatter(
+                          secondTokenVolume,
+                          PartialConstants.DEFAULT_FORMAT_FLOATING_NUMBER
+                        )
+                      )
+                    : nFormatter(
+                        secondTokenVolume,
+                        PartialConstants.DEFAULT_FORMAT_FLOATING_NUMBER
+                      )}
                 </span>
               </div>
             </div>
             <div className="price-pool-share-row items-start">
               <p className="self-start font-poppins_light">Rates</p>
               <div className="flex flex-col justify-end">
-                <p className="text-right">{`1 ${firstTokenInfo?.assetsChain} = ${firstPerSecondTokenExchangeRate} ${secondTokenInfo?.assetsChain}`}</p>
-                <p className="text-right">{`1 ${secondTokenInfo?.assetsChain} = ${secondPerFirstTokenExchangeRate} ${firstTokenInfo?.assetsChain}`}</p>
+                <p className="text-right">{`1 ${
+                  firstTokenInfo?.assetsChain
+                } = ${nFormatter(
+                  firstPerSecondTokenExchangeRate,
+                  PartialConstants.DEFAULT_FORMAT_FLOATING_NUMBER
+                )} ${secondTokenInfo?.assetsChain}`}</p>
+                <p className="text-right">{`1 ${
+                  secondTokenInfo?.assetsChain
+                } = ${nFormatter(
+                  secondPerFirstTokenExchangeRate,
+                  PartialConstants.DEFAULT_FORMAT_FLOATING_NUMBER
+                )} ${firstTokenInfo?.assetsChain}`}</p>
               </div>
             </div>
             <div className="price-pool-share-row">
               <p>Share a Pool</p>
-              <p>{shareAPool < 0.01 ? "<0,01" : nFormatter(shareAPool, 8)}%</p>
+              <p>
+                {shareAPool < 0.01
+                  ? "<0,01"
+                  : nFormatter(
+                      shareAPool,
+                      PartialConstants.DEFAULT_FORMAT_FLOATING_NUMBER
+                    )}
+                %
+              </p>
             </div>
           </div>
         </div>
